@@ -31,9 +31,29 @@ using namespace search;
 
 node_deque planner::search(const planning_task &task, const strategy strategy, const daedalus::tester::printer_ptr &printer) {
     std::cout << "==================================================" << std::endl;
-    std::cout << "Starting search in domain: " << task.get_domain_name();
-    std::cout << " (Problem ID: " << task.get_problem_id() << ")." << std::endl;
-    std::cout << "Current goal: " << task.get_goal()->to_string(task.get_language(), false) << std::endl;
+    std::cout << "                     DAEDALUS                     " << std::endl;
+    std::cout << "==================================================" << std::endl << std::endl;
+
+    std::cout << "------------------ CURRENT TASK ------------------" << std::endl;
+    std::cout << " - DOMAIN:  " << task.get_domain_name() << std::endl;
+    std::cout << " - PROBLEM: " << task.get_problem_id() << std::endl;
+    std::cout << " - GOAL:    " << task.get_goal()->to_string(task.get_language(), false) << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl << std::endl;
+
+    std::cout << "----------------- CONFIGURATION ------------------" << std::endl;
+
+    switch (strategy) {
+        case strategy::unbounded_search:
+            std::cout << " - STRATEGY: Unbounded Search" << std::endl;
+            break;
+        case strategy::iterative_bounded_search:
+            std::cout << " - STRATEGY: Iterative Bounded Search" << std::endl;
+            break;
+    }
+
+    std::cout << " - SEMANTICS: Kripke" << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl << std::endl;
+    std::cout << "-------------------- SOLVING ---------------------" << std::endl;
 
     node_deque path;
     auto start = std::chrono::steady_clock::now();
@@ -49,14 +69,13 @@ node_deque planner::search(const planning_task &task, const strategy strategy, c
 
     auto end = std::chrono::steady_clock::now();
     auto delta = since(start).count();
-    std::cout << "Plan found in " << (delta / 1000) << "." << (delta % 1000) << "s." << std::endl << std::endl;
+    std::cout << "Plan found in " << (delta / 1000) << "." << (delta % 1000) << "s." << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl << std::endl;
 
     return path;
 }
 
 node_deque planner::unbounded_search(const planning_task &task, const daedalus::tester::printer_ptr &printer) {
-    std::cout << "Using strategy: Unbounded Search" << std::endl;
-    std::cout << "==================================================" << std::endl << std::endl;
     node_deque previous_iter_frontier = {};
     unsigned long long id = 0;
 
@@ -64,8 +83,6 @@ node_deque planner::unbounded_search(const planning_task &task, const daedalus::
 }
 
 node_deque planner::iterative_bounded_search(const planning_task &task, const daedalus::tester::printer_ptr &printer) {
-    std::cout << "Using strategy: Iterative Bounded Search" << std::endl;
-    std::cout << "==================================================" << std::endl << std::endl;
     unsigned long b = task.get_goal()->get_modal_depth();
     node_deque previous_iter_frontier;
     unsigned long long id = 0;

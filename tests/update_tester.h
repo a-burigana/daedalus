@@ -1,5 +1,5 @@
 //
-// BEP - Bounded Epistemic Planner (MIT License)
+// DAEDALUS - DynAmic Epistemic and DoxAstic Logic Universal Solver (MIT License)
 //
 // Copyright (c) 2023-2024 Alessandro Burigana
 //
@@ -26,7 +26,7 @@
 
 #include "../include/del/states/state.h"
 
-namespace bep::tester {
+namespace daedalus::tester {
     class update_tester {
     public:
         static del::state test_CB_1(const std::string &out_path, bool print = true);

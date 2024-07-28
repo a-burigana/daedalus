@@ -1,5 +1,5 @@
 //
-// BEP - Bounded Epistemic Planner (MIT License)
+// DAEDALUS - DynAmic Epistemic and DoxAstic Logic Universal Solver (MIT License)
 //
 // Copyright (c) 2023-2024 Alessandro Burigana
 //
@@ -32,7 +32,7 @@
 #include "../include/search/strategies.h"
 //#include "../include/search/planner.h"
 
-namespace bep::tester {
+namespace daedalus::tester {
     class printer;
     using printer_ptr = std::unique_ptr<printer>;
 

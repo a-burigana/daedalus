@@ -1,5 +1,5 @@
 //
-// BEP - Bounded Epistemic Planner (MIT License)
+// DAEDALUS - DynAmic Epistemic and DoxAstic Logic Universal Solver (MIT License)
 //
 // Copyright (c) 2023-2024 Alessandro Burigana
 //
@@ -39,7 +39,7 @@
 #include <string>
 #include <thread>
 
-using namespace bep::tester;
+using namespace daedalus::tester;
 using namespace std::chrono_literals;
 
 printer::printer(bool out_to_file, const std::string &path, const std::string &name) :
@@ -135,7 +135,7 @@ void printer::print_results(const search::planning_task &task, search::strategy 
             state_name += "_" + node->get_action()->get_name();
 
         if (not out_path.empty())
-            bep::tester::printer::print_state(*node->get_state(), out_task_path + strategy_str, state_name);
+            daedalus::tester::printer::print_state(*node->get_state(), out_task_path + strategy_str, state_name);
     }
 }
 

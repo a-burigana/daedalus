@@ -1,5 +1,5 @@
 //
-// BEP - Bounded Epistemic Planner (MIT License)
+// DAEDALUS - DynAmic Epistemic and DoxAstic Logic Universal Solver (MIT License)
 //
 // Copyright (c) 2023-2024 Alessandro Burigana
 //
@@ -30,7 +30,7 @@
 #include "../../../include/del/language/language.h"
 #include "../../../include/search/planning_task.h"
 
-namespace bep::tester {
+namespace daedalus::tester {
     class collaboration_communication {
     public:
         static std::string get_name();

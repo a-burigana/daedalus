@@ -1,5 +1,5 @@
 //
-// BEP - Bounded Epistemic Planner (MIT License)
+// DAEDALUS - DynAmic Epistemic and DoxAstic Logic Universal Solver (MIT License)
 //
 // Copyright (c) 2023-2024 Alessandro Burigana
 //
@@ -31,7 +31,7 @@
 #include "builder/domains/coin_in_the_box.h"
 #include <memory>
 
-using namespace bep::tester;
+using namespace daedalus::tester;
 
 void formula_tester::test_CB_1() {
     const del::state s = coin_in_the_box::build_initial_state();

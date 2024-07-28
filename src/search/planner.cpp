@@ -1,5 +1,5 @@
 //
-// BEP - Bounded Epistemic Planner (MIT License)
+// DAEDALUS - DynAmic Epistemic and DoxAstic Logic Universal Solver (MIT License)
 //
 // Copyright (c) 2023-2024 Alessandro Burigana
 //
@@ -29,7 +29,7 @@
 
 using namespace search;
 
-node_deque planner::search(const planning_task &task, const strategy strategy, const bep::tester::printer_ptr &printer) {
+node_deque planner::search(const planning_task &task, const strategy strategy, const daedalus::tester::printer_ptr &printer) {
     std::cout << "==================================================" << std::endl;
     std::cout << "Starting search in domain: " << task.get_domain_name();
     std::cout << " (Problem ID: " << task.get_problem_id() << ")." << std::endl;
@@ -54,7 +54,7 @@ node_deque planner::search(const planning_task &task, const strategy strategy, c
     return path;
 }
 
-node_deque planner::unbounded_search(const planning_task &task, const bep::tester::printer_ptr &printer) {
+node_deque planner::unbounded_search(const planning_task &task, const daedalus::tester::printer_ptr &printer) {
     std::cout << "Using strategy: Unbounded Search" << std::endl;
     std::cout << "==================================================" << std::endl << std::endl;
     node_deque previous_iter_frontier = {};
@@ -63,7 +63,7 @@ node_deque planner::unbounded_search(const planning_task &task, const bep::teste
     return bfs(task, strategy::unbounded_search, previous_iter_frontier, 0, id, printer);
 }
 
-node_deque planner::iterative_bounded_search(const planning_task &task, const bep::tester::printer_ptr &printer) {
+node_deque planner::iterative_bounded_search(const planning_task &task, const daedalus::tester::printer_ptr &printer) {
     std::cout << "Using strategy: Iterative Bounded Search" << std::endl;
     std::cout << "==================================================" << std::endl << std::endl;
     unsigned long b = task.get_goal()->get_modal_depth();
@@ -80,12 +80,12 @@ node_deque planner::iterative_bounded_search(const planning_task &task, const be
 }
 
 node_deque planner::bounded_search(const planning_task &task, node_deque &previous_iter_frontier, const unsigned long b,
-                                   unsigned long long &id, const bep::tester::printer_ptr &printer) {
+                                   unsigned long long &id, const daedalus::tester::printer_ptr &printer) {
     return bfs(task, strategy::iterative_bounded_search, previous_iter_frontier, b, id, printer);
 }
 
 node_deque planner::bfs(const planning_task &task, const strategy strategy, node_deque &previous_iter_frontier,
-                        const unsigned long b, unsigned long long &id, const bep::tester::printer_ptr &printer) {
+                        const unsigned long b, unsigned long long &id, const daedalus::tester::printer_ptr &printer) {
     del::state_ptr s0 = task.get_initial_state();
     node_deque frontier = init_frontier(s0, strategy, b, previous_iter_frontier);
     unsigned long goal_depth = task.get_goal()->get_modal_depth();
@@ -145,7 +145,7 @@ node_deque planner::init_frontier(del::state_ptr &s0, const strategy strategy, c
 
 node_deque planner::expand_node(const planning_task &task, const strategy strategy, node_ptr &n,
                                 const del::action_deque &actions, node_deque &frontier, const unsigned long goal_depth,
-                                unsigned long long &id, const bep::tester::printer_ptr &printer) {
+                                unsigned long long &id, const daedalus::tester::printer_ptr &printer) {
     del::action_deque to_apply_actions;
     bool is_dead_node = true;
 
@@ -249,17 +249,17 @@ node_ptr planner::init_node(const strategy strategy, const del::state_ptr &s, co
 
 
 // Print utilities
-void planner::print_max_tree_depth(const bep::tester::printer_ptr &printer, unsigned long long max_tree_depth) {
+void planner::print_max_tree_depth(const daedalus::tester::printer_ptr &printer, unsigned long long max_tree_depth) {
     printer->out() << "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*" << std::endl;
     printer->out() << "                                      Search Tree Depth: " << max_tree_depth << "                                           " << std::endl;
     printer->out() << "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*" << std::endl;
 }
 
-void planner::print_node_id(const bep::tester::printer_ptr &printer, const search::node_ptr &n) {
+void planner::print_node_id(const daedalus::tester::printer_ptr &printer, const search::node_ptr &n) {
     printer->out() << "(" << n->get_tree_depth() << ", " << n->get_id() << ")";
 }
 
-void planner::print_begin_expanding_node(const bep::tester::printer_ptr &printer, const node_ptr &n, const strategy strategy) {
+void planner::print_begin_expanding_node(const daedalus::tester::printer_ptr &printer, const node_ptr &n, const strategy strategy) {
     printer->out() << "--------------------------------------------------" << std::endl;
     printer->out() << (n->get_to_apply_actions().empty() ? "~Expanding node: " : "~Resuming expansion of node: ");
     print_node_id(printer, n);
@@ -278,13 +278,13 @@ void planner::print_begin_expanding_node(const bep::tester::printer_ptr &printer
         printer->out() << "." << std::endl << std::endl;
 }
 
-void planner::print_goal_found(const bep::tester::printer_ptr &printer, const node_ptr &n) {
+void planner::print_goal_found(const daedalus::tester::printer_ptr &printer, const node_ptr &n) {
     printer->out() << "Goal found in node ";
     print_node_id(printer, n);
     printer->out() << "!" << std::endl;
 }
 
-void planner::print_applying_action(const bep::tester::printer_ptr &printer, const del::action_ptr &a, const node_ptr &n_,
+void planner::print_applying_action(const daedalus::tester::printer_ptr &printer, const del::action_ptr &a, const node_ptr &n_,
                                     const strategy strategy) {
     printer->out() <<"\t~Applying action: " << a->get_name();
 
@@ -299,7 +299,7 @@ void planner::print_applying_action(const bep::tester::printer_ptr &printer, con
         printer->out() << " (unsuccessful)." << std::endl;
 }
 
-void planner::print_end_expanding_node(const bep::tester::printer_ptr &printer, const node_ptr &n,
+void planner::print_end_expanding_node(const daedalus::tester::printer_ptr &printer, const node_ptr &n,
                                        strategy strategy, bool is_dead_node, bool is_fully_expanded_node) {
     printer->out() << std::endl << "~Expanded node: ";
     print_node_id(printer, n);

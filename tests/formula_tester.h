@@ -1,5 +1,5 @@
 //
-// BEP - Bounded Epistemic Planner (MIT License)
+// DAEDALUS - DynAmic Epistemic and DoxAstic Logic Universal Solver (MIT License)
 //
 // Copyright (c) 2023-2024 Alessandro Burigana
 //
@@ -27,7 +27,7 @@
 #include "../include/del/states/state.h"
 #include "../include/del/formulae/formula.h"
 
-namespace bep::tester {
+namespace daedalus::tester {
     class formula_tester {
     public:
         static void test_CB_1();

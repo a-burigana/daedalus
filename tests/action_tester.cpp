@@ -1,5 +1,5 @@
 //
-// BEP - Bounded Epistemic Planner (MIT License)
+// DAEDALUS - DynAmic Epistemic and DoxAstic Logic Universal Solver (MIT License)
 //
 // Copyright (c) 2023-2024 Alessandro Burigana
 //
@@ -31,7 +31,7 @@
 #include "printer.h"
 #include <string>
 
-using namespace bep::tester;
+using namespace daedalus::tester;
 
 void action_tester::test_coin_in_the_box_actions(const std::string &out_path) {
     auto actions = coin_in_the_box::build_actions();

@@ -1,5 +1,5 @@
 //
-// BEP - Bounded Epistemic Planner (MIT License)
+// DAEDALUS - DynAmic Epistemic and DoxAstic Logic Universal Solver (MIT License)
 //
 // Copyright (c) 2023-2024 Alessandro Burigana
 //
@@ -39,26 +39,26 @@
 namespace search {
     class planner {
     public:
-        static node_deque search(const planning_task &task, strategy strategy, const bep::tester::printer_ptr &printer = nullptr);
+        static node_deque search(const planning_task &task, strategy strategy, const daedalus::tester::printer_ptr &printer = nullptr);
 
         static void print_plan(const node_deque &path);
 
     private:
-        static node_deque unbounded_search(const planning_task &task, const bep::tester::printer_ptr &printer);
-        static node_deque iterative_bounded_search(const planning_task &task, const bep::tester::printer_ptr &printer);
+        static node_deque unbounded_search(const planning_task &task, const daedalus::tester::printer_ptr &printer);
+        static node_deque iterative_bounded_search(const planning_task &task, const daedalus::tester::printer_ptr &printer);
 
         static node_deque bounded_search(const planning_task &task, node_deque &previous_iter_frontier, unsigned long b,
-                                         unsigned long long &id, const bep::tester::printer_ptr &printer);
+                                         unsigned long long &id, const daedalus::tester::printer_ptr &printer);
 
         static node_deque bfs(const planning_task &task, strategy strategy, node_deque &previous_iter_frontier,
-                              unsigned long b, unsigned long long &id, const bep::tester::printer_ptr &printer);
+                              unsigned long b, unsigned long long &id, const daedalus::tester::printer_ptr &printer);
 
         static node_deque init_frontier(del::state_ptr &s0, strategy strategy, unsigned long b,
                                         node_deque &previous_iter_frontier);
 
         static node_deque expand_node(const planning_task &task, strategy strategy, node_ptr &n,
                                       const del::action_deque &actions, node_deque &frontier, unsigned long goal_depth,
-                                      unsigned long long &id, const bep::tester::printer_ptr &printer);
+                                      unsigned long long &id, const daedalus::tester::printer_ptr &printer);
         
         static node_deque extract_path(node_ptr n);
 
@@ -71,13 +71,13 @@ namespace search {
                                           bool was_bisim, const node_ptr &parent, unsigned long long id, unsigned long b = 0);
 
         // Print utilities
-        static void print_max_tree_depth(const bep::tester::printer_ptr &printer, unsigned long long max_tree_depth);
-        static void print_node_id(const bep::tester::printer_ptr &printer, const node_ptr &n);
-        static void print_begin_expanding_node(const bep::tester::printer_ptr &printer, const node_ptr &n, strategy strategy);
-        static void print_goal_found(const bep::tester::printer_ptr &printer, const node_ptr &n);
-        static void print_applying_action(const bep::tester::printer_ptr &printer, const del::action_ptr &a, const node_ptr &n_,
+        static void print_max_tree_depth(const daedalus::tester::printer_ptr &printer, unsigned long long max_tree_depth);
+        static void print_node_id(const daedalus::tester::printer_ptr &printer, const node_ptr &n);
+        static void print_begin_expanding_node(const daedalus::tester::printer_ptr &printer, const node_ptr &n, strategy strategy);
+        static void print_goal_found(const daedalus::tester::printer_ptr &printer, const node_ptr &n);
+        static void print_applying_action(const daedalus::tester::printer_ptr &printer, const del::action_ptr &a, const node_ptr &n_,
                                           strategy strategy);
-        static void print_end_expanding_node(const bep::tester::printer_ptr &printer, const node_ptr &n, strategy strategy,
+        static void print_end_expanding_node(const daedalus::tester::printer_ptr &printer, const node_ptr &n, strategy strategy,
                                              bool is_dead_node, bool is_fully_expanded_node);
     };
 }

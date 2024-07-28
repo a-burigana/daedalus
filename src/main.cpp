@@ -1,5 +1,5 @@
 //
-// BEP - Bounded Epistemic Planner (MIT License)
+// DAEDALUS - DynAmic Epistemic and DoxAstic Logic Universal Solver (MIT License)
 //
 // Copyright (c) 2023-2024 Alessandro Burigana
 //
@@ -31,21 +31,21 @@
 
 #define OUT_PATH std::string{"../tests/out/"}
 
-using namespace bep::tester;
+using namespace daedalus::tester;
 
 #include <iostream>
 
 int main() {
-    auto tasks = collaboration_communication::build_tasks();
-    std::map<std::string, unsigned long> b_map;
+    auto tasks = coin_in_the_box::build_tasks();
+//    std::map<std::string, unsigned long> b_map;
 
     for (const auto &task : tasks) {
-        auto path = search::planner::search(task, search::strategy::iterative_bounded_search);
-        b_map[task.get_problem_id()] = path.back()->get_bound();
+        search::planner::search(task, search::strategy::iterative_bounded_search);
+//        b_map[task.get_problem_id()] = path.back()->get_bound();
     }
 
-    for (const auto &[id, b] : b_map)
-        std::cout << id << " & " << b << std::endl;
+//    for (const auto &[id, b] : b_map)
+//        std::cout << id << " & " << b << std::endl;
 
 //    action_tester::test_switches_actions(5, OUT_PATH);
 

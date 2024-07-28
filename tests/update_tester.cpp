@@ -1,5 +1,5 @@
 //
-// BEP - Bounded Epistemic Planner (MIT License)
+// DAEDALUS - DynAmic Epistemic and DoxAstic Logic Universal Solver (MIT License)
 //
 // Copyright (c) 2023-2024 Alessandro Burigana
 //
@@ -33,7 +33,7 @@
 #include "../include/del/formulae/propositional/true_formula.h"
 #include "builder/domains/coin_in_the_box.h"
 
-using namespace bep::tester;
+using namespace daedalus::tester;
 
 del::state update_tester::test_CB_1(const std::string &out_path, bool print) {
     std::string cb_dir = "coin_in_the_box/";
@@ -78,7 +78,7 @@ del::state update_tester::test_CB_2(const std::string &out_path, bool print) {
 del::state update_tester::test_CB_3(const std::string &out_path, bool print) {
     std::string cb_dir = "coin_in_the_box/";
 
-    del::state s_open = bep::tester::update_tester::test_CB_2(out_path, false);
+    del::state s_open = daedalus::tester::update_tester::test_CB_2(out_path, false);
     del::language_ptr l = s_open.get_language();
 
     const del::agent a = l->get_agent_id("a"), b = l->get_agent_id("b");

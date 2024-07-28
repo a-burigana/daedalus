@@ -1,5 +1,5 @@
 //
-// BEP - Bounded Epistemic Planner (MIT License)
+// DAEDALUS - DynAmic Epistemic and DoxAstic Logic Universal Solver (MIT License)
 //
 // Copyright (c) 2023-2024 Alessandro Burigana
 //
@@ -26,7 +26,7 @@
 
 #include "../../include/del/language/language.h"
 
-namespace bep::tester {
+namespace daedalus::tester {
     class language_builder {
     public:
         static del::language_ptr build_language1();

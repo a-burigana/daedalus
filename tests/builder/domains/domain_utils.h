@@ -1,5 +1,5 @@
 //
-// BEP - Bounded Epistemic Planner (MIT License)
+// DAEDALUS - DynAmic Epistemic and DoxAstic Logic Universal Solver (MIT License)
 //
 // Copyright (c) 2023-2024 Alessandro Burigana
 //
@@ -29,7 +29,7 @@
 #include "../../../include/del/formulae/formula.h"
 #include <deque>
 
-namespace bep::tester {
+namespace daedalus::tester {
     using bitset_deque = std::deque<boost::dynamic_bitset<>>;
     using ulong_vector  = std::vector<unsigned long>;
 

@@ -21,18 +21,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_UPDATE_TESTER_H
-#define BEP_UPDATE_TESTER_H
+#ifndef DAEDALUS_UPDATE_TESTER_H
+#define DAEDALUS_UPDATE_TESTER_H
 
-#include "../include/del/states/state.h"
+#include "../include/del/semantics/kripke/states/state.h"
 
 namespace daedalus::tester {
     class update_tester {
     public:
-        static del::state test_CB_1(const std::string &out_path, bool print = true);
-        static del::state test_CB_2(const std::string &out_path, bool print = true);
-        static del::state test_CB_3(const std::string &out_path, bool print = true);
+        static kripke::state test_CB_1(const std::string &out_path, bool print = true);
+        static kripke::state test_CB_2(const std::string &out_path, bool print = true);
+        static kripke::state test_CB_3(const std::string &out_path, bool print = true);
     };
 }
 
-#endif //BEP_UPDATE_TESTER_H
+#endif //DAEDALUS_UPDATE_TESTER_H

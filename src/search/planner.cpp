@@ -103,7 +103,7 @@ node_deque planner::bounded_search(const planning_task &task, node_deque &previo
 
 node_deque planner::bfs(const planning_task &task, const strategy strategy, node_deque &previous_iter_frontier,
                         const unsigned long b, unsigned long long &id, const daedalus::tester::printer_ptr &printer) {
-    del::state_ptr s0 = task.get_initial_state();
+    kripke::state_ptr s0 = task.get_initial_state();
     node_deque frontier = init_frontier(s0, strategy, b, previous_iter_frontier);
     unsigned long goal_depth = task.get_goal()->get_modal_depth();
     unsigned long long max_tree_depth = 0;
@@ -129,7 +129,7 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, node
         //      the actions that produced nodes n_ such that n_.is_bisim == false. These actions are stored in the
         //      attribute 'm_to_apply_actions' of the class 'node'.
         //   2. Otherwise, we reached n for the first time. We then expand it wrt the entire set of actions of our task.
-        const del::action_deque &actions = n->get_to_apply_actions().empty() ? task.get_actions() : n->get_to_apply_actions();
+        const kripke::action_deque &actions = n->get_to_apply_actions().empty() ? task.get_actions() : n->get_to_apply_actions();
         node_deque path = expand_node(task, strategy, n, actions, frontier, goal_depth, id, printer);
 
         if (not path.empty()) return path;
@@ -142,7 +142,7 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, node
     return {};
 }
 
-node_deque planner::init_frontier(del::state_ptr &s0, const strategy strategy, const unsigned long b,
+node_deque planner::init_frontier(kripke::state_ptr &s0, const strategy strategy, const unsigned long b,
                                   node_deque &previous_iter_frontier) {
     node_deque frontier;
 
@@ -161,13 +161,13 @@ node_deque planner::init_frontier(del::state_ptr &s0, const strategy strategy, c
 }
 
 node_deque planner::expand_node(const planning_task &task, const strategy strategy, node_ptr &n,
-                                const del::action_deque &actions, node_deque &frontier, const unsigned long goal_depth,
+                                const kripke::action_deque &actions, node_deque &frontier, const unsigned long goal_depth,
                                 unsigned long long &id, const daedalus::tester::printer_ptr &printer) {
-    del::action_deque to_apply_actions;
+    kripke::action_deque to_apply_actions;
     bool is_dead_node = true;
 
-    for (const del::action_ptr &a : actions)
-        if (del::updater::is_applicable(*n->get_state(), *a)) {         // For all applicable actions. Let n_ be the
+    for (const kripke::action_ptr &a : actions)
+        if (kripke::updater::is_applicable(*n->get_state(), *a)) {         // For all applicable actions. Let n_ be the
             node_ptr n_ = update_node(strategy, n, a, id, goal_depth);  // result of updating node n with 'a'
             if (printer) print_applying_action(printer, a, n_, strategy);
 
@@ -220,15 +220,15 @@ void planner::print_plan(const node_deque &path) {
     std::cout << std::endl;
 }
 
-node_ptr planner::update_node(const strategy strategy, const node_ptr &n, const del::action_ptr &a,
+node_ptr planner::update_node(const strategy strategy, const node_ptr &n, const kripke::action_ptr &a,
                               unsigned long long &id, unsigned long goal_depth) {
     switch (strategy) {
         case strategy::unbounded_search: {
-            del::state_ptr s_ = std::make_shared<del::state>(del::updater::product_update(*n->get_state(), *a));
+            kripke::state_ptr s_ = std::make_shared<kripke::state>(kripke::updater::product_update(*n->get_state(), *a));
             return init_node(strategy, s_, a, true, n, ++id);
         } case strategy::iterative_bounded_search:
             if (n->is_bisim() or n->get_bound() - a->get_maximum_depth() >= goal_depth) {
-                del::state_ptr s_ = std::make_shared<del::state>(del::updater::product_update(*n->get_state(), *a));
+                kripke::state_ptr s_ = std::make_shared<kripke::state>(kripke::updater::product_update(*n->get_state(), *a));
 
                 if (n->is_bisim())
                     return init_node(strategy, s_, a, true, n, ++id, n->get_bound());
@@ -244,21 +244,21 @@ void planner::refresh_node(node_ptr &n) {
     n->clear_non_bisim_children();  // n'.is_bisim == false. We have to discard them before we move to the next iteration
 
     if (not n->is_bisim()) {                                        // If we can still do some refinement steps
-        auto [is_bisim, s_contr] = del::bisimulator::contract(del::bisimulation_type::bounded, *n->get_original_state(), n->get_bound());    // We do another refinement step
+        auto [is_bisim, s_contr] = kripke::bisimulator::contract(kripke::bisimulation_type::bounded, *n->get_original_state(), n->get_bound());    // We do another refinement step
         n->set_is_bisim(is_bisim);                                  // And we update the value of is_bisim
-        n->set_state(std::make_shared<del::state>(std::move(s_contr)));
+        n->set_state(std::make_shared<kripke::state>(std::move(s_contr)));
         if (is_bisim) n->set_original_state(nullptr);
     }
 }
 
-node_ptr planner::init_node(const strategy strategy, const del::state_ptr &s, const del::action_ptr &a, bool was_bisim,
+node_ptr planner::init_node(const strategy strategy, const kripke::state_ptr &s, const kripke::action_ptr &a, bool was_bisim,
                             const node_ptr &parent, unsigned long long id, unsigned long b) {
-    del::bisimulation_type bisim_type = strategy == strategy::unbounded_search
-            ? del::bisimulation_type::full
-            : del::bisimulation_type::bounded;
+    kripke::bisimulation_type bisim_type = strategy == strategy::unbounded_search
+            ? kripke::bisimulation_type::full
+            : kripke::bisimulation_type::bounded;
 
-    auto [is_bisim, s_contr] = del::bisimulator::contract(bisim_type, *s, b);
-    node_ptr n = std::make_shared<node>(id, std::make_shared<del::state>(std::move(s_contr)), a, b, is_bisim and was_bisim, parent);
+    auto [is_bisim, s_contr] = kripke::bisimulator::contract(bisim_type, *s, b);
+    node_ptr n = std::make_shared<node>(id, std::make_shared<kripke::state>(std::move(s_contr)), a, b, is_bisim and was_bisim, parent);
 
     if (not n->is_bisim()) n->set_original_state(s);
     return n;
@@ -301,7 +301,7 @@ void planner::print_goal_found(const daedalus::tester::printer_ptr &printer, con
     printer->out() << "!" << std::endl;
 }
 
-void planner::print_applying_action(const daedalus::tester::printer_ptr &printer, const del::action_ptr &a, const node_ptr &n_,
+void planner::print_applying_action(const daedalus::tester::printer_ptr &printer, const kripke::action_ptr &a, const node_ptr &n_,
                                     const strategy strategy) {
     printer->out() <<"\t~Applying action: " << a->get_name();
 

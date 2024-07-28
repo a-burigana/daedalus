@@ -21,52 +21,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../../../include/del/states/label.h"
+#ifndef DAEDALUS_BOUNDED_BISIMULATION_TYPES_H
+#define DAEDALUS_BOUNDED_BISIMULATION_TYPES_H
 
-using namespace del;
+#include <deque>
+#include <list>
+#include <memory>
+#include <vector>
+#include <set>
+#include <unordered_map>
+#include "../../../../utils/bit_deque.h"
+#include "../states/states_types.h"
 
-label::label(boost::dynamic_bitset<> bitset) :
-        m_bitset{std::move(bitset)},
-        m_id{m_bitset.to_ulong()} {}
+namespace kripke {
+    using block_id         = unsigned long;
+    using block            = bit_deque;
+    using block_ptr        = std::shared_ptr<block>;
+    using block_vector     = std::vector<block_ptr>;
+    using block_matrix     = std::vector<block_vector>;
+    using block_deque      = std::list<block_ptr>;      // TODO: REVERT BACK TO DEQUE!!!!!!!!!!!!!!
+    using block_set        = std::set<block_ptr>;
+    using partition        = std::vector<block_deque>;
+    using split_blocks_map = std::unordered_map<block_ptr, block_ptr>;
 
-unsigned long label::get_id() const {
-    return m_id;
+    struct bpr_structures {
+        partition Q;
+        block_matrix worlds_blocks;
+        relations r_1;
+        block_id count;
+    };
 }
 
-boost::dynamic_bitset<> &label::operator*() {
-    return m_bitset;
-}
-
-bool label::operator[](const atom &p) const {
-    return m_bitset[p];
-}
-
-void label::update(const atom p, const bool value) {
-    m_bitset[p] = value;
-    auto offset = static_cast<unsigned long>(std::exp2(m_bitset.size() - p-1));
-    m_id = value ? m_id + offset : m_id - offset;
-}
-
-bool label::operator==(const label &rhs) const {
-    return m_id == rhs.m_id;
-}
-
-bool label::operator!=(const label &rhs) const {
-    return m_id != rhs.m_id;
-}
-
-bool label::operator<(const label &rhs) const {
-    return m_id < rhs.m_id;
-}
-
-bool label::operator>(const label &rhs) const {
-    return m_id > rhs.m_id;
-}
-
-bool label::operator<=(const label &rhs) const {
-    return m_id <= rhs.m_id;
-}
-
-bool label::operator>=(const label &rhs) const {
-    return m_id >= rhs.m_id;
-}
+#endif //DAEDALUS_BOUNDED_BISIMULATION_TYPES_H

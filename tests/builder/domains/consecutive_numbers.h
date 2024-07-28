@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_CONSECUTIVE_NUMBERS_H
-#define BEP_CONSECUTIVE_NUMBERS_H
+#ifndef DAEDALUS_CONSECUTIVE_NUMBERS_H
+#define DAEDALUS_CONSECUTIVE_NUMBERS_H
 
 #include "../../../include/del/language/language.h"
-#include "../../../include/del/states/state.h"
+#include "../../../include/del/semantics/kripke/states/state.h"
 #include "../../../include/search/planning_task.h"
 
 namespace daedalus::tester {
@@ -34,12 +34,12 @@ namespace daedalus::tester {
         static std::string get_name();
 
         static del::language_ptr build_language(unsigned long n);
-        static del::state build_initial_state(unsigned long n);
+        static kripke::state build_initial_state(unsigned long n);
 
-        static del::action_deque build_actions(unsigned long n);
+        static kripke::action_deque build_actions(unsigned long n);
         static search::planning_task build_task(unsigned long n);
         static std::vector<search::planning_task> build_tasks();
     };
 }
 
-#endif //BEP_CONSECUTIVE_NUMBERS_H
+#endif //DAEDALUS_CONSECUTIVE_NUMBERS_H

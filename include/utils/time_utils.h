@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_TIME_UTILS_H
-#define BEP_TIME_UTILS_H
+#ifndef DAEDALUS_TIME_UTILS_H
+#define DAEDALUS_TIME_UTILS_H
 
 #include <chrono>
 
@@ -35,4 +35,4 @@ auto since(std::chrono::time_point<clock_t, duration_t> const &start) {
     return std::chrono::duration_cast<result_t>(clock_t::now() - start);
 }
 
-#endif //BEP_TIME_UTILS_H
+#endif //DAEDALUS_TIME_UTILS_H

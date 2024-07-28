@@ -21,15 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_FORMULA_H
-#define BEP_FORMULA_H
+#ifndef DAEDALUS_FORMULA_H
+#define DAEDALUS_FORMULA_H
 
-#include "../states/states_types.h"
+#include "../semantics/kripke/states/states_types.h"
 #include "../language/language.h"
 #include <deque>
 
 namespace del {
-    class state;
     class formula;
     using formula_ptr   = std::shared_ptr<formula>;
     using formula_deque = std::deque<formula_ptr>;
@@ -46,7 +45,7 @@ namespace del {
 
         virtual ~formula() = default;
 
-        [[nodiscard]] virtual bool holds_in(const state &s, const world_id &w) const = 0;
+        [[nodiscard]] virtual bool holds_in(const kripke::state &s, const kripke::world_id &w) const = 0;
         [[nodiscard]] virtual bool is_propositional() const = 0;
 
         [[nodiscard]] virtual unsigned long get_modal_depth() const = 0;
@@ -58,4 +57,4 @@ namespace del {
     };
 }
 
-#endif //BEP_FORMULA_H
+#endif //DAEDALUS_FORMULA_H

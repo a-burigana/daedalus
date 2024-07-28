@@ -32,9 +32,10 @@
 #include <memory>
 
 using namespace daedalus::tester;
+using namespace kripke;
 
 void formula_tester::test_CB_1() {
-    const del::state s = coin_in_the_box::build_initial_state();
+    const state s = coin_in_the_box::build_initial_state();
     const del::language_ptr l = s.get_language();
 
     del::formula_ptr heads = std::make_shared<del::atom_formula>(l->get_atom_id("heads"));
@@ -49,7 +50,7 @@ void formula_tester::test_CB_1() {
 }
 
 void formula_tester::test_CB_2() {
-    const del::state s = coin_in_the_box::build_initial_state();
+    const state s = coin_in_the_box::build_initial_state();
     const del::language_ptr l = s.get_language();
     const del::agent a = l->get_agent_id("a");
 
@@ -64,7 +65,7 @@ void formula_tester::test_CB_2() {
 }
 
 void formula_tester::test_CB_3() {
-    const del::state s = coin_in_the_box::build_initial_state();
+    const state s = coin_in_the_box::build_initial_state();
     const del::language_ptr l = s.get_language();
     const del::agent a = l->get_agent_id("a"), b = l->get_agent_id("b"), c = l->get_agent_id("c");
 

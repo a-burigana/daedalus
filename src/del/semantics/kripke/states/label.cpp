@@ -21,34 +21,52 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_ACTIONS_TYPES_H
-#define BEP_ACTIONS_TYPES_H
+#include "../../../../../include/del/semantics/kripke/states/label.h"
 
-#include <memory>
-#include <vector>
-#include <set>
-#include <list>
-#include "../language/language_types.h"
-#include "../../utils/bit_deque.h"
+using namespace kripke;
 
-namespace del {
-    class formula;
-    class action;
-    using formula_ptr  = std::shared_ptr<formula>;
-    using action_ptr   = std::shared_ptr<action>;
-    using action_set   = std::set<del::action_ptr>;
-    using action_deque = std::deque<del::action_ptr>;
+label::label(boost::dynamic_bitset<> bitset) :
+        m_bitset{std::move(bitset)},
+        m_id{m_bitset.to_ulong()} {}
 
-    using event_id               = unsigned long long;
-    using event_deque            = std::list<event_id>;    // std::deque<event_id>; TODO: CHANGE BACK TO DEQUE!!!!!!!!!!!!!!!!!
-//    using event_set              = std::set<const event_id>;
-    using event_set              = bit_deque;
-    using action_agent_relations = std::vector<event_set>;
-    using action_relations       = std::vector<action_agent_relations>;
-
-    using preconditions  = std::vector<formula_ptr>;
-    using event_post     = std::map<atom, formula_ptr>;
-    using postconditions = std::vector<event_post>;
+unsigned long label::get_id() const {
+    return m_id;
 }
 
-#endif //BEP_ACTIONS_TYPES_H
+boost::dynamic_bitset<> &label::operator*() {
+    return m_bitset;
+}
+
+bool label::operator[](const del::atom &p) const {
+    return m_bitset[p];
+}
+
+void label::update(const del::atom p, const bool value) {
+    m_bitset[p] = value;
+    auto offset = static_cast<unsigned long>(std::exp2(m_bitset.size() - p-1));
+    m_id = value ? m_id + offset : m_id - offset;
+}
+
+bool label::operator==(const label &rhs) const {
+    return m_id == rhs.m_id;
+}
+
+bool label::operator!=(const label &rhs) const {
+    return m_id != rhs.m_id;
+}
+
+bool label::operator<(const label &rhs) const {
+    return m_id < rhs.m_id;
+}
+
+bool label::operator>(const label &rhs) const {
+    return m_id > rhs.m_id;
+}
+
+bool label::operator<=(const label &rhs) const {
+    return m_id <= rhs.m_id;
+}
+
+bool label::operator>=(const label &rhs) const {
+    return m_id >= rhs.m_id;
+}

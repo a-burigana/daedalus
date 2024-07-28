@@ -27,8 +27,8 @@
 #include "../include/del/formulae/propositional/atom_formula.h"
 #include "../include/del/formulae/propositional/and_formula.h"
 #include "../include/del/formulae/propositional/not_formula.h"
-#include "../include/del/update/updater.h"
-#include "../include/del/bisimulation/bisimulator.h"
+#include "../include/del/semantics/kripke/update/updater.h"
+#include "../include/del/semantics/kripke/bisimulation/bisimulator.h"
 #include "../include/search/planner.h"
 #include "../include/utils/time_utils.h"
 #include "../include/utils/timer.h"
@@ -61,7 +61,7 @@ void printer::set_out_to_file(bool out_to_file) {
     m_out_to_file = out_to_file;
 }
 
-void printer::print_state(const del::state &s, const std::string &path, const std::string &name) {
+void printer::print_state(const kripke::state &s, const std::string &path, const std::string &name) {
     if (not std::filesystem::exists(path))
         std::filesystem::create_directories(path);
 
@@ -80,7 +80,7 @@ void printer::print_state(const del::state &s, const std::string &path, const st
     dot_file.close();
 }
 
-void printer::print_action(const del::action &a, const std::string &path) {
+void printer::print_action(const kripke::action &a, const std::string &path) {
     if (not std::filesystem::exists(path))
         std::filesystem::create_directories(path);
 
@@ -99,17 +99,17 @@ void printer::print_action(const del::action &a, const std::string &path) {
     dot_file.close();
 }
 
-void printer::print_states(const del::state &s, const del::action_deque &as, const std::string &path,
-                           const std::string &name, bool apply_contraction, del::bisimulation_type type,
+void printer::print_states(const kripke::state &s, const kripke::action_deque &as, const std::string &path,
+                           const std::string &name, bool apply_contraction, kripke::bisimulation_type type,
                            const unsigned long k) {
-    del::state s_ = del::updater::product_update(s, *as.front());
+    kripke::state s_ = kripke::updater::product_update(s, *as.front());
     std::string new_name = name + "_" + as.front()->get_name();
 
     if (apply_contraction)
-        s_ = del::bisimulator::contract(type, s_, k).second;
+        s_ = kripke::bisimulator::contract(type, s_, k).second;
 
     print_state(s_, path, new_name);
-    del::action_deque as_ = as;
+    kripke::action_deque as_ = as;
     as_.pop_front();
 
     if (as_.empty())

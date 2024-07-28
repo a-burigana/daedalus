@@ -36,28 +36,28 @@ using namespace daedalus::tester;
 void action_tester::test_coin_in_the_box_actions(const std::string &out_path) {
     auto actions = coin_in_the_box::build_actions();
 
-    for (const del::action_ptr &a: actions)
+    for (const kripke::action_ptr &a: actions)
         printer::print_action(*a, out_path + "actions/" + coin_in_the_box::get_name() + "/");
 }
 
 void action_tester::test_consecutive_numbers_actions(unsigned long n, const std::string &out_path) {
     auto actions = consecutive_numbers::build_actions(n);
 
-    for (const del::action_ptr &a: actions)
+    for (const kripke::action_ptr &a: actions)
         printer::print_action(*a, out_path + "actions/" + consecutive_numbers::get_name() + "/" + std::to_string(n) + "/");
 }
 
 void action_tester::test_switches_actions(unsigned long n, const std::string &out_path) {
     auto actions = switches::build_actions(n);
 
-    for (const del::action_ptr &a: actions)
+    for (const kripke::action_ptr &a: actions)
         printer::print_action(*a, out_path + "actions/" + switches::get_name() + "/" + std::to_string(n) + "/");
 }
 
 void action_tester::test_selective_communication_actions(unsigned long agents_no, unsigned long rooms_no, const std::string &out_path) {
     auto actions = selective_communication::build_actions(agents_no, rooms_no);
 
-    for (const del::action_ptr &a: actions)
+    for (const kripke::action_ptr &a: actions)
         printer::print_action(*a, out_path + "actions/" + selective_communication::get_name() + "/" + std::to_string(agents_no) + "_" + std::to_string(rooms_no) + "/");
 }
 
@@ -65,6 +65,6 @@ void action_tester::test_collaboration_communication_actions(unsigned long agent
                                                              unsigned long boxes_no, const std::string &out_path) {
     auto actions = collaboration_communication::build_actions(agents_no, rooms_no, boxes_no);
 
-    for (const del::action_ptr &a: actions)
+    for (const kripke::action_ptr &a: actions)
         printer::print_action(*a, out_path + "actions/" + collaboration_communication::get_name() + "/" + std::to_string(agents_no) + "_" + std::to_string(rooms_no) + "_" + std::to_string(boxes_no) + "/");
 }

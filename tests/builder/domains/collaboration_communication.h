@@ -21,10 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_COLLABORATION_COMMUNICATION_H
-#define BEP_COLLABORATION_COMMUNICATION_H
+#ifndef DAEDALUS_COLLABORATION_COMMUNICATION_H
+#define DAEDALUS_COLLABORATION_COMMUNICATION_H
 
-#include "../../../include/del/actions/action.h"
+#include "../../../include/del/semantics/kripke/actions/action.h"
 #include "../../../include/del/del_types.h"
 #include "../../../include/del/formulae/formula.h"
 #include "../../../include/del/language/language.h"
@@ -36,23 +36,23 @@ namespace daedalus::tester {
         static std::string get_name();
 
         static del::language_ptr build_language(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no);
-        static del::state build_initial_state(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no);
+        static kripke::state build_initial_state(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no);
 
-        static del::action_deque build_actions(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no);
+        static kripke::action_deque build_actions(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no);
         static search::planning_task build_task(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no, unsigned long goal_id);
         static std::vector<search::planning_task> build_tasks();
 
     private:
-        static del::action build_left(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no,
+        static kripke::action build_left(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no,
                                       del::agent ag, const del::agent_set &fo_ags);
 
-        static del::action build_right(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no,
+        static kripke::action build_right(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no,
                                        del::agent ag, const del::agent_set &fo_ags);
 
-        static del::action build_sense(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no,
+        static kripke::action build_sense(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no,
                                        del::agent ag, unsigned long r, unsigned long b, const del::agent_set &po_ags);
 
-        static del::action build_tell(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no,
+        static kripke::action build_tell(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no,
                                       del::agent ag, unsigned long r, unsigned long b, const del::agent_set &fo_ags);
 
         static del::formula_ptr build_goal(const del::language_ptr &language, unsigned long boxes_no, unsigned long goal_id);
@@ -61,4 +61,4 @@ namespace daedalus::tester {
     };
 }
 
-#endif //BEP_COLLABORATION_COMMUNICATION_H
+#endif //DAEDALUS_COLLABORATION_COMMUNICATION_H

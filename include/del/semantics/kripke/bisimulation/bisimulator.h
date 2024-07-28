@@ -21,30 +21,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../../../include/del/bisimulation/bisimulator.h"
-#include "../../../include/del/bisimulation/partition_refinement.h"
-#include "../../../include/del/bisimulation/bounded_partition_refinement.h"
+#ifndef DAEDALUS_BISIMULATOR_H
+#define DAEDALUS_BISIMULATOR_H
 
-using namespace del;
+#include <utility>
+#include "../states/state.h"
+#include "../../../language/language.h"
+#include "bisimulation_types.h"
+#include "../../../../search/search_types.h"
 
-std::pair<bool, state> bisimulator::contract(del::bisimulation_type type, del::state &s, unsigned long k) {
-    switch (type) {
-        case bisimulation_type::full:
-            return partition_refinement::contract(s);           // Classic Paige and Tarjan algorithm
-        case bisimulation_type::bounded:
-            return bounded_partition_refinement::contract(s, k);
-    }
+namespace kripke {
+    class bisimulator {
+    public:
+        static std::pair<bool, state> contract(bisimulation_type type, state &s, unsigned long k = 0);
+//        static bool contract(bisimulation_type type, search::node_ptr &n);
+//        static bool repeat_contraction(search::node_ptr &n);
+    };
 }
 
-//bool bisimulator::contract(bisimulation_type type, search::node_ptr &n) {
-//    switch (type) {
-//        case bisimulation_type::full:
-//            return partition_refinement::contract(n);           // Classic Paige and Tarjan algorithm
-//        case bisimulation_type::bounded:
-//            return bounded_partition_refinement::contract(n);
-//    }
-//}
-
-//bool bisimulator::repeat_contraction(search::node_ptr &n) {
-//    return bounded_partition_refinement::repeat_contraction(n);
-//}
+#endif //DAEDALUS_BISIMULATOR_H

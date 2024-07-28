@@ -21,13 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../../../include/del/states/state.h"
+#include "../../../../../include/del/semantics/kripke/states/state.h"
 #include <queue>
 #include <string>
 #include <utility>
 #include <vector>
 
 using namespace del;
+using namespace kripke;
 
 state::state(language_ptr language, unsigned long long worlds_number, relations relations,
              label_vector valuation, world_set designated_worlds) :
@@ -114,7 +115,7 @@ void state::calculate_worlds_depth() {
     }
 }
 
-std::ostream &del::operator<<(std::ostream &os, const state &s) {
+std::ostream &kripke::operator<<(std::ostream &os, const state &s) {
     using edges_map = std::map<std::pair<world_id, world_id>, std::vector<agent>>;
 
     const std::string font = std::string{"\"Helvetica,Arial,sans-serif\""};

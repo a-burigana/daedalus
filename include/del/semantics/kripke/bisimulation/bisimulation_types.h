@@ -21,24 +21,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_BISIMULATION_TYPES_H
-#define BEP_BISIMULATION_TYPES_H
+#ifndef DAEDALUS_BISIMULATION_TYPES_H
+#define DAEDALUS_BISIMULATION_TYPES_H
 
 #include <list>
 #include <set>
 #include <vector>
 #include <map>
 #include <unordered_map>
-#include "../language/language_types.h"
-#include "../../utils/bit_deque.h"
+#include "../../../language/language_types.h"
+#include "../../../../utils/bit_deque.h"
 
-namespace del {
+namespace kripke {
     enum class bisimulation_type : uint8_t {
         full,
         bounded
     };
 
-    using agent_worlds_labels = std::vector<agent>;
+    using agent_worlds_labels = std::vector<del::agent>;
 
     struct q_block;
     struct x_block;
@@ -95,4 +95,4 @@ namespace del {
     };
 }
 
-#endif //BEP_BISIMULATION_TYPES_H
+#endif //DAEDALUS_BISIMULATION_TYPES_H

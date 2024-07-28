@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_DEL_TYPES_H
-#define BEP_DEL_TYPES_H
+#ifndef DAEDALUS_DEL_TYPES_H
+#define DAEDALUS_DEL_TYPES_H
 
 #include <boost/dynamic_bitset.hpp>
 
@@ -31,4 +31,4 @@ namespace del {
     using agent_set = boost::dynamic_bitset<>;
 }
 
-#endif //BEP_DEL_TYPES_H
+#endif //DAEDALUS_DEL_TYPES_H

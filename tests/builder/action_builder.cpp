@@ -30,6 +30,7 @@
 
 using namespace daedalus::tester;
 using namespace del;
+using namespace kripke;
 
 action action_builder::build_public_announcement(std::string name, const language_ptr &language, const formula_ptr &f_pre) {
     const event_id events_number = 1;
@@ -51,8 +52,8 @@ action action_builder::build_public_announcement(std::string name, const languag
     return action{language, std::move(name), events_number, q, pre, post, is_ontic, designated_events};
 }
 
-del::action action_builder::build_public_ontic(std::string name, const del::language_ptr &language,
-                                               const del::formula_ptr &f_pre, const del::event_post &e_post) {
+action action_builder::build_public_ontic(std::string name, const del::language_ptr &language,
+                                          const del::formula_ptr &f_pre, const event_post &e_post) {
     const event_id events_number = 1;
     action_relations q(language->get_agents_number());
 
@@ -76,7 +77,7 @@ del::action action_builder::build_public_ontic(std::string name, const del::lang
 }
 
 action action_builder::build_private_ontic(std::string name, const language_ptr &language, const formula_ptr &f_pre,
-                                           const del::event_post &e_post, const agent_set &fo_ags) {
+                                           const event_post &e_post, const agent_set &fo_ags) {
     const event_id events_number = 2;
     action_relations q(language->get_agents_number());
 

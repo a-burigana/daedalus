@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_BIT_DEQUE_H
-#define BEP_BIT_DEQUE_H
+#ifndef DAEDALUS_BIT_DEQUE_H
+#define DAEDALUS_BIT_DEQUE_H
 
 #include <boost/dynamic_bitset.hpp>
 #include <list>
@@ -107,4 +107,4 @@ private:
     unsigned long m_id;
 };
 
-#endif //BEP_BIT_DEQUE_H
+#endif //DAEDALUS_BIT_DEQUE_H

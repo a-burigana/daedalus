@@ -21,22 +21,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_STATE_H
-#define BEP_STATE_H
+#ifndef DAEDALUS_STATE_H
+#define DAEDALUS_STATE_H
 
 #include <set>
 #include <map>
 #include <ostream>
 #include <vector>
 #include "states_types.h"
-#include "../formulae/formula.h"
-#include "../language/language.h"
+#include "../../../formulae/formula.h"
+#include "../../../language/language.h"
 
-namespace del {
+namespace kripke {
     class state {
     public:
 
-        state(language_ptr language, unsigned long long worlds_number, relations relations,
+        state(del::language_ptr language, unsigned long long worlds_number, relations relations,
               label_vector valuation, world_set designated_worlds);
 
         state(const state&) = delete;
@@ -48,21 +48,21 @@ namespace del {
         ~state() = default;
 
         [[nodiscard]] unsigned long long get_worlds_number() const;
-        [[nodiscard]] const world_set &get_agent_possible_worlds(agent ag, world_id w) const;
-        [[nodiscard]] bool has_edge(agent ag, world_id w, world_id v) const;
+        [[nodiscard]] const world_set &get_agent_possible_worlds(del::agent ag, world_id w) const;
+        [[nodiscard]] bool has_edge(del::agent ag, world_id w, world_id v) const;
         [[nodiscard]] const label &get_label(world_id w) const;
         [[nodiscard]] const world_set &get_designated_worlds() const;
         [[nodiscard]] bool is_designated(world_id w) const;
 
-        [[nodiscard]] language_ptr get_language() const;
+        [[nodiscard]] del::language_ptr get_language() const;
         [[nodiscard]] unsigned long long get_depth(world_id w) const;
         [[nodiscard]] unsigned long long get_max_depth() const;
-        [[nodiscard]] bool satisfies(const formula_ptr &f) const;
+        [[nodiscard]] bool satisfies(const del::formula_ptr &f) const;
 
         friend std::ostream &operator<<(std::ostream &os, const state &s);
 
     private:
-        language_ptr m_language;
+        del::language_ptr m_language;
         unsigned long long m_worlds_number;
         relations m_relations;
         label_vector m_labels;
@@ -74,4 +74,4 @@ namespace del {
     };
 }
 
-#endif //BEP_STATE_H
+#endif //DAEDALUS_STATE_H

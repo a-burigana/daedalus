@@ -39,11 +39,11 @@ int main() {
     auto tasks = coin_in_the_box::build_tasks();
 //    std::map<std::string, unsigned long> b_map;
 
-//    for (const auto &task : tasks) {
-        search::planner::search(tasks[0], search::strategy::iterative_bounded_search);
-        search::planner::search(tasks[0], search::strategy::unbounded_search);
+    for (const auto &task : tasks) {
+        search::planner::search(task, search::strategy::iterative_bounded_search);
+        search::planner::search(task, search::strategy::unbounded_search);
 //        b_map[task.get_problem_id()] = path.back()->get_bound();
-//    }
+    }
 
 //    for (const auto &[id, b] : b_map)
 //        std::cout << id << " & " << b << std::endl;

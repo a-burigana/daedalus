@@ -22,15 +22,15 @@
 // SOFTWARE.
 
 #include "../../../../include/del/formulae/propositional/atom_formula.h"
-#include "../../../../include/del/states/state.h"
-#include "../../../../include/del/states/label.h"
+#include "../../../../include/del/semantics/kripke/states/state.h"
+#include "../../../../include/del/semantics/kripke/states/label.h"
 
 using namespace del;
 
 atom_formula::atom_formula(const atom atom) :
     m_atom{atom} {}
 
-bool atom_formula::holds_in(const state &s, const world_id &w) const {
+bool atom_formula::holds_in(const kripke::state &s, const kripke::world_id &w) const {
     return s.get_label(w)[m_atom];
 }
 

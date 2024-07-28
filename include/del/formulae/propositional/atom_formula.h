@@ -21,14 +21,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_ATOM_FORMULA_H
-#define BEP_ATOM_FORMULA_H
+#ifndef DAEDALUS_ATOM_FORMULA_H
+#define DAEDALUS_ATOM_FORMULA_H
 
 #include "../formula.h"
 #include "../../language/language_types.h"
-#include "../../states/states_types.h"
+#include "../../semantics/kripke/states/states_types.h"
 #include "../../language/language.h"
-
 
 namespace del {
     class atom_formula : public formula {
@@ -41,7 +40,7 @@ namespace del {
         atom_formula(atom_formula&&) = default;
         atom_formula& operator=(atom_formula&&) = default;
 
-        [[nodiscard]] bool holds_in(const state &s, const world_id &w) const override;
+        [[nodiscard]] bool holds_in(const kripke::state &s, const kripke::world_id &w) const override;
         [[nodiscard]] bool is_propositional() const override;
 
         [[nodiscard]] unsigned long get_modal_depth() const override;
@@ -55,4 +54,4 @@ namespace del {
     };
 }
 
-#endif //BEP_ATOM_FORMULA_H
+#endif //DAEDALUS_ATOM_FORMULA_H

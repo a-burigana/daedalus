@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_LANGUAGE_BUILDER_H
-#define BEP_LANGUAGE_BUILDER_H
+#ifndef DAEDALUS_LANGUAGE_BUILDER_H
+#define DAEDALUS_LANGUAGE_BUILDER_H
 
 #include "../../include/del/language/language.h"
 
@@ -35,4 +35,4 @@ namespace daedalus::tester {
     };
 }
 
-#endif //BEP_LANGUAGE_BUILDER_H
+#endif //DAEDALUS_LANGUAGE_BUILDER_H

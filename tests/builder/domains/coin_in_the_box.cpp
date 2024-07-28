@@ -50,7 +50,7 @@ del::language_ptr coin_in_the_box::build_language() {
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-del::state coin_in_the_box::build_initial_state() {
+kripke::state coin_in_the_box::build_initial_state() {
     language_ptr language = coin_in_the_box::build_language();
 
     const world_id worlds_number = 2;
@@ -85,7 +85,7 @@ del::state coin_in_the_box::build_initial_state() {
 }
 
 
-del::action_deque coin_in_the_box::build_actions() {
+kripke::action_deque coin_in_the_box::build_actions() {
     language_ptr language = coin_in_the_box::build_language();
     action_deque actions;
 
@@ -309,7 +309,7 @@ action coin_in_the_box::build_open(const del::agent ag, const agent_set &fo_ags)
     return action_builder::build_private_ontic(std::move(name), language, f_pre, e_post, fo_ags);
 }
 
-del::action coin_in_the_box::build_peek(const del::agent ag, const agent_set &po_ags) {
+kripke::action coin_in_the_box::build_peek(const del::agent ag, const agent_set &po_ags) {
     language_ptr language = coin_in_the_box::build_language();
 
     agent_set fo_ags(language->get_agents_number());
@@ -338,7 +338,7 @@ del::action coin_in_the_box::build_peek(const del::agent ag, const agent_set &po
     return action_builder::build_semi_private_sensing(std::move(name), language, f_pre, sensed, fo_ags, po_ags);
 }
 
-del::action coin_in_the_box::build_shout(const agent ag, const agent_set &fo_ags) {
+kripke::action coin_in_the_box::build_shout(const agent ag, const agent_set &fo_ags) {
     language_ptr language = coin_in_the_box::build_language();
     agent_set ag_set(language->get_agents_number()), fo_ags_2 = fo_ags;
     ag_set[ag] = true;

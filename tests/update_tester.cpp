@@ -25,7 +25,7 @@
 #include "builder/action_builder.h"
 #include "builder/state_builder.h"
 #include "../include/del/formulae/propositional/atom_formula.h"
-#include "../include/del/update/updater.h"
+#include "../include/del/semantics/kripke/update/updater.h"
 #include "../include/del/formulae/propositional/not_formula.h"
 #include "../include/del/formulae/modal/box_formula.h"
 #include "../include/del/formulae/propositional/and_formula.h"
@@ -34,26 +34,27 @@
 #include "builder/domains/coin_in_the_box.h"
 
 using namespace daedalus::tester;
+using namespace kripke;
 
-del::state update_tester::test_CB_1(const std::string &out_path, bool print) {
+state update_tester::test_CB_1(const std::string &out_path, bool print) {
     std::string cb_dir = "coin_in_the_box/";
 
-    del::state s0 = coin_in_the_box::build_initial_state();
+    state s0 = coin_in_the_box::build_initial_state();
     del::language_ptr l = s0.get_language();
 
     del::formula_ptr heads = std::make_shared<del::atom_formula>(l->get_atom_id("heads"));
-    del::action act = action_builder::build_public_announcement("shout_heads", l, heads);
+    action act = action_builder::build_public_announcement("shout_heads", l, heads);
 
-    del::state s_cb_heads = del::updater::product_update(s0, act);
+    state s_cb_heads = updater::product_update(s0, act);
     printer::print_state(s_cb_heads, out_path + cb_dir, "cb_heads");
 
     return s_cb_heads;
 }
 
-del::state update_tester::test_CB_2(const std::string &out_path, bool print) {
+state update_tester::test_CB_2(const std::string &out_path, bool print) {
     std::string cb_dir = "coin_in_the_box/";
 
-    del::state s0 = coin_in_the_box::build_initial_state();
+    state s0 = coin_in_the_box::build_initial_state();
     del::language_ptr l = s0.get_language();
 
     const del::agent a = l->get_agent_id("a"), b = l->get_agent_id("b");
@@ -67,18 +68,18 @@ del::state update_tester::test_CB_2(const std::string &out_path, bool print) {
     del::formula_ptr f_post         = std::make_shared<del::true_formula>();
 //    del::formula_ptr has_key_a      = std::make_shared<del::atom_formula>(l->get_atom_id("has_key_a"));
 
-    del::action act = coin_in_the_box::build_open(a, fo_ags);
+    action act = coin_in_the_box::build_open(a, fo_ags);
 
-    del::state s_cb_open = del::updater::product_update(s0, act);
+    state s_cb_open = updater::product_update(s0, act);
     printer::print_state(s_cb_open, out_path + cb_dir, "cb_open");
 
     return s_cb_open;
 }
 
-del::state update_tester::test_CB_3(const std::string &out_path, bool print) {
+state update_tester::test_CB_3(const std::string &out_path, bool print) {
     std::string cb_dir = "coin_in_the_box/";
 
-    del::state s_open = daedalus::tester::update_tester::test_CB_2(out_path, false);
+    state s_open = daedalus::tester::update_tester::test_CB_2(out_path, false);
     del::language_ptr l = s_open.get_language();
 
     const del::agent a = l->get_agent_id("a"), b = l->get_agent_id("b");
@@ -90,9 +91,9 @@ del::state update_tester::test_CB_3(const std::string &out_path, bool print) {
     del::formula_ptr opened     = std::make_shared<del::atom_formula>(l->get_atom_id("opened"));
     del::formula_ptr K_a_opened = std::make_shared<del::box_formula>(a, opened);
 
-    del::action act = action_builder::build_semi_private_sensing("peek_a", l, K_a_opened, heads, fo_ags, po_ags);
+    action act = action_builder::build_semi_private_sensing("peek_a", l, K_a_opened, heads, fo_ags, po_ags);
 
-    del::state s_cb_open_peek = del::updater::product_update(s_open, act);
+    state s_cb_open_peek = kripke::updater::product_update(s_open, act);
     printer::print_state(s_cb_open_peek, out_path + cb_dir, "cb_open_peek");
 
     return s_cb_open_peek;

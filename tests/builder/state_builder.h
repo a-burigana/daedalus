@@ -21,19 +21,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_STATE_BUILDER_H
-#define BEP_STATE_BUILDER_H
+#ifndef DAEDALUS_STATE_BUILDER_H
+#define DAEDALUS_STATE_BUILDER_H
 
-#include "../../include/del/states/state.h"
+#include "../../include/del/semantics/kripke/states/state.h"
 
 namespace daedalus::tester {
     class state_builder {
     public:
-        static del::state build_test_state1();
-        static del::state build_singleton(bool has_loop);
-        static del::state build_chain(unsigned long length, bool has_final_loop, bool all_designated = false);
-        static del::state build_k_tree(unsigned long k);
+        static kripke::state build_test_state1();
+        static kripke::state build_singleton(bool has_loop);
+        static kripke::state build_chain(unsigned long length, bool has_final_loop, bool all_designated = false);
+        static kripke::state build_k_tree(unsigned long k);
     };
 }
 
-#endif //BEP_STATE_BUILDER_H
+#endif //DAEDALUS_STATE_BUILDER_H

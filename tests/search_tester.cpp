@@ -25,8 +25,8 @@
 #include <iostream>
 #include <string>
 #include "../include/del/language/language.h"
-#include "../include/del/states/state.h"
-#include "../include/del/update/updater.h"
+#include "../include/del/semantics/kripke/states/state.h"
+#include "../include/del/semantics/kripke/update/updater.h"
 #include "../tests/builder/state_builder.h"
 #include "../tests/formula_tester.h"
 #include "../tests/update_tester.h"

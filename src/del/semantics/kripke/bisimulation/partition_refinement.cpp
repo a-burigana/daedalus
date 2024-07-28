@@ -21,15 +21,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../../../include/del/bisimulation/partition_refinement.h"
-#include "../../../include/del/bisimulation/bisimulator.h"
-#include "../../../include/search/search_space.h"
+#include "../../../../../include/del/semantics/kripke/bisimulation/partition_refinement.h"
+#include "../../../../../include/del/semantics/kripke/bisimulation/bisimulator.h"
+#include "../../../../../include/search/search_space.h"
 #include <algorithm>
 #include <memory>
 
-using namespace del;
+using namespace kripke;
 
-std::pair<bool, state> partition_refinement::contract(del::state &s) {
+std::pair<bool, state> partition_refinement::contract(state &s) {
     return contraction_helper(s);
 }
 
@@ -40,7 +40,7 @@ bool partition_refinement::contract(search::node_ptr &n) {
     return is_bisim;
 }
 
-std::pair<bool, state> partition_refinement::contraction_helper(const del::state &s) {
+std::pair<bool, state> partition_refinement::contraction_helper(const state &s) {
     auto result = build_preprocessed_state(s);          // todo: try to generate the preprocessed relations on the fly
     const agent_relation &r = result.first;
     const agent_worlds_labels labels = result.second;
@@ -101,7 +101,7 @@ state partition_refinement::build_full_contraction(const state &s, const agent_r
         }
     }
 
-    for (agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
         quotient_r[ag] = agent_relation(s.get_worlds_number());     // todo: shouldn't it be worlds_number?
 
         for (world_id w_ = 0; w_ < worlds_number; ++w_)     // We make sure that the relations of worlds with
@@ -110,7 +110,7 @@ state partition_refinement::build_full_contraction(const state &s, const agent_r
 
     for (world_id w = 0; w < s.get_worlds_number(); ++w) {
         for (const world_id w_ag: r[w]) {                       // By construction, w only sees "agent worlds"
-            agent ag = labels[w_ag - s.get_worlds_number()];    // ag is the label of w_ag
+            del::agent ag = labels[w_ag - s.get_worlds_number()];    // ag is the label of w_ag
 
             for (const world_id v: s.get_agent_possible_worlds(ag, w))
                 quotient_r[ag][contracted_worlds_map[w]].push_back(contracted_worlds_map[v]);
@@ -256,7 +256,7 @@ void partition_refinement::update_counts(x_block_ptr &S, const q_block &B_, cons
 std::pair<agent_relation, agent_worlds_labels> partition_refinement::build_preprocessed_state(const state &s) {
     world_id worlds_number = s.get_worlds_number();
 
-    for (agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
         for (world_id w = 0; w < s.get_worlds_number(); ++w)
             worlds_number += s.get_agent_possible_worlds(ag, w).size();
 
@@ -266,9 +266,9 @@ std::pair<agent_relation, agent_worlds_labels> partition_refinement::build_prepr
         r[w] = world_set{worlds_number};
 
     world_id count = s.get_worlds_number() - 1;
-    agent_worlds_labels agent_labels = std::vector<agent>(worlds_number - s.get_worlds_number());
+    agent_worlds_labels agent_labels = std::vector<del::agent>(worlds_number - s.get_worlds_number());
 
-    for (agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
         for (world_id w = 0; w < s.get_worlds_number(); ++w) {
             for (world_id v : s.get_agent_possible_worlds(ag, w)) {
                 world_id w_ag = ++count;
@@ -296,7 +296,7 @@ void partition_refinement::init_partitions(const state &s, const agent_relation 
                                            q_partition &Q, q_partition &Q_sinks, x_partition &X, compound_x_blocks_set &C,
                                            q_block_ptr_vector &worlds_blocks, const world_id preprocessed_worlds_no) {
     std::map<const label, q_block> initial_partition, initial_partition_sinks;
-    std::map<const agent, q_block> initial_agent_worlds_partition;      // By construction, "agent worlds" can not be sinks
+    std::map<const del::agent, q_block> initial_agent_worlds_partition;      // By construction, "agent worlds" can not be sinks
 
     worlds_blocks = q_block_ptr_vector(r.size());
 
@@ -312,7 +312,7 @@ void partition_refinement::init_partitions(const state &s, const agent_relation 
             else
                 init_partitions_helper<const label>(initial_partition, w, s.get_label(w), preprocessed_worlds_no);
         } else
-            init_partitions_helper<const agent>(initial_agent_worlds_partition, w, labels[w - s.get_worlds_number()], preprocessed_worlds_no);
+            init_partitions_helper<const del::agent>(initial_agent_worlds_partition, w, labels[w - s.get_worlds_number()], preprocessed_worlds_no);
 
     // (*) In an efficient implementation of the algorithm, it is useful to reduce the problem instance to one in which
     // |R(x)| >= 1 for all x \in W. To do this we preprocess the partition P by splitting each block B \in P [where
@@ -360,7 +360,7 @@ void partition_refinement::init_partitions(const state &s, const agent_relation 
 }
 
 bool partition_refinement::is_sink(const state &s, const world_id w) {
-    for (agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
         if (not s.get_agent_possible_worlds(ag, w).empty())
             return false;
     return true;

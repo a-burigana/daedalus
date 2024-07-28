@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_STRATEGIES_H
-#define BEP_STRATEGIES_H
+#ifndef DAEDALUS_STRATEGIES_H
+#define DAEDALUS_STRATEGIES_H
 
 #include <cstdint>
 
@@ -33,4 +33,4 @@ namespace search {
     };
 }
 
-#endif //BEP_STRATEGIES_H
+#endif //DAEDALUS_STRATEGIES_H

@@ -27,6 +27,7 @@
 
 using namespace daedalus::tester;
 using namespace del;
+using namespace kripke;
 
 state state_builder::build_test_state1() {
     language_ptr language = language_builder::build_language1();

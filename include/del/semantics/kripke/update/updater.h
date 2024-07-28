@@ -21,23 +21,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_UPDATER_H
-#define BEP_UPDATER_H
+#ifndef DAEDALUS_UPDATER_H
+#define DAEDALUS_UPDATER_H
 
 #include "../states/state.h"
 #include "../actions/action.h"
-#include "../language/language.h"
+#include "../../../language/language.h"
 #include "boost/dynamic_bitset.hpp"
 #include "../bisimulation/bisimulation_types.h"
 
-namespace del {
+namespace kripke {
     class updater {
     public:
         static bool is_applicable(const state &s, const action &a);
         static state product_update(const state &s, const action &a);
 
         static state product_update(const state &s, const action_deque &as, bool apply_contraction = false,
-                                    del::bisimulation_type type = del::bisimulation_type::full, const unsigned long k = 0);
+                                    bisimulation_type type = bisimulation_type::full, const unsigned long k = 0);
 
     private:
         using updated_world            = std::pair<const world_id, const event_id>;
@@ -61,4 +61,4 @@ namespace del {
     };
 }
 
-#endif //BEP_UPDATER_H
+#endif //DAEDALUS_UPDATER_H

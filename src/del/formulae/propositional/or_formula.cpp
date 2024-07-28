@@ -30,7 +30,7 @@ using namespace del;
 or_formula::or_formula(formula_deque fs) :
     m_fs{std::move(fs)} {}
 
-bool or_formula::holds_in(const state &s, const world_id &w) const {
+bool or_formula::holds_in(const kripke::state &s, const kripke::world_id &w) const {
     auto check = [&](const formula_ptr &f) { return f->holds_in(s, w); };
     return std::any_of(m_fs.begin(), m_fs.end(), check);
 }

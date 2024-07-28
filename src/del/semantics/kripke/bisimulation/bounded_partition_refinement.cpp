@@ -21,17 +21,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../../../include/del/bisimulation/bounded_partition_refinement.h"
-#include "../../../include/del/states/state.h"
-#include "../../../include/search/search_space.h"
+#include "../../../../../include/del/semantics/kripke/bisimulation/bounded_partition_refinement.h"
+#include "../../../../../include/del/semantics/kripke/states/state.h"
+#include "../../../../../include/search/search_space.h"
 #include <memory>
 #include <set>
 #include <queue>
 #include <utility>
 
-using namespace del;
+using namespace kripke;
 
-std::pair<bool, state> bounded_partition_refinement::contract(del::state &s, unsigned long k) {
+std::pair<bool, state> bounded_partition_refinement::contract(state &s, unsigned long k) {
     bpr_structures structures = init_structures(s, k+1);        // todo: use k again everywhere and figure out how to check if k-contraction is bisimilar
     bool is_bisim = do_refinement_steps(s, k+1, structures);
     return {is_bisim, calculate_bounded_contraction(s, k, structures.worlds_blocks)};
@@ -170,7 +170,7 @@ void bounded_partition_refinement::refine(const state &s, const unsigned long k,
     // itself during the refinement.)
     block B_ = *B;
 
-    for (agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
         block B_preimage = calculate_preimages(s, B_, r_1, ag);
 
         // [STEP 4] Refine Q with respect to B
@@ -180,7 +180,7 @@ void bounded_partition_refinement::refine(const state &s, const unsigned long k,
 }
 
 block bounded_partition_refinement::calculate_preimages(const state &s, const block &B_, const relations &r_1,
-                                                        const agent ag) {
+                                                        const del::agent ag) {
 //    boost::dynamic_bitset<> B_preimage(s.get_worlds_number());
 //
 //    for (const world_id y: B_)
@@ -288,7 +288,7 @@ void bounded_partition_refinement::init_partitions_helper(const state &s, std::m
 relations bounded_partition_refinement::init_preimage(const state &s) {
     relations r_1 = relations(s.get_language()->get_agents_number());
 
-    for (agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
         agent_relation r_ag = agent_relation(s.get_worlds_number());
 
         for (world_id w = 0; w < s.get_worlds_number(); ++w)    // Initializing world sets
@@ -341,7 +341,7 @@ state bounded_partition_refinement::calculate_bounded_contraction(const state &s
         quotient_v[count++] = s.get_label(w);
     }
 
-    for (agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
         quotient_r[ag] = agent_relation(bounded_worlds_number);
 
         for (world_id w = 0; w < bounded_worlds_number; ++w)
@@ -352,7 +352,7 @@ state bounded_partition_refinement::calculate_bounded_contraction(const state &s
         if (k > s.get_depth(x)) {
             unsigned long b_x = k - s.get_depth(x);
 
-            for (agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
+            for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
                 for (const world_id y : s.get_agent_possible_worlds(ag, x))
                     if (s.get_depth(y) <= k) {
                         auto y_reprs = max_reprs_bitset & worlds_blocks[y][b_x-1]->get_bitset();    // We compute the maximal representatives of y in its (b(x)-1)-block
@@ -405,7 +405,7 @@ std::vector<world_id> bounded_partition_refinement::calculate_max_representative
         }
         // We visit unrepresented worlds that are directly accessible from 'current'. In this way,
         // we implement a visit by descending depth.
-        for (agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
+        for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
             for (const world_id w : s.get_agent_possible_worlds(ag, current))
 //            for (world_id w = 0; w < s.get_worlds_number(); ++w)
                 if (s.get_depth(w) <= k and not represented[w])     // s.has_edge(ag, current, w) and

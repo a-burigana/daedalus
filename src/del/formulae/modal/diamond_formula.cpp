@@ -24,7 +24,7 @@
 #include <utility>
 
 #include "../../../../include/del/formulae/modal/diamond_formula.h"
-#include "../../../../include/del/states/state.h"
+#include "../../../../include/del/semantics/kripke/states/state.h"
 
 using namespace del;
 
@@ -32,9 +32,9 @@ diamond_formula::diamond_formula(const agent ag, formula_ptr f) :
     m_ag{ag},
     m_f{std::move(f)} {}
 
-bool diamond_formula::holds_in(const state &s, const world_id &w) const {
+bool diamond_formula::holds_in(const kripke::state &s, const kripke::world_id &w) const {
     const auto &worlds = s.get_agent_possible_worlds(m_ag, w);
-    return std::any_of(worlds.begin(), worlds.end(), [&](const world_id &v) { return m_f->holds_in(s, v); });
+    return std::any_of(worlds.begin(), worlds.end(), [&](const kripke::world_id &v) { return m_f->holds_in(s, v); });
 }
 
 bool diamond_formula::is_propositional() const {

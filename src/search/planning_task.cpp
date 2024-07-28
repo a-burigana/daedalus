@@ -28,11 +28,11 @@
 using namespace search;
 
 planning_task::planning_task(std::string domain_name, std::string problem_id, del::language_ptr language,
-                             del::state initial_state, del::action_deque actions, del::formula_ptr goal) :
+                             kripke::state initial_state, kripke::action_deque actions, del::formula_ptr goal) :
          m_domain_name{std::move(domain_name)},
          m_problem_id{std::move(problem_id)},
          m_language{std::move(language)},
-         m_initial_state{std::make_shared<del::state>(std::move(initial_state))},
+         m_initial_state{std::make_shared<kripke::state>(std::move(initial_state))},
          m_actions{std::move(actions)},
          m_goal{std::move(goal)} {
     init_actions_map();
@@ -42,22 +42,22 @@ planning_task::planning_task(std::string domain_name, std::string problem_id, de
 void planning_task::init_maximum_depth() {
     m_maximum_depth = 0;
     
-    for (const del::action_ptr &a : m_actions)
+    for (const kripke::action_ptr &a : m_actions)
         if (a->get_maximum_depth() > m_maximum_depth)
             m_maximum_depth = a->get_maximum_depth();
 }
 
 void planning_task::init_actions_map() {
-    for (const del::action_ptr &a : m_actions)
+    for (const kripke::action_ptr &a : m_actions)
         m_actions_map[a->get_name()] = a;
 }
 
-const del::action_ptr &planning_task::get_action(const std::string &name) const {
+const kripke::action_ptr &planning_task::get_action(const std::string &name) const {
     return m_actions_map.at(name);
 }
 
-del::action_deque planning_task::get_actions(const std::deque<std::string> &names) const {
-    del::action_deque as;
+kripke::action_deque planning_task::get_actions(const std::deque<std::string> &names) const {
+    kripke::action_deque as;
 
     for (const std::string &name : names)
         as.push_back(get_action(name));
@@ -81,11 +81,11 @@ del::language_ptr planning_task::get_language() const {
     return m_language;
 }
 
-del::state_ptr planning_task::get_initial_state() const {
+kripke::state_ptr planning_task::get_initial_state() const {
     return m_initial_state;
 }
 
-const del::action_deque &planning_task::get_actions() const {
+const kripke::action_deque &planning_task::get_actions() const {
     return m_actions;
 }
 

@@ -21,14 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../../../include/del/actions/action.h"
-#include "../../../include/del/formulae/formula.h"
+#include "../../../../../include/del/semantics/kripke/actions/action.h"
+#include "../../../../../include/del/formulae/formula.h"
 
-using namespace del;
+using namespace kripke;
 
-action::action(language_ptr language, std::string name, unsigned long long events_number, del::action_relations relations,
-               del::preconditions pre, del::postconditions post, boost::dynamic_bitset<> is_ontic,
-               del::event_deque designated_events) :
+action::action(del::language_ptr language, std::string name, unsigned long long events_number, action_relations relations,
+               preconditions pre, postconditions post, boost::dynamic_bitset<> is_ontic,
+               event_deque designated_events) :
        m_language{std::move(language)},
        m_name{std::move(name)},
        m_events_number{events_number},
@@ -40,7 +40,7 @@ action::action(language_ptr language, std::string name, unsigned long long event
     calculate_maximum_depth();
 }
 
-language_ptr action::get_language() const {
+del::language_ptr action::get_language() const {
     return m_language;
 }
 
@@ -51,7 +51,7 @@ std::string action::get_name() const {
 void action::calculate_maximum_depth() {
     m_maximum_depth = 0;
 
-    for (const formula_ptr &f_pre : m_preconditions)
+    for (const del::formula_ptr &f_pre : m_preconditions)
         if (f_pre->get_modal_depth() > m_maximum_depth)
             m_maximum_depth = f_pre->get_modal_depth();
 
@@ -65,15 +65,15 @@ unsigned long long action::get_events_number() const {
     return m_events_number;
 }
 
-const event_set &action::get_agent_possible_events(const agent ag, const event_id e) const {
+const event_set &action::get_agent_possible_events(const del::agent ag, const event_id e) const {
     return m_relations[ag][e];
 }
 
-bool action::has_edge(const agent ag, const event_id e, const event_id f) const {
+bool action::has_edge(const del::agent ag, const event_id e, const event_id f) const {
     return std::find(m_relations[ag].at(e).begin(), m_relations[ag].at(e).end(), f) != m_relations[ag].at(e).end();
 }
 
-formula_ptr action::get_precondition(const event_id e) const {
+del::formula_ptr action::get_precondition(const event_id e) const {
     return m_preconditions[e];
 }
 
@@ -101,8 +101,8 @@ unsigned long action::get_maximum_depth() const {
     return m_maximum_depth;
 }
 
-std::ostream &del::operator<<(std::ostream &os, const action &act) {
-    using edges_map = std::map<std::pair<event_id, event_id>, std::vector<agent>>;
+std::ostream &kripke::operator<<(std::ostream &os, const action &act) {
+    using edges_map = std::map<std::pair<event_id, event_id>, std::vector<del::agent>>;
 
     const std::string font = std::string{"\"Helvetica,Arial,sans-serif\""};
 
@@ -139,7 +139,7 @@ std::ostream &del::operator<<(std::ostream &os, const action &act) {
         for (world_id e = 0; e < act.get_events_number(); ++e) {
             boost::dynamic_bitset<> out(act.get_events_number());
 
-            for (agent ag = 0; ag < act.get_language()->get_agents_number(); ++ag)
+            for (del::agent ag = 0; ag < act.get_language()->get_agents_number(); ++ag)
                 out |= *act.get_agent_possible_events(ag, e);
 
             ranks[out.to_ulong()].emplace_back(e);
@@ -159,7 +159,7 @@ std::ostream &del::operator<<(std::ostream &os, const action &act) {
 
     edges_map edges;
 
-    for (agent ag = 0; ag < act.get_language()->get_agents_number(); ++ag)
+    for (del::agent ag = 0; ag < act.get_language()->get_agents_number(); ++ag)
         for (event_id e = 0; e < act.get_events_number(); ++e)
             for (const event_id f : act.get_agent_possible_events(ag, e))
                 if (edges.find({e, f}) == edges.end())
@@ -167,9 +167,9 @@ std::ostream &del::operator<<(std::ostream &os, const action &act) {
                 else
                     edges[{e, f}].emplace_back(ag);
 
-    auto print_ags = [&act](const std::vector<agent> &ags) {
+    auto print_ags = [&act](const std::vector<del::agent> &ags) {
         std::string ags_string;
-        for (const agent &ag: ags)
+        for (const del::agent &ag: ags)
             ags_string += std::string{act.get_language()->get_agent_name(ag)} + ", ";
         return ags_string.substr(0, ags_string.size() - 2);
     };
@@ -180,9 +180,9 @@ std::ostream &del::operator<<(std::ostream &os, const action &act) {
         if (it == edges.end())
             os << "\te" << from << " -> e" << to << " [label=\"" << print_ags(ags) << "\"];" << std::endl;
         else {
-            std::vector<agent> ags2 = it->second;
+            std::vector<del::agent> ags2 = it->second;
             auto size = std::max(ags.size(), ags2.size());
-            std::vector<agent> ags_intersection = std::vector<agent>(size), ags_difference = std::vector<agent>(size);
+            std::vector<del::agent> ags_intersection = std::vector<del::agent>(size), ags_difference = std::vector<del::agent>(size);
 
             std::sort(ags.begin(), ags.end());
             std::sort(ags2.begin(), ags2.end());

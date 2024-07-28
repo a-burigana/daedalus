@@ -52,7 +52,7 @@ del::language_ptr switches::build_language(unsigned long n) {
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-del::state switches::build_initial_state(unsigned long n) {
+kripke::state switches::build_initial_state(unsigned long n) {
     language_ptr language = switches::build_language(n);
 
     world_id worlds_number = 1;
@@ -73,7 +73,7 @@ del::state switches::build_initial_state(unsigned long n) {
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
 }
 
-del::action_deque switches::build_actions(unsigned long n) {
+kripke::action_deque switches::build_actions(unsigned long n) {
     language_ptr language = switches::build_language(n);
     action_deque actions;
 

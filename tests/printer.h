@@ -21,16 +21,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_PRINTER_H
-#define BEP_PRINTER_H
+#ifndef DAEDALUS_PRINTER_H
+#define DAEDALUS_PRINTER_H
 
 #include <fstream>
-#include "../include/del/states/state.h"
-#include "../include/del/actions/action.h"
-#include "../include/del/bisimulation/bisimulation_types.h"
+#include "../include/del/semantics/kripke/states/state.h"
+#include "../include/del/semantics/kripke/actions/action.h"
+#include "../include/del/semantics/kripke/bisimulation/bisimulation_types.h"
 #include "../include/search/planning_task.h"
 #include "../include/search/strategies.h"
 //#include "../include/search/planner.h"
+
+using namespace kripke;
 
 namespace daedalus::tester {
     class printer;
@@ -51,12 +53,12 @@ namespace daedalus::tester {
         [[nodiscard]] std::ostream &out();
         void set_out_to_file(bool out_to_file);
 
-        static void print_state(const del::state &s, const std::string &path, const std::string &name);
-        static void print_action(const del::action &a, const std::string &path);
+        static void print_state(const state &s, const std::string &path, const std::string &name);
+        static void print_action(const action &a, const std::string &path);
 
-        static void print_states(const del::state &s, const del::action_deque &as, const std::string &path,
+        static void print_states(const state &s, const action_deque &as, const std::string &path,
                                  const std::string &name, bool apply_contraction = false,
-                                 del::bisimulation_type type = del::bisimulation_type::full, unsigned long k = 0);
+                                 bisimulation_type type = bisimulation_type::full, unsigned long k = 0);
 
         static void print_results(const search::planning_task &task, search::strategy strategy, const std::string &out_path);
         static void print_time_results(const search::planning_task &task, std::ofstream &table);
@@ -67,4 +69,4 @@ namespace daedalus::tester {
     };
 }
 
-#endif //BEP_PRINTER_H
+#endif //DAEDALUS_PRINTER_H

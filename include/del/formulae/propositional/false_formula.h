@@ -21,11 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_FALSE_FORMULA_H
-#define BEP_FALSE_FORMULA_H
+#ifndef DAEDALUS_FALSE_FORMULA_H
+#define DAEDALUS_FALSE_FORMULA_H
 
 #include "../formula.h"
-#include "../../states/state.h"
 
 namespace del {
     class false_formula : public formula {
@@ -38,7 +37,7 @@ namespace del {
         false_formula(false_formula&&) = default;
         false_formula& operator=(false_formula&&) = default;
 
-        [[nodiscard]] bool holds_in(const state &s, const world_id &w) const override;
+        [[nodiscard]] bool holds_in(const kripke::state &s, const kripke::world_id &w) const override;
         [[nodiscard]] bool is_propositional() const override;
 
         [[nodiscard]] unsigned long get_modal_depth() const override;
@@ -49,4 +48,4 @@ namespace del {
     };
 }
 
-#endif //BEP_FALSE_FORMULA_H
+#endif //DAEDALUS_FALSE_FORMULA_H

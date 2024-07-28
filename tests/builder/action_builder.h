@@ -21,44 +21,47 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_ACTION_BUILDER_H
-#define BEP_ACTION_BUILDER_H
+#ifndef DAEDALUS_ACTION_BUILDER_H
+#define DAEDALUS_ACTION_BUILDER_H
 
-#include "../../include/del/actions/action.h"
+#include "../../include/del/semantics/kripke/actions/action.h"
 #include "../../include/del/language/language.h"
 #include "../../include/del/del_types.h"
+#include "../../include/del/formulae/formula.h"
+
+using namespace kripke;
 
 namespace daedalus::tester {
     class action_builder {
     public:
-        static del::action build_public_announcement(std::string name, const del::language_ptr &language,
+        static action build_public_announcement(std::string name, const del::language_ptr &language,
                                                      const del::formula_ptr &f_pre);
 
-        static del::action build_public_ontic(std::string name, const del::language_ptr &language,
-                                              const del::formula_ptr &f_pre, const del::event_post &e_post);
+        static action build_public_ontic(std::string name, const del::language_ptr &language,
+                                              const del::formula_ptr &f_pre, const event_post &e_post);
 
-        static del::action build_private_ontic(std::string name, const del::language_ptr &language,
-                                               const del::formula_ptr &f_pre, const del::event_post &e_post,
+        static action build_private_ontic(std::string name, const del::language_ptr &language,
+                                               const del::formula_ptr &f_pre, const event_post &e_post,
                                                const del::agent_set &fo_ags);
 
-        static del::action build_private_sensing(std::string name, const del::language_ptr &language,
+        static action build_private_sensing(std::string name, const del::language_ptr &language,
                                                  const del::formula_ptr &f_pre, const del::agent_set &fo_ags);
 
-        static del::action build_semi_private_sensing(std::string name, const del::language_ptr &language,
+        static action build_semi_private_sensing(std::string name, const del::language_ptr &language,
                                                       const del::formula_ptr &f_pre, const del::formula_ptr &sensed,
                                                       const del::agent_set &fo_ags, const del::agent_set &po_ags);
 
-        static del::action build_semi_private_announcement(std::string name, const del::language_ptr &language,
+        static action build_semi_private_announcement(std::string name, const del::language_ptr &language,
                                                            const del::formula_ptr &f_pre, const del::formula_ptr &announced,
                                                            const del::agent_set &fo_ags, const del::agent_set &po_ags);
 
-        static del::action build_quasi_private_announcement(std::string name, const del::language_ptr &language,
+        static action build_quasi_private_announcement(std::string name, const del::language_ptr &language,
                                                             const del::formula_ptr &f_pre_1, const del::formula_ptr &f_pre_2,
                                                             const del::agent_set &fo_ags_1, const del::agent_set &fo_ags_2);
 
-        static del::action build_private_announcement(std::string name, const del::language_ptr &language,
+        static action build_private_announcement(std::string name, const del::language_ptr &language,
                                                       const del::formula_ptr &f_pre, const del::agent_set &fo_ags);
     };
 }
 
-#endif //BEP_ACTION_BUILDER_H
+#endif //DAEDALUS_ACTION_BUILDER_H

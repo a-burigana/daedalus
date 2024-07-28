@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_SEARCH_TESTER_H
-#define BEP_SEARCH_TESTER_H
+#ifndef DAEDALUS_SEARCH_TESTER_H
+#define DAEDALUS_SEARCH_TESTER_H
 
 #include "../include/search/planning_task.h"
 
@@ -56,4 +56,4 @@ namespace daedalus::tester {
     };
 }
 
-#endif //BEP_SEARCH_TESTER_H
+#endif //DAEDALUS_SEARCH_TESTER_H

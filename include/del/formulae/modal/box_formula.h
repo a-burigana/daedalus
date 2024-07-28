@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_BOX_FORMULA_H
-#define BEP_BOX_FORMULA_H
+#ifndef DAEDALUS_BOX_FORMULA_H
+#define DAEDALUS_BOX_FORMULA_H
 
 #include "../../language/language_types.h"
 #include "../formula.h"
@@ -40,7 +40,7 @@ namespace del {
 
 //        ~box_formula() = default;
 
-        [[nodiscard]] bool holds_in(const state &s, const world_id &w) const override;
+        [[nodiscard]] bool holds_in(const kripke::state &s, const kripke::world_id &w) const override;
         [[nodiscard]] bool is_propositional() const override;
 
         [[nodiscard]] unsigned long get_modal_depth() const override;
@@ -55,4 +55,4 @@ namespace del {
     };
 }
 
-#endif //BEP_BOX_FORMULA_H
+#endif //DAEDALUS_BOX_FORMULA_H

@@ -21,10 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_COIN_IN_THE_BOX_H
-#define BEP_COIN_IN_THE_BOX_H
+#ifndef DAEDALUS_COIN_IN_THE_BOX_H
+#define DAEDALUS_COIN_IN_THE_BOX_H
 
-#include "../../../include/del/actions/action.h"
+#include "../../../include/del/semantics/kripke/actions/action.h"
 #include "../../../include/del/del_types.h"
 #include "../../../include/del/formulae/formula.h"
 #include "../../../include/del/language/language.h"
@@ -36,17 +36,17 @@ namespace daedalus::tester {
         static std::string get_name();
 
         static del::language_ptr build_language();
-        static del::state build_initial_state();
+        static kripke::state build_initial_state();
 
-        static del::action_deque build_actions();
+        static kripke::action_deque build_actions();
         static search::planning_task build_task(unsigned long id);
         static std::vector<search::planning_task> build_tasks();
 
-        static del::action build_open(del::agent ag, const del::agent_set &fo_ags);
-        static del::action build_peek(del::agent ag, const del::agent_set &po_ags);
-        static del::action build_shout(del::agent ag, const del::agent_set &fo_ags);
-        static del::action build_walk_in(del::agent ag, const del::agent_set &fo_ags);
-        static del::action build_walk_out(del::agent ag, const del::agent_set &fo_ags);
+        static kripke::action build_open(del::agent ag, const del::agent_set &fo_ags);
+        static kripke::action build_peek(del::agent ag, const del::agent_set &po_ags);
+        static kripke::action build_shout(del::agent ag, const del::agent_set &fo_ags);
+        static kripke::action build_walk_in(del::agent ag, const del::agent_set &fo_ags);
+        static kripke::action build_walk_out(del::agent ag, const del::agent_set &fo_ags);
 
     private:
         static search::planning_task build_task_1();
@@ -62,4 +62,4 @@ namespace daedalus::tester {
     };
 }
 
-#endif //BEP_COIN_IN_THE_BOX_H
+#endif //DAEDALUS_COIN_IN_THE_BOX_H

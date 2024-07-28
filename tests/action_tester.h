@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_ACTION_TESTER_H
-#define BEP_ACTION_TESTER_H
+#ifndef DAEDALUS_ACTION_TESTER_H
+#define DAEDALUS_ACTION_TESTER_H
 
 #include <string>
 
@@ -37,4 +37,4 @@ namespace daedalus::tester {
     };
 }
 
-#endif //BEP_ACTION_TESTER_H
+#endif //DAEDALUS_ACTION_TESTER_H

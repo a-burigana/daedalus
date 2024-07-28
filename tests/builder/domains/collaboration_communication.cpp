@@ -61,7 +61,7 @@ collaboration_communication::build_language(unsigned long agents_no, unsigned lo
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-del::state collaboration_communication::build_initial_state(unsigned long agents_no, unsigned long rooms_no,
+kripke::state collaboration_communication::build_initial_state(unsigned long agents_no, unsigned long rooms_no,
                                                             unsigned long boxes_no) {
     language_ptr language = collaboration_communication::build_language(agents_no, rooms_no, boxes_no);
 
@@ -122,7 +122,7 @@ del::state collaboration_communication::build_initial_state(unsigned long agents
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
 }
 
-del::action_deque collaboration_communication::build_actions(unsigned long agents_no, unsigned long rooms_no,
+kripke::action_deque collaboration_communication::build_actions(unsigned long agents_no, unsigned long rooms_no,
                                                              unsigned long boxes_no) {
     language_ptr language = collaboration_communication::build_language(agents_no, rooms_no, boxes_no);
     action_deque actions;
@@ -241,7 +241,7 @@ std::vector<search::planning_task> collaboration_communication::build_tasks() {
     return tasks;
 }
 
-del::action collaboration_communication::build_left(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no,
+kripke::action collaboration_communication::build_left(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no,
                                                     del::agent ag, const del::agent_set &fo_ags) {
     language_ptr language = collaboration_communication::build_language(agents_no, rooms_no, boxes_no);
     std::string ag_name = language->get_agent_name(ag);
@@ -269,7 +269,7 @@ del::action collaboration_communication::build_left(unsigned long agents_no, uns
     return action_builder::build_public_ontic(std::move(name), language, f_pre, e_post);
 }
 
-del::action collaboration_communication::build_right(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no,
+kripke::action collaboration_communication::build_right(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no,
                                                      del::agent ag, const del::agent_set &fo_ags) {
     language_ptr language = collaboration_communication::build_language(agents_no, rooms_no, boxes_no);
     std::string ag_name = language->get_agent_name(ag);
@@ -297,7 +297,7 @@ del::action collaboration_communication::build_right(unsigned long agents_no, un
     return action_builder::build_public_ontic(std::move(name), language, f_pre, e_post);
 }
 
-del::action collaboration_communication::build_sense(unsigned long agents_no, unsigned long rooms_no,
+kripke::action collaboration_communication::build_sense(unsigned long agents_no, unsigned long rooms_no,
                                                      unsigned long boxes_no, del::agent ag, unsigned long r,
                                                      unsigned long b, const del::agent_set &po_ags) {
     language_ptr language = collaboration_communication::build_language(agents_no, rooms_no, boxes_no);
@@ -324,7 +324,7 @@ del::action collaboration_communication::build_sense(unsigned long agents_no, un
     return action_builder::build_semi_private_sensing(std::move(name), language, f_pre, sensed, fo_ags, po_ags);
 }
 
-del::action collaboration_communication::build_tell(unsigned long agents_no, unsigned long rooms_no,
+kripke::action collaboration_communication::build_tell(unsigned long agents_no, unsigned long rooms_no,
                                                     unsigned long boxes_no, del::agent ag, unsigned long r,
                                                     unsigned long b, const del::agent_set &fo_ags) {
     language_ptr language = collaboration_communication::build_language(agents_no, rooms_no, boxes_no);

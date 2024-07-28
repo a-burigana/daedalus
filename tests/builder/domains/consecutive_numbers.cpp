@@ -49,7 +49,7 @@ del::language_ptr consecutive_numbers::build_language(unsigned long n) {
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-del::state consecutive_numbers::build_initial_state(unsigned long n) {
+kripke::state consecutive_numbers::build_initial_state(unsigned long n) {
     language_ptr language = consecutive_numbers::build_language(n);
 
     world_id worlds_number = n;

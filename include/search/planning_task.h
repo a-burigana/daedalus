@@ -21,12 +21,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_PLANNING_TASK_H
-#define BEP_PLANNING_TASK_H
+#ifndef DAEDALUS_PLANNING_TASK_H
+#define DAEDALUS_PLANNING_TASK_H
 
 #include <set>
-#include "../del/states/state.h"
-#include "../del/actions/action.h"
+#include "../del/semantics/kripke/states/state.h"
+#include "../del/semantics/kripke/actions/action.h"
 #include "../del/formulae/formula.h"
 #include "../del/language/language.h"
 
@@ -37,7 +37,7 @@ namespace search {
     class planning_task {
     public:
         planning_task(std::string domain_name, std::string problem_id, del::language_ptr language,
-                      del::state initial_state, del::action_deque actions, del::formula_ptr goal);
+                      kripke::state initial_state, kripke::action_deque actions, del::formula_ptr goal);
 
         planning_task(const planning_task&) = delete;
         planning_task& operator=(const planning_task&) = delete;
@@ -52,27 +52,27 @@ namespace search {
         [[nodiscard]] unsigned long get_maximum_depth() const;
 
         [[nodiscard]] del::language_ptr get_language() const;
-        [[nodiscard]] del::state_ptr get_initial_state() const;
-        [[nodiscard]] const del::action_deque &get_actions() const;
+        [[nodiscard]] kripke::state_ptr get_initial_state() const;
+        [[nodiscard]] const kripke::action_deque &get_actions() const;
         [[nodiscard]] del::formula_ptr get_goal() const;
 
-        [[nodiscard]] const del::action_ptr &get_action(const std::string &name) const;
-        [[nodiscard]] del::action_deque get_actions(const std::deque<std::string> &names) const;
+        [[nodiscard]] const kripke::action_ptr &get_action(const std::string &name) const;
+        [[nodiscard]] kripke::action_deque get_actions(const std::deque<std::string> &names) const;
 
     private:
         std::string m_domain_name, m_problem_id;
         unsigned long m_maximum_depth;
 
         del::language_ptr m_language;
-        del::state_ptr m_initial_state;
-        del::action_deque m_actions;
+        kripke::state_ptr m_initial_state;
+        kripke::action_deque m_actions;
         del::formula_ptr m_goal;
 
-        std::map<std::string, del::action_ptr> m_actions_map;
+        std::map<std::string, kripke::action_ptr> m_actions_map;
 
         void init_maximum_depth();
         void init_actions_map();
     };
 }
 
-#endif //BEP_PLANNING_TASK_H
+#endif //DAEDALUS_PLANNING_TASK_H

@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_SEARCH_TYPES_H
-#define BEP_SEARCH_TYPES_H
+#ifndef DAEDALUS_SEARCH_TYPES_H
+#define DAEDALUS_SEARCH_TYPES_H
 
 #include <memory>
 #include <deque>
@@ -32,4 +32,4 @@ namespace search {
     using node_ptr   = std::shared_ptr<node>;
     using node_deque = std::list<node_ptr>;     // TODO; CHANGE BACK TO DEQUE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
-#endif //BEP_SEARCH_TYPES_H
+#endif //DAEDALUS_SEARCH_TYPES_H

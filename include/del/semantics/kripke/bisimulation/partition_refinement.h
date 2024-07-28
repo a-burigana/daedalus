@@ -21,15 +21,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_PARTITION_REFINEMENT_H
-#define BEP_PARTITION_REFINEMENT_H
+#ifndef DAEDALUS_PARTITION_REFINEMENT_H
+#define DAEDALUS_PARTITION_REFINEMENT_H
 
-#include "../language/language.h"
+#include "../../../language/language.h"
 #include "bisimulation_types.h"
 #include "../states/states_types.h"
-#include "../../search/search_types.h"
+#include "../../../../search/search_types.h"
 
-namespace del {
+namespace kripke {
     class state;
 
     class partition_refinement {
@@ -82,4 +82,4 @@ namespace del {
     };
 }
 
-#endif //BEP_PARTITION_REFINEMENT_H
+#endif //DAEDALUS_PARTITION_REFINEMENT_H

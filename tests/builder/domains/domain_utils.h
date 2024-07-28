@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_DOMAIN_UTILS_H
-#define BEP_DOMAIN_UTILS_H
+#ifndef DAEDALUS_DOMAIN_UTILS_H
+#define DAEDALUS_DOMAIN_UTILS_H
 
 #include "../../../include/del/language/language.h"
 #include "../../../include/del/del_types.h"
@@ -50,4 +50,4 @@ namespace daedalus::tester {
     };
 }
 
-#endif //BEP_DOMAIN_UTILS_H
+#endif //DAEDALUS_DOMAIN_UTILS_H

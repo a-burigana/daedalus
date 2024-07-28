@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_BOUNDED_PARTITION_REFINEMENT_H
-#define BEP_BOUNDED_PARTITION_REFINEMENT_H
+#ifndef DAEDALUS_BOUNDED_PARTITION_REFINEMENT_H
+#define DAEDALUS_BOUNDED_PARTITION_REFINEMENT_H
 
 #include <vector>
 #include <list>
@@ -32,11 +32,11 @@
 #include <set>
 #include <boost/dynamic_bitset.hpp>
 #include "bounded_bisimulation_types.h"
-#include "../del_types.h"
+#include "../../../del_types.h"
 #include "../states/states_types.h"
-#include "../../search/search_types.h"
+#include "../../../../search/search_types.h"
 
-namespace del {
+namespace kripke {
     class state;
 
     class bounded_partition_refinement {
@@ -57,7 +57,7 @@ namespace del {
         static void refine(const state &s, unsigned long k, unsigned long h, partition &Q, const block_ptr &B,
                            const relations &r_1, block_matrix &worlds_blocks, block_id &count);
 
-        static block calculate_preimages(const state &s, const block &B_, const relations &r_1, agent ag);
+        static block calculate_preimages(const state &s, const block &B_, const relations &r_1, del::agent ag);
 
         static void split(const state &s, unsigned long k, unsigned long h, partition &Q,
                           const block &block_preimage, block_matrix &worlds_blocks, block_id &count);
@@ -84,4 +84,4 @@ namespace del {
     };
 }
 
-#endif //BEP_BOUNDED_PARTITION_REFINEMENT_H
+#endif //DAEDALUS_BOUNDED_PARTITION_REFINEMENT_H

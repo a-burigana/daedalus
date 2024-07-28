@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_LANGUAGE_TYPES_H
-#define BEP_LANGUAGE_TYPES_H
+#ifndef DAEDALUS_LANGUAGE_TYPES_H
+#define DAEDALUS_LANGUAGE_TYPES_H
 
 #include <vector>
 #include <map>
@@ -37,4 +37,4 @@ namespace del {
     using agent_id_map = std::map<std::string, agent>;
 }
 
-#endif //BEP_LANGUAGE_TYPES_H
+#endif //DAEDALUS_LANGUAGE_TYPES_H

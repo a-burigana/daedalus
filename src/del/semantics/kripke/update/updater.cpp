@@ -24,10 +24,10 @@
 #include <queue>
 #include <utility>
 #include <list>
-#include "../../../include/del/update/updater.h"
-#include "../../../include/del/bisimulation/bisimulator.h"
+#include "../../../../../include/del/semantics/kripke/update/updater.h"
+#include "../../../../../include/del/semantics/kripke/bisimulation/bisimulator.h"
 
-using namespace del;
+using namespace kripke;
 
 bool updater::is_applicable(const state &s, const action &a) {
     const auto check = [&](const world_id wd) { return is_applicable_world(s, a, wd); };
@@ -39,8 +39,8 @@ bool updater::is_applicable_world(const state &s, const action &a, const world_i
     return std::any_of(a.get_designated_events().begin(), a.get_designated_events().end(), check);
 }
 
-state updater::product_update(const del::state &s, const del::action_deque &as, bool apply_contraction,
-                              del::bisimulation_type type, const unsigned long k) {
+state updater::product_update(const state &s, const action_deque &as, bool apply_contraction,
+                              bisimulation_type type, const unsigned long k) {
     state s_ = product_update(s, *as.front());
 
     if (apply_contraction)
@@ -70,7 +70,7 @@ std::pair<world_id, world_set> updater::calculate_worlds(const state &s, const a
     std::set<updated_world> to_expand;
     std::set<updated_world> visited;
 
-    for (agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
         r_map[ag] = updated_world_pair_deque{};
 
     for (const world_id wd : s.get_designated_worlds())
@@ -87,7 +87,7 @@ std::pair<world_id, world_set> updater::calculate_worlds(const state &s, const a
         if (s.is_designated(w) and a.is_designated(e))
             designated_worlds.push_back(worlds_number - 1);
 
-        for (agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
+        for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
             const world_set &ag_worlds = s.get_agent_possible_worlds(ag, w);
             const event_set &ag_events = a.get_agent_possible_events(ag, e);
 
@@ -112,14 +112,14 @@ relations updater::calculate_relations(const state &s, const action &a, const wo
                                        const updated_worlds_map &w_map, const updated_edges_vector &r_map) {
     relations r = relations(s.get_language()->get_agents_number());
 
-    for (agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
         r[ag] = agent_relation(worlds_number);
 
         for (world_id w = 0; w < worlds_number; ++w)
             r[ag][w] = world_set(worlds_number);
     }
 
-    for (agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
         for (const auto &[w_, v_] : r_map[ag]) {
             const auto &[w, e] = w_;
             const auto &[v, f] = v_;

@@ -28,7 +28,7 @@
 
 using namespace search;
 
-node::node(unsigned long long id, del::state_ptr state, del::action_ptr action, unsigned long bound, bool is_bisim,
+node::node(unsigned long long id, kripke::state_ptr state, kripke::action_ptr action, unsigned long bound, bool is_bisim,
            node_ptr parent) :
         m_id{id},
         m_state{std::move(state)},
@@ -47,15 +47,15 @@ unsigned long long node::get_tree_depth() const {
     return m_tree_depth;
 }
 
-del::state_ptr node::get_state() const {
+kripke::state_ptr node::get_state() const {
     return m_state;
 }
 
-del::state_ptr node::get_original_state() const {
+kripke::state_ptr node::get_original_state() const {
     return m_original_state;
 }
 
-del::action_ptr node::get_action() const {
+kripke::action_ptr node::get_action() const {
     return m_action;
 }
 
@@ -75,7 +75,7 @@ const node_deque &node::get_children() const {
     return m_children;
 }
 
-const del::action_deque &node::get_to_apply_actions() const {
+const kripke::action_deque &node::get_to_apply_actions() const {
     return m_to_apply_actions;
 }
 
@@ -83,7 +83,7 @@ const del::action_deque &node::get_to_apply_actions() const {
 //    return *m_structures;
 //}
 
-void node::set_state(del::state_ptr s) {
+void node::set_state(kripke::state_ptr s) {
     m_state = std::move(s);
 }
 
@@ -106,11 +106,11 @@ void node::clear_non_bisim_children() {
     m_non_bisim_children.clear();
 }
 
-void node::set_to_apply_action(del::action_deque actions) {
+void node::set_to_apply_action(kripke::action_deque actions) {
     m_to_apply_actions = std::move(actions);
 }
 
-void node::set_original_state(del::state_ptr s) {
+void node::set_original_state(kripke::state_ptr s) {
     m_original_state = s;
 }
 

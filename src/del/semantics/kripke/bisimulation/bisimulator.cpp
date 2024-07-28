@@ -21,47 +21,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_LABEL_H
-#define BEP_LABEL_H
+#include "../../../../../include/del/semantics/kripke/bisimulation/bisimulator.h"
+#include "../../../../../include/del/semantics/kripke/bisimulation/partition_refinement.h"
+#include "../../../../../include/del/semantics/kripke/bisimulation/bounded_partition_refinement.h"
 
-#include "boost/dynamic_bitset.hpp"
-#include "../language/language_types.h"
+using namespace kripke;
 
-namespace del {
-    class label;
-    using label_ptr = std::shared_ptr<label>;
-
-    class label {
-    public:
-        label() = default;
-
-        explicit label(boost::dynamic_bitset<> bitset);
-
-        label(const label&) = default;
-        label& operator=(const label&) = default;
-
-        label(label&&) = default;       // todo: make it delete?
-        label& operator=(label&&) = default;
-
-        ~label() = default;
-
-        [[nodiscard]] unsigned long get_id() const;
-
-        boost::dynamic_bitset<> &operator*();
-        bool operator[](const atom &p) const;
-        void update(atom p, bool value);
-
-        bool operator==(const label &rhs) const;
-        bool operator!=(const label &rhs) const;
-        bool operator< (const label &rhs) const;
-        bool operator> (const label &rhs) const;
-        bool operator<=(const label &rhs) const;
-        bool operator>=(const label &rhs) const;
-
-    private:
-        boost::dynamic_bitset<> m_bitset;
-        unsigned long m_id;
-    };
+std::pair<bool, state> bisimulator::contract(bisimulation_type type, state &s, unsigned long k) {
+    switch (type) {
+        case bisimulation_type::full:
+            return partition_refinement::contract(s);           // Classic Paige and Tarjan algorithm
+        case bisimulation_type::bounded:
+            return bounded_partition_refinement::contract(s, k);
+    }
 }
 
-#endif //BEP_LABEL_H
+//bool bisimulator::contract(bisimulation_type type, search::node_ptr &n) {
+//    switch (type) {
+//        case bisimulation_type::full:
+//            return partition_refinement::contract(n);           // Classic Paige and Tarjan algorithm
+//        case bisimulation_type::bounded:
+//            return bounded_partition_refinement::contract(n);
+//    }
+//}
+
+//bool bisimulator::repeat_contraction(search::node_ptr &n) {
+//    return bounded_partition_refinement::repeat_contraction(n);
+//}

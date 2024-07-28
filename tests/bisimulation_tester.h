@@ -21,10 +21,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_BISIMULATION_TESTER_H
-#define BEP_BISIMULATION_TESTER_H
+#ifndef DAEDALUS_BISIMULATION_TESTER_H
+#define DAEDALUS_BISIMULATION_TESTER_H
 
-#include "../include/del/states/state.h"
+#include "../include/del/semantics/kripke/states/state.h"
+
+using namespace kripke;
 
 namespace daedalus::tester {
     class bisimulation_tester {
@@ -41,18 +43,18 @@ namespace daedalus::tester {
 
         static void test_bisim_cn(const std::string &out_path, unsigned long n, unsigned long k);
 
-        static del::state test_full_bisim_1();
-        static del::state test_full_bisim_singleton(bool has_loop);
-        static del::state test_full_bisim_chain(unsigned long length, bool has_final_loop, bool all_designated = false);
-        static del::state test_full_bisim_k_tree(unsigned long k);
-        static del::state test_full_bisim_cn(unsigned long n, unsigned long k);
+        static state test_full_bisim_1();
+        static state test_full_bisim_singleton(bool has_loop);
+        static state test_full_bisim_chain(unsigned long length, bool has_final_loop, bool all_designated = false);
+        static state test_full_bisim_k_tree(unsigned long k);
+        static state test_full_bisim_cn(unsigned long n, unsigned long k);
 
-        static std::pair<bool, del::state> test_bounded_bisim_1(unsigned long k);
-        static std::pair<bool, del::state> test_bounded_bisim_singleton(unsigned long k, bool has_loop);
-        static std::pair<bool, del::state> test_bounded_bisim_chain(unsigned long k, unsigned long length, bool has_final_loop, bool all_designated = false);
-        static std::pair<bool, del::state> test_bounded_bisim_k_tree(unsigned long k);
-        static std::pair<bool, del::state> test_bounded_bisim_cn(unsigned long n, unsigned long k);
+        static std::pair<bool, state> test_bounded_bisim_1(unsigned long k);
+        static std::pair<bool, state> test_bounded_bisim_singleton(unsigned long k, bool has_loop);
+        static std::pair<bool, state> test_bounded_bisim_chain(unsigned long k, unsigned long length, bool has_final_loop, bool all_designated = false);
+        static std::pair<bool, state> test_bounded_bisim_k_tree(unsigned long k);
+        static std::pair<bool, state> test_bounded_bisim_cn(unsigned long n, unsigned long k);
     };
 }
 
-#endif //BEP_BISIMULATION_TESTER_H
+#endif //DAEDALUS_BISIMULATION_TESTER_H

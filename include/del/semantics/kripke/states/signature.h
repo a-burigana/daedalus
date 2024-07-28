@@ -21,25 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <utility>
+#ifndef DAEDALUS_SIGNATURE_H
+#define DAEDALUS_SIGNATURE_H
 
-#include "../../../../include/del/formulae/propositional/imply_formula.h"
-#include "../../../../include/del/semantics/kripke/states/states_types.h"
-
-using namespace del;
-
-imply_formula::imply_formula(formula_ptr f1, formula_ptr f2) :
-        m_f1{std::move(f1)},
-        m_f2{std::move(f2)} {}
-
-bool imply_formula::holds_in(const kripke::state &s, const kripke::world_id &w) const {
-    return not m_f1->holds_in(s, w) or m_f2->holds_in(s, w);
+namespace delphic {
+    class signature {
+    private:
+        unsigned long m_id;
+    };
 }
 
-bool imply_formula::is_propositional() const {
-    return m_f1->is_propositional() and m_f2->is_propositional();
-}
-
-unsigned long imply_formula::get_modal_depth() const {
-    return std::max(m_f1->get_modal_depth(), m_f2->get_modal_depth());
-}
+#endif //DAEDALUS_SIGNATURE_H

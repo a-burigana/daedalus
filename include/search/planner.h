@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_PLANNER_H
-#define BEP_PLANNER_H
+#ifndef DAEDALUS_PLANNER_H
+#define DAEDALUS_PLANNER_H
 
 #include <functional>
 #include <list>
@@ -30,9 +30,9 @@
 #include <queue>
 #include "planning_task.h"
 #include "search_space.h"
-#include "../del/states/state.h"
-#include "../del/update/updater.h"
-#include "../del/bisimulation/bisimulator.h"
+#include "../del/semantics/kripke/states/state.h"
+#include "../del/semantics/kripke/update/updater.h"
+#include "../del/semantics/kripke/bisimulation/bisimulator.h"
 #include "../../tests/printer.h"
 #include "strategies.h"
 
@@ -53,21 +53,21 @@ namespace search {
         static node_deque bfs(const planning_task &task, strategy strategy, node_deque &previous_iter_frontier,
                               unsigned long b, unsigned long long &id, const daedalus::tester::printer_ptr &printer);
 
-        static node_deque init_frontier(del::state_ptr &s0, strategy strategy, unsigned long b,
+        static node_deque init_frontier(kripke::state_ptr &s0, strategy strategy, unsigned long b,
                                         node_deque &previous_iter_frontier);
 
         static node_deque expand_node(const planning_task &task, strategy strategy, node_ptr &n,
-                                      const del::action_deque &actions, node_deque &frontier, unsigned long goal_depth,
+                                      const kripke::action_deque &actions, node_deque &frontier, unsigned long goal_depth,
                                       unsigned long long &id, const daedalus::tester::printer_ptr &printer);
         
         static node_deque extract_path(node_ptr n);
 
-        static search::node_ptr update_node(strategy strategy, const node_ptr &n, const del::action_ptr &a,
+        static search::node_ptr update_node(strategy strategy, const node_ptr &n, const kripke::action_ptr &a,
                                             unsigned long long &id, unsigned long goal_depth = 0);
 
         static void refresh_node(node_ptr &n);
 
-        static search::node_ptr init_node(strategy strategy, const del::state_ptr &s, const del::action_ptr &a,
+        static search::node_ptr init_node(strategy strategy, const kripke::state_ptr &s, const kripke::action_ptr &a,
                                           bool was_bisim, const node_ptr &parent, unsigned long long id, unsigned long b = 0);
 
         // Print utilities
@@ -75,11 +75,11 @@ namespace search {
         static void print_node_id(const daedalus::tester::printer_ptr &printer, const node_ptr &n);
         static void print_begin_expanding_node(const daedalus::tester::printer_ptr &printer, const node_ptr &n, strategy strategy);
         static void print_goal_found(const daedalus::tester::printer_ptr &printer, const node_ptr &n);
-        static void print_applying_action(const daedalus::tester::printer_ptr &printer, const del::action_ptr &a, const node_ptr &n_,
+        static void print_applying_action(const daedalus::tester::printer_ptr &printer, const kripke::action_ptr &a, const node_ptr &n_,
                                           strategy strategy);
         static void print_end_expanding_node(const daedalus::tester::printer_ptr &printer, const node_ptr &n, strategy strategy,
                                              bool is_dead_node, bool is_fully_expanded_node);
     };
 }
 
-#endif //BEP_PLANNER_H
+#endif //DAEDALUS_PLANNER_H

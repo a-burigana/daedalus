@@ -21,35 +21,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_BOUNDED_BISIMULATION_TYPES_H
-#define BEP_BOUNDED_BISIMULATION_TYPES_H
+#include "../../../../../include/del/semantics/kripke/states/signature.h"
 
-#include <deque>
-#include <list>
-#include <memory>
-#include <vector>
-#include <set>
-#include <unordered_map>
-#include "../../utils/bit_deque.h"
-#include "../states/states_types.h"
-
-namespace del {
-    using block_id         = unsigned long;
-    using block            = bit_deque;
-    using block_ptr        = std::shared_ptr<block>;
-    using block_vector     = std::vector<block_ptr>;
-    using block_matrix     = std::vector<block_vector>;
-    using block_deque      = std::list<block_ptr>;      // TODO: REVERT BACK TO DEQUE!!!!!!!!!!!!!!
-    using block_set        = std::set<block_ptr>;
-    using partition        = std::vector<block_deque>;
-    using split_blocks_map = std::unordered_map<block_ptr, block_ptr>;
-
-    struct bpr_structures {
-        partition Q;
-        block_matrix worlds_blocks;
-        relations r_1;
-        block_id count;
-    };
-}
-
-#endif //BEP_BOUNDED_BISIMULATION_TYPES_H
+using namespace delphic;

@@ -58,7 +58,7 @@ del::language_ptr selective_communication::build_language(const unsigned long ag
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-del::state selective_communication::build_initial_state(unsigned long agents_no, unsigned long rooms_no) {
+kripke::state selective_communication::build_initial_state(unsigned long agents_no, unsigned long rooms_no) {
     language_ptr language = selective_communication::build_language(agents_no, rooms_no);
 
     const world_id worlds_number = 2;
@@ -97,7 +97,7 @@ del::state selective_communication::build_initial_state(unsigned long agents_no,
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
 }
 
-del::action_deque selective_communication::build_actions(unsigned long agents_no, unsigned long rooms_no) {
+kripke::action_deque selective_communication::build_actions(unsigned long agents_no, unsigned long rooms_no) {
     language_ptr language = selective_communication::build_language(agents_no, rooms_no);
     action_deque actions;
 
@@ -210,7 +210,7 @@ std::vector<search::planning_task> selective_communication::build_tasks() {
     return tasks;
 }
 
-del::action selective_communication::build_left(unsigned long agents_no, unsigned long rooms_no, del::agent ag, const del::agent_set &fo_ags) {
+kripke::action selective_communication::build_left(unsigned long agents_no, unsigned long rooms_no, del::agent ag, const del::agent_set &fo_ags) {
     language_ptr language = selective_communication::build_language(agents_no, rooms_no);
     std::string ag_name = language->get_agent_name(ag);
 
@@ -237,7 +237,7 @@ del::action selective_communication::build_left(unsigned long agents_no, unsigne
     return action_builder::build_public_ontic(std::move(name), language, f_pre, e_post);
 }
 
-del::action selective_communication::build_right(unsigned long agents_no, unsigned long rooms_no, del::agent ag, const del::agent_set &fo_ags) {
+kripke::action selective_communication::build_right(unsigned long agents_no, unsigned long rooms_no, del::agent ag, const del::agent_set &fo_ags) {
     language_ptr language = selective_communication::build_language(agents_no, rooms_no);
     std::string ag_name = language->get_agent_name(ag);
 
@@ -264,7 +264,7 @@ del::action selective_communication::build_right(unsigned long agents_no, unsign
     return action_builder::build_public_ontic(std::move(name), language, f_pre, e_post);
 }
 
-del::action selective_communication::build_sense(unsigned long agents_no, unsigned long rooms_no, del::agent ag,
+kripke::action selective_communication::build_sense(unsigned long agents_no, unsigned long rooms_no, del::agent ag,
                                                  const del::agent_set &po_ags) {
     language_ptr language = selective_communication::build_language(agents_no, rooms_no);
     std::string ag_name = language->get_agent_name(ag);
@@ -290,7 +290,7 @@ del::action selective_communication::build_sense(unsigned long agents_no, unsign
     return action_builder::build_semi_private_sensing(std::move(name), language, f_pre, sensed, fo_ags, po_ags);
 }
 
-del::action selective_communication::build_tell(unsigned long agents_no, unsigned long rooms_no, del::agent ag,
+kripke::action selective_communication::build_tell(unsigned long agents_no, unsigned long rooms_no, del::agent ag,
                                                 unsigned long r, const del::agent_set &fo_ags) {
     language_ptr language = selective_communication::build_language(agents_no, rooms_no);
     agent_set ag_set(language->get_agents_number()), fo_ags_2 = fo_ags;

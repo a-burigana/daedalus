@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_LANGUAGE_H
-#define BEP_LANGUAGE_H
+#ifndef DAEDALUS_LANGUAGE_H
+#define DAEDALUS_LANGUAGE_H
 
 #include "language_types.h"
 
@@ -59,4 +59,4 @@ namespace del {
     };
 }
 
-#endif //BEP_LANGUAGE_H
+#endif //DAEDALUS_LANGUAGE_H

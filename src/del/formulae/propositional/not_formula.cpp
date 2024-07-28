@@ -30,7 +30,7 @@ using namespace del;
 not_formula::not_formula(formula_ptr f) :
     m_f{std::move(f)} {}
 
-bool not_formula::holds_in(const state &s, const world_id &w) const {
+bool not_formula::holds_in(const kripke::state &s, const kripke::world_id &w) const {
     return not m_f->holds_in(s, w);
 }
 

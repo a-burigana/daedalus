@@ -31,7 +31,7 @@ using namespace del;
 and_formula::and_formula(formula_deque fs) :
         m_fs{std::move(fs)} {}
 
-bool and_formula::holds_in(const state &s, const world_id &w) const {
+bool and_formula::holds_in(const kripke::state &s, const kripke::world_id &w) const {
     auto check = [&](const formula_ptr &f) { return f->holds_in(s, w); };
     return std::all_of(m_fs.begin(), m_fs.end(), check);
 }

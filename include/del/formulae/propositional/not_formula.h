@@ -21,11 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_NOT_FORMULA_H
-#define BEP_NOT_FORMULA_H
+#ifndef DAEDALUS_NOT_FORMULA_H
+#define DAEDALUS_NOT_FORMULA_H
 
 #include "../formula.h"
-#include "../../states/states_types.h"
 #include "../../language/language.h"
 
 namespace del {
@@ -41,7 +40,7 @@ namespace del {
 
 //        ~not_formula() = default;
 
-        [[nodiscard]] bool holds_in(const state &s, const world_id &w) const override;
+        [[nodiscard]] bool holds_in(const kripke::state &s, const kripke::world_id &w) const override;
         [[nodiscard]] bool is_propositional() const override;
 
         [[nodiscard]] unsigned long get_modal_depth() const override;
@@ -56,4 +55,4 @@ namespace del {
     };
 }
 
-#endif //BEP_NOT_FORMULA_H
+#endif //DAEDALUS_NOT_FORMULA_H

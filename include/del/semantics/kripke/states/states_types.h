@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_STATES_TYPES_H
-#define BEP_STATES_TYPES_H
+#ifndef DAEDALUS_STATES_TYPES_H
+#define DAEDALUS_STATES_TYPES_H
 
 #include <cmath>
 #include <cstddef>
@@ -31,11 +31,11 @@
 #include <list>
 #include <boost/dynamic_bitset.hpp>
 #include <ostream>
-#include "../language/language_types.h"
+#include "../../../language/language_types.h"
 #include "label.h"
-#include "../../utils/bit_deque.h"
+#include "../../../../utils/bit_deque.h"
 
-namespace del {
+namespace kripke {
     class state;
     using state_ptr = std::shared_ptr<state>;
 
@@ -128,4 +128,4 @@ namespace del {
 //    };
 }
 
-#endif //BEP_STATES_TYPES_H
+#endif //DAEDALUS_STATES_TYPES_H

@@ -21,10 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_FORMULA_TESTER_H
-#define BEP_FORMULA_TESTER_H
+#ifndef DAEDALUS_FORMULA_TESTER_H
+#define DAEDALUS_FORMULA_TESTER_H
 
-#include "../include/del/states/state.h"
+#include "../include/del/semantics/kripke/states/state.h"
 #include "../include/del/formulae/formula.h"
 
 namespace daedalus::tester {
@@ -36,4 +36,4 @@ namespace daedalus::tester {
     };
 }
 
-#endif //BEP_FORMULA_TESTER_H
+#endif //DAEDALUS_FORMULA_TESTER_H

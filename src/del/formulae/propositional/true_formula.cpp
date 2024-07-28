@@ -25,7 +25,7 @@
 
 using namespace del;
 
-bool true_formula::holds_in(const del::state &s, const del::world_id &w) const {
+bool true_formula::holds_in(const kripke::state &s, const kripke::world_id &w) const {
     return true;
 }
 

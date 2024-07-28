@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef BEP_AND_FORMULA_H
-#define BEP_AND_FORMULA_H
+#ifndef DAEDALUS_AND_FORMULA_H
+#define DAEDALUS_AND_FORMULA_H
 
 
 #include "../formula.h"
@@ -40,7 +40,7 @@ namespace del {
 
 //        ~and_formula() = default;
 
-        [[nodiscard]] bool holds_in(const state &s, const world_id &w) const override;
+        [[nodiscard]] bool holds_in(const kripke::state &s, const kripke::world_id &w) const override;
         [[nodiscard]] bool is_propositional() const override;
 
         [[nodiscard]] unsigned long get_modal_depth() const override;
@@ -59,4 +59,4 @@ namespace del {
     };
 }
 
-#endif //BEP_AND_FORMULA_H
+#endif //DAEDALUS_AND_FORMULA_H

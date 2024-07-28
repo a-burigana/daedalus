@@ -25,7 +25,7 @@
 #include "bisimulation_tester.h"
 #include "builder/domains/consecutive_numbers.h"
 #include "builder/state_builder.h"
-#include "../include/del/bisimulation/bisimulator.h"
+#include "../include/del/semantics/kripke/bisimulation/bisimulator.h"
 #include "printer.h"
 
 using namespace daedalus::tester;
@@ -124,60 +124,60 @@ void bisimulation_tester::test_bisim_cn(const std::string &out_path, unsigned lo
 }
 
 
-del::state bisimulation_tester::test_full_bisim_1() {
+state bisimulation_tester::test_full_bisim_1() {
     state s = state_builder::build_test_state1();
     auto [is_bisim, s_contr] = bisimulator::contract(bisimulation_type::full, s);
     return std::move(s_contr);
 }
 
-std::pair<bool, del::state> bisimulation_tester::test_bounded_bisim_1(const unsigned long k) {
+std::pair<bool, state> bisimulation_tester::test_bounded_bisim_1(const unsigned long k) {
     state s = state_builder::build_test_state1();
     return bisimulator::contract(bisimulation_type::bounded, s, k);
 }
 
 
-del::state bisimulation_tester::test_full_bisim_singleton(bool has_loop) {
+state bisimulation_tester::test_full_bisim_singleton(bool has_loop) {
     state s = state_builder::build_singleton(has_loop);
     auto [is_bisim, s_contr] = bisimulator::contract(bisimulation_type::full, s);
     return std::move(s_contr);
 }
 
-std::pair<bool, del::state> bisimulation_tester::test_bounded_bisim_singleton(const unsigned long k, bool has_loop) {
+std::pair<bool, state> bisimulation_tester::test_bounded_bisim_singleton(const unsigned long k, bool has_loop) {
     state s = state_builder::build_singleton(has_loop);
     return bisimulator::contract(bisimulation_type::bounded, s, k);
 }
 
 
-del::state bisimulation_tester::test_full_bisim_chain(const unsigned long length, bool has_final_loop, bool all_designated) {
+state bisimulation_tester::test_full_bisim_chain(const unsigned long length, bool has_final_loop, bool all_designated) {
     state s = state_builder::build_chain(length, has_final_loop, all_designated);
     auto [is_bisim, s_contr] = bisimulator::contract(bisimulation_type::full, s);
     return std::move(s_contr);
 }
 
-std::pair<bool, del::state> bisimulation_tester::test_bounded_bisim_chain(const unsigned long k, const unsigned long length, bool has_final_loop, bool all_designated) {
+std::pair<bool, state> bisimulation_tester::test_bounded_bisim_chain(const unsigned long k, const unsigned long length, bool has_final_loop, bool all_designated) {
     state s = state_builder::build_chain(length, has_final_loop, all_designated);
     return bisimulator::contract(bisimulation_type::bounded, s, k);
 }
 
 
-del::state bisimulation_tester::test_full_bisim_k_tree(unsigned long k) {
+state bisimulation_tester::test_full_bisim_k_tree(unsigned long k) {
     state s = state_builder::build_k_tree(k);
     auto [is_bisim, s_contr] = bisimulator::contract(bisimulation_type::full, s);
     return std::move(s_contr);
 }
 
-std::pair<bool, del::state> bisimulation_tester::test_bounded_bisim_k_tree(unsigned long k) {
+std::pair<bool, state> bisimulation_tester::test_bounded_bisim_k_tree(unsigned long k) {
     state s = state_builder::build_k_tree(k);
     return bisimulator::contract(bisimulation_type::bounded, s, k);
 }
 
-del::state bisimulation_tester::test_full_bisim_cn(unsigned long n, unsigned long k) {
+state bisimulation_tester::test_full_bisim_cn(unsigned long n, unsigned long k) {
     state s = consecutive_numbers::build_initial_state(n);
     auto [is_bisim, s_contr] = bisimulator::contract(bisimulation_type::full, s);
     return std::move(s_contr);
 }
 
-std::pair<bool, del::state> bisimulation_tester::test_bounded_bisim_cn(unsigned long n, unsigned long k) {
+std::pair<bool, state> bisimulation_tester::test_bounded_bisim_cn(unsigned long n, unsigned long k) {
     state s = consecutive_numbers::build_initial_state(n);
     return bisimulator::contract(bisimulation_type::bounded, s, k);
 }

@@ -23,10 +23,10 @@ find_package(Sanitizers) # Sanitizers
 
 add_executable(DAEDALUS
         src/main.cpp
-        src/del/states/state.cpp
-        include/del/states/state.h
-        src/del/actions/action.cpp
-        include/del/actions/action.h
+        src/del/semantics/kripke/states/state.cpp
+        include/del/semantics/kripke/states/state.h
+        src/del/semantics/kripke/actions/action.cpp
+        include/del/semantics/kripke/actions/action.h
         src/search/planner.cpp
         include/search/planner.h
         src/del/formulae/formula.cpp
@@ -45,26 +45,26 @@ add_executable(DAEDALUS
         include/del/formulae/modal/box_formula.h
         src/del/formulae/modal/diamond_formula.cpp
         include/del/formulae/modal/diamond_formula.h
-        src/del/update/updater.cpp
-        include/del/update/updater.h
+        src/del/semantics/kripke/update/updater.cpp
+        include/del/semantics/kripke/update/updater.h
         src/del/language/language.cpp
         include/del/language/language.h
         src/search/planning_task.cpp
         include/search/planning_task.h
         src/search/search_space.cpp
         include/search/search_space.h
-        src/del/bisimulation/bisimulator.cpp
-        include/del/bisimulation/bisimulator.h
-        src/del/states/label.cpp
-        include/del/states/label.h
-        src/del/bisimulation/partition_refinement.cpp
-        include/del/bisimulation/partition_refinement.h
-        include/del/states/states_types.h
-        include/del/bisimulation/bisimulation_types.h
+        src/del/semantics/kripke/bisimulation/bisimulator.cpp
+        include/del/semantics/kripke/bisimulation/bisimulator.h
+        src/del/semantics/kripke/states/label.cpp
+        include/del/semantics/kripke/states/label.h
+        src/del/semantics/kripke/bisimulation/partition_refinement.cpp
+        include/del/semantics/kripke/bisimulation/partition_refinement.h
+        include/del/semantics/kripke/states/states_types.h
+        include/del/semantics/kripke/bisimulation/bisimulation_types.h
         include/del/language/language_types.h
-        include/del/actions/actions_types.h
-        src/del/bisimulation/bounded_partition_refinement.cpp
-        include/del/bisimulation/bounded_partition_refinement.h
+        include/del/semantics/kripke/actions/actions_types.h
+        src/del/semantics/kripke/bisimulation/bounded_partition_refinement.cpp
+        include/del/semantics/kripke/bisimulation/bounded_partition_refinement.h
         include/del/del_types.h
         tests/formula_tester.cpp
         tests/formula_tester.h
@@ -90,7 +90,7 @@ add_executable(DAEDALUS
         tests/action_tester.cpp
         tests/action_tester.h
         include/search/strategies.h
-        include/del/bisimulation/bounded_bisimulation_types.h
+        include/del/semantics/kripke/bisimulation/bounded_bisimulation_types.h
         include/search/search_types.h
         include/utils/time_utils.h
         tests/builder/domains/consecutive_numbers.cpp
@@ -106,6 +106,6 @@ add_executable(DAEDALUS
         tests/search_tester.h
         tests/builder/domains/switches.cpp
         tests/builder/domains/switches.h
-        )
+        src/del/semantics/kripke/states/signature.cpp include/del/semantics/kripke/states/signature.h include/del/semantics/delphic/states/possibility.cpp include/del/semantics/delphic/states/possibility.h)
 
 add_sanitizers(DAEDALUS)

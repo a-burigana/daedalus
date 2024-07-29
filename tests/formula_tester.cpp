@@ -24,11 +24,11 @@
 #include "formula_tester.h"
 #include "../include/del/semantics/kripke/model_checker.h"
 #include "builder/state_builder.h"
-#include "../include/del/formulae/propositional/and_formula.h"
-#include "../include/del/formulae/propositional/atom_formula.h"
-#include "../include/del/formulae/modal/box_formula.h"
-#include "../include/del/formulae/propositional/not_formula.h"
-#include "../include/del/formulae/modal/diamond_formula.h"
+#include "../include/del/formulas/propositional/and_formula.h"
+#include "../include/del/formulas/propositional/atom_formula.h"
+#include "../include/del/formulas/modal/box_formula.h"
+#include "../include/del/formulas/propositional/not_formula.h"
+#include "../include/del/formulas/modal/diamond_formula.h"
 #include "builder/domains/coin_in_the_box.h"
 #include <memory>
 

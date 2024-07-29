@@ -26,7 +26,7 @@
 
 #include "../../../include/del/semantics/kripke/actions/action.h"
 #include "../../../include/del/del_types.h"
-#include "../../../include/del/formulae/formula.h"
+#include "../../../include/del/formulas/formula.h"
 #include "../../../include/del/language/language.h"
 #include "../../../include/search/planning_task.h"
 

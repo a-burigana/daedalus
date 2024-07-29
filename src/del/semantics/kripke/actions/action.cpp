@@ -22,7 +22,10 @@
 // SOFTWARE.
 
 #include "../../../../../include/del/semantics/kripke/actions/action.h"
-#include "../../../../../include/del/formulae/formula.h"
+#include "../../../../../include/del/semantics/kripke/states/states_types.h"
+#include "../../../../../include/del/formulas/formula.h"
+#include "../../../../../include/del/formulas/formula_types.h"
+#include "../../../../../include/utils/printer/formula_printer.h"
 
 using namespace kripke;
 
@@ -222,7 +225,8 @@ std::ostream &kripke::operator<<(std::ostream &os, const action &act) {
                 << "\t\t\t\t<TD>" << "e" << e << "</TD>" << std::endl;
 
         os
-                << "\t\t\t\t<TD>" << act.get_precondition(e)->to_string(act.get_language(), true) << "</TD>" << std::endl;
+                << "\t\t\t\t<TD>" << printer::formula_printer::to_string(*act.get_precondition(e), act.get_language(), true) << "</TD>" << std::endl;
+//                << "\t\t\t\t<TD>" << act.get_precondition(e)->to_string(act.get_language(), true) << "</TD>" << std::endl;
 
         os << "\t\t\t\t<TD>" << std::endl;
 
@@ -233,7 +237,8 @@ std::ostream &kripke::operator<<(std::ostream &os, const action &act) {
                 os
                     << "\t\t\t\t\t(<font color=\"blue\">" << act.get_language()->get_atom_name(p) << "</font>"
                     << " iff "
-                    << f_post->to_string(act.get_language(), true)
+                    << printer::formula_printer::to_string(*f_post, act.get_language(), true)
+//                    << f_post->to_string(act.get_language(), true)
                     << ") " << std::endl;
 
         os

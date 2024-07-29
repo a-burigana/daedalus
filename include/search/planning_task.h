@@ -27,7 +27,7 @@
 #include <set>
 #include "../del/semantics/kripke/states/state.h"
 #include "../del/semantics/kripke/actions/action.h"
-#include "../del/formulae/formula.h"
+#include "../del/formulas/formula.h"
 #include "../del/language/language.h"
 
 namespace search {

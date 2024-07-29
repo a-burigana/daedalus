@@ -24,13 +24,13 @@
 #include "update_tester.h"
 #include "builder/action_builder.h"
 #include "builder/state_builder.h"
-#include "../include/del/formulae/propositional/atom_formula.h"
+#include "../include/del/formulas/propositional/atom_formula.h"
 #include "../include/del/semantics/kripke/update/updater.h"
-#include "../include/del/formulae/propositional/not_formula.h"
-#include "../include/del/formulae/modal/box_formula.h"
-#include "../include/del/formulae/propositional/and_formula.h"
+#include "../include/del/formulas/propositional/not_formula.h"
+#include "../include/del/formulas/modal/box_formula.h"
+#include "../include/del/formulas/propositional/and_formula.h"
 #include "printer.h"
-#include "../include/del/formulae/propositional/true_formula.h"
+#include "../include/del/formulas/propositional/true_formula.h"
 #include "builder/domains/coin_in_the_box.h"
 
 using namespace daedalus::tester;

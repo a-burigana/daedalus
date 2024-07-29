@@ -22,12 +22,12 @@
 // SOFTWARE.
 
 #include "switches.h"
-#include "../../../include/del/formulae/propositional/atom_formula.h"
-#include "../../../include/del/formulae/propositional/not_formula.h"
+#include "../../../include/del/formulas/propositional/atom_formula.h"
+#include "../../../include/del/formulas/propositional/not_formula.h"
 #include "../../../include/del/del_types.h"
 #include "../action_builder.h"
-#include "../../../include/del/formulae/propositional/true_formula.h"
-#include "../../../include/del/formulae/propositional/and_formula.h"
+#include "../../../include/del/formulas/propositional/true_formula.h"
+#include "../../../include/del/formulas/propositional/and_formula.h"
 #include <memory>
 #include <string>
 

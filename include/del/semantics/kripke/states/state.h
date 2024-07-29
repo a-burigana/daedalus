@@ -29,7 +29,7 @@
 #include <ostream>
 #include <vector>
 #include "states_types.h"
-#include "../../../formulae/formula.h"
+#include "../../../formulas/formula.h"
 #include "../../../language/language.h"
 
 namespace kripke {

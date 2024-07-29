@@ -26,7 +26,7 @@
 
 #include "../../../include/del/language/language.h"
 #include "../../../include/del/del_types.h"
-#include "../../../include/del/formulae/formula.h"
+#include "../../../include/del/formulas/formula.h"
 #include <deque>
 
 namespace daedalus::tester {

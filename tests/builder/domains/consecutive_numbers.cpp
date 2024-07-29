@@ -22,12 +22,12 @@
 // SOFTWARE.
 
 #include "consecutive_numbers.h"
-#include "../../../include/del/formulae/propositional/atom_formula.h"
-#include "../../../include/del/formulae/modal/box_formula.h"
-#include "../../../include/del/formulae/propositional/or_formula.h"
-#include "../../../include/del/formulae/propositional/not_formula.h"
+#include "../../../include/del/formulas/propositional/atom_formula.h"
+#include "../../../include/del/formulas/modal/box_formula.h"
+#include "../../../include/del/formulas/propositional/or_formula.h"
+#include "../../../include/del/formulas/propositional/not_formula.h"
 #include "../action_builder.h"
-#include "../../../include/del/formulae/propositional/and_formula.h"
+#include "../../../include/del/formulas/propositional/and_formula.h"
 #include <memory>
 #include <string>
 

@@ -22,10 +22,10 @@
 // SOFTWARE.
 
 #include "action_builder.h"
-#include "../../include/del/formulae/formula.h"
-#include "../../include/del/formulae/propositional/true_formula.h"
-#include "../../include/del/formulae/propositional/and_formula.h"
-#include "../../include/del/formulae/propositional/not_formula.h"
+#include "../../include/del/formulas/formula.h"
+#include "../../include/del/formulas/propositional/true_formula.h"
+#include "../../include/del/formulas/propositional/and_formula.h"
+#include "../../include/del/formulas/propositional/not_formula.h"
 #include <memory>
 
 using namespace daedalus::tester;

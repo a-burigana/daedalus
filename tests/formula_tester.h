@@ -25,7 +25,7 @@
 #define DAEDALUS_FORMULA_TESTER_H
 
 #include "../include/del/semantics/kripke/states/state.h"
-#include "../include/del/formulae/formula.h"
+#include "../include/del/formulas/formula.h"
 
 namespace daedalus::tester {
     class formula_tester {

@@ -29,14 +29,14 @@ add_executable(DAEDALUS
         include/del/semantics/kripke/actions/action.h
         src/search/planner.cpp
         include/search/planner.h
-        include/del/formulae/formula.h
-        include/del/formulae/propositional/atom_formula.h
-        include/del/formulae/propositional/not_formula.h
-        include/del/formulae/propositional/and_formula.h
-        include/del/formulae/propositional/or_formula.h
-        include/del/formulae/propositional/imply_formula.h
-        include/del/formulae/modal/box_formula.h
-        include/del/formulae/modal/diamond_formula.h
+        include/del/formulas/formula.h
+        include/del/formulas/propositional/atom_formula.h
+        include/del/formulas/propositional/not_formula.h
+        include/del/formulas/propositional/and_formula.h
+        include/del/formulas/propositional/or_formula.h
+        include/del/formulas/propositional/imply_formula.h
+        include/del/formulas/modal/box_formula.h
+        include/del/formulas/modal/diamond_formula.h
         src/del/semantics/kripke/update/updater.cpp
         include/del/semantics/kripke/update/updater.h
         src/del/language/language.cpp
@@ -68,8 +68,8 @@ add_executable(DAEDALUS
         tests/update_tester.h
         tests/builder/action_builder.cpp
         tests/builder/action_builder.h
-        include/del/formulae/propositional/true_formula.h
-        include/del/formulae/propositional/false_formula.h
+        include/del/formulas/propositional/true_formula.h
+        include/del/formulas/propositional/false_formula.h
         tests/bisimulation_tester.cpp
         tests/bisimulation_tester.h
         tests/printer.cpp
@@ -96,6 +96,6 @@ add_executable(DAEDALUS
         tests/search_tester.h
         tests/builder/domains/switches.cpp
         tests/builder/domains/switches.h
-        src/del/semantics/delphic/states/signature.cpp include/del/semantics/delphic/states/signature.h src/del/semantics/delphic/states/possibility.cpp include/del/semantics/delphic/states/possibility.h src/utils/storage.cpp include/utils/storage.h src/del/semantics/delphic/actions/eventuality.cpp include/del/semantics/delphic/actions/eventuality.h src/del/semantics/delphic/update/union_updater.cpp include/del/semantics/delphic/update/union_updater.h src/del/semantics/kripke/model_checker.cpp include/del/semantics/kripke/model_checker.h src/utils/printer/formula_printer.cpp include/utils/printer/formula_printer.h include/del/formulae/formula_types.h include/del/formulae/all_formulas.h)
+        src/del/semantics/delphic/states/signature.cpp include/del/semantics/delphic/states/signature.h src/del/semantics/delphic/states/possibility.cpp include/del/semantics/delphic/states/possibility.h src/utils/storage.cpp include/utils/storage.h src/del/semantics/delphic/actions/eventuality.cpp include/del/semantics/delphic/actions/eventuality.h src/del/semantics/delphic/update/union_updater.cpp include/del/semantics/delphic/update/union_updater.h src/del/semantics/kripke/model_checker.cpp include/del/semantics/kripke/model_checker.h src/utils/printer/formula_printer.cpp include/utils/printer/formula_printer.h include/del/formulas/formula_types.h include/del/formulas/all_formulas.h)
 
 add_sanitizers(DAEDALUS)

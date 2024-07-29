@@ -24,7 +24,9 @@
 #include <queue>
 #include <utility>
 #include <list>
+#include "../../../../../include/del/formulas/formula_types.h"
 #include "../../../../../include/del/semantics/kripke/update/updater.h"
+#include "../../../../../include/del/semantics/kripke/model_checker.h"
 #include "../../../../../include/del/semantics/kripke/bisimulation/bisimulator.h"
 
 using namespace kripke;
@@ -35,7 +37,8 @@ bool updater::is_applicable(const state &s, const action &a) {
 }
 
 bool updater::is_applicable_world(const state &s, const action &a, const world_id wd) {
-    const auto check = [&](const event_id ed) { return a.get_precondition(ed)->holds_in(s, wd); };
+    const auto check = [&](const event_id ed) { return model_checker::holds_in(s, wd, *a.get_precondition(ed)); };
+//    const auto check = [&](const event_id ed) { return a.get_precondition(ed)->holds_in(s, wd); };
     return std::any_of(a.get_designated_events().begin(), a.get_designated_events().end(), check);
 }
 
@@ -75,7 +78,8 @@ std::pair<world_id, world_set> updater::calculate_worlds(const state &s, const a
 
     for (const world_id wd : s.get_designated_worlds())
         for (const event_id ed : a.get_designated_events())
-            if (a.get_precondition(ed)->holds_in(s, wd))
+            if (model_checker::holds_in(s, wd, *a.get_precondition(ed)))
+//            if (a.get_precondition(ed)->holds_in(s, wd))
                 to_expand.emplace(wd, ed);
 
     while (not to_expand.empty()) {
@@ -93,7 +97,8 @@ std::pair<world_id, world_set> updater::calculate_worlds(const state &s, const a
 
             for (const world_id v : ag_worlds) {
                 for (const event_id f : ag_events) {
-                    if (a.get_precondition(f)->holds_in(s, v)) {
+                    if (model_checker::holds_in(s, v, *a.get_precondition(f))) {
+//                    if (a.get_precondition(f)->holds_in(s, v)) {
                         updated_world w_ = {w, e}, v_ = {v, f};
                         r_map[ag].emplace_back(w_, v_);
 
@@ -146,7 +151,8 @@ label updater::update_world(const state &s, const world_id &w, const action &a, 
     label l = s.get_label(w);
 
     for (const auto &[p, post] : a.get_postconditions(e))
-        l.update(p, post->holds_in(s, w));
+        l.update(p, model_checker::holds_in(s, w, *post));
+//        l.update(p, post->holds_in(s, w));
 
     return l;
 }

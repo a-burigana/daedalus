@@ -21,34 +21,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef DAEDALUS_ACTIONS_TYPES_H
-#define DAEDALUS_ACTIONS_TYPES_H
+#ifndef DAEDALUS_MODEL_CHECKER_H
+#define DAEDALUS_MODEL_CHECKER_H
 
-#include <memory>
-#include <vector>
-#include <set>
-#include <list>
-#include "../../../language/language_types.h"
-#include "../../../../utils/bit_deque.h"
-#include "../../../formulas/formula.h"
+#include "states/state.h"
+#include "states/states_types.h"
+#include "../../formulas/all_formulas.h"
 
 namespace kripke {
-    class formula;
-    class action;
-    using action_ptr   = std::shared_ptr<action>;
-    using action_set   = std::set<kripke::action_ptr>;
-    using action_deque = std::deque<kripke::action_ptr>;
+    class model_checker {
+    public:
+        static bool holds_in(const state &s, world_id w, const del::formula &f);
 
-    using event_id               = unsigned long long;
-    using event_deque            = std::list<event_id>;    // std::deque<event_id>; TODO: CHANGE BACK TO DEQUE!!!!!!!!!!!!!!!!!
-//    using event_set              = std::set<const event_id>;
-    using event_set              = bit_deque;
-    using action_agent_relations = std::vector<event_set>;
-    using action_relations       = std::vector<action_agent_relations>;
-
-    using preconditions  = std::vector<del::formula_ptr>;
-    using event_post     = std::map<del::atom, del::formula_ptr>;
-    using postconditions = std::vector<event_post>;
+    private:
+        static bool holds_in(const state &s, world_id w, const del::atom_formula &f);
+        static bool holds_in(const state &s, world_id w, const del::not_formula &f);
+        static bool holds_in(const state &s, world_id w, const del::and_formula &f);
+        static bool holds_in(const state &s, world_id w, const del::or_formula &f);
+        static bool holds_in(const state &s, world_id w, const del::imply_formula &f);
+        static bool holds_in(const state &s, world_id w, const del::box_formula &f);
+        static bool holds_in(const state &s, world_id w, const del::diamond_formula &f);
+    };
 }
 
-#endif //DAEDALUS_ACTIONS_TYPES_H
+#endif //DAEDALUS_MODEL_CHECKER_H

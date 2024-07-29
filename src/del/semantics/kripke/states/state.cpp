@@ -22,6 +22,8 @@
 // SOFTWARE.
 
 #include "../../../../../include/del/semantics/kripke/states/state.h"
+#include "../../../../../include/del/semantics/kripke/model_checker.h"
+#include "../../../../../include/del/formulas/formula_types.h"
 #include <queue>
 #include <string>
 #include <utility>
@@ -78,7 +80,8 @@ unsigned long long state::get_max_depth() const {
 }
 
 bool state::satisfies(const formula_ptr &f) const {
-    const auto check = [&](const world_id wd) { return f->holds_in(*this, wd); };
+    const auto check = [&](const world_id wd) { return model_checker::holds_in(*this, wd, *f); };
+//    const auto check = [&](const world_id wd) { return f->holds_in(*this, wd); };
     return std::all_of(m_designated_worlds.begin(), m_designated_worlds.end(), check);
 }
 

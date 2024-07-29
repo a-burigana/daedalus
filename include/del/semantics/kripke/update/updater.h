@@ -37,7 +37,7 @@ namespace kripke {
         static state product_update(const state &s, const action &a);
 
         static state product_update(const state &s, const action_deque &as, bool apply_contraction = false,
-                                    bisimulation_type type = bisimulation_type::full, const unsigned long k = 0);
+                                    bisimulation_type type = bisimulation_type::full, unsigned long k = 0);
 
     private:
         using updated_world            = std::pair<const world_id, const event_id>;

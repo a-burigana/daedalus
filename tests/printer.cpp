@@ -22,11 +22,11 @@
 // SOFTWARE.
 
 #include "printer.h"
-#include "../include/del/formulae/propositional/true_formula.h"
-#include "../include/del/formulae/propositional/false_formula.h"
-#include "../include/del/formulae/propositional/atom_formula.h"
-#include "../include/del/formulae/propositional/and_formula.h"
-#include "../include/del/formulae/propositional/not_formula.h"
+#include "../include/del/formulas/propositional/true_formula.h"
+#include "../include/del/formulas/propositional/false_formula.h"
+#include "../include/del/formulas/propositional/atom_formula.h"
+#include "../include/del/formulas/propositional/and_formula.h"
+#include "../include/del/formulas/propositional/not_formula.h"
 #include "../include/del/semantics/kripke/update/updater.h"
 #include "../include/del/semantics/kripke/bisimulation/bisimulator.h"
 #include "../include/search/planner.h"

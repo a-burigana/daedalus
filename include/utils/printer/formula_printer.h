@@ -26,7 +26,7 @@
 
 #include <string>
 #include "../../del/language/language.h"
-#include "../../del/formulae/all_formulas.h"
+#include "../../del/formulas/all_formulas.h"
 
 namespace printer {
     class formula_printer {

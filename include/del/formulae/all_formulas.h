@@ -21,26 +21,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <utility>
+#ifndef DAEDALUS_ALL_FORMULAS_H
+#define DAEDALUS_ALL_FORMULAS_H
 
-#include "../../../../include/del/formulae/modal/box_formula.h"
-#include "../../../../include/del/semantics/kripke/states/state.h"
+#include "propositional/true_formula.h"
+#include "propositional/false_formula.h"
+#include "propositional/atom_formula.h"
+#include "propositional/not_formula.h"
+#include "propositional/and_formula.h"
+#include "propositional/or_formula.h"
+#include "propositional/imply_formula.h"
+#include "modal/box_formula.h"
+#include "modal/diamond_formula.h"
 
-using namespace del;
-
-box_formula::box_formula(const agent ag, formula_ptr f) :
-    m_ag{ag},
-    m_f{std::move(f)} {}
-
-bool box_formula::holds_in(const kripke::state &s, const kripke::world_id &w) const {
-    const auto &worlds = s.get_agent_possible_worlds(m_ag, w);
-    return std::all_of(worlds.begin(), worlds.end(), [&](const kripke::world_id &v) { return m_f->holds_in(s, v); });
-}
-
-bool box_formula::is_propositional() const {
-    return false;
-}
-
-unsigned long box_formula::get_modal_depth() const {
-    return 1 + m_f->get_modal_depth();
-}
+#endif //DAEDALUS_ALL_FORMULAS_H

@@ -30,7 +30,12 @@
 namespace del {
     class box_formula : public formula {
     public:
-        box_formula(agent ag, const formula_ptr f);
+        box_formula(agent ag, formula_ptr f) :
+                m_ag{ag},
+                m_f{std::move(f)} {
+            m_type = formula_type::box_formula;
+            m_modal_depth = m_f->get_modal_depth() + 1;
+        };
 
         box_formula(const box_formula&) = delete;
         box_formula& operator=(const box_formula&) = delete;
@@ -38,16 +43,8 @@ namespace del {
         box_formula(box_formula&&) = default;
         box_formula& operator=(box_formula&&) = default;
 
-//        ~box_formula() = default;
-
-        [[nodiscard]] bool holds_in(const kripke::state &s, const kripke::world_id &w) const override;
-        [[nodiscard]] bool is_propositional() const override;
-
-        [[nodiscard]] unsigned long get_modal_depth() const override;
-
-        [[nodiscard]] std::string to_string(const language_ptr &language, bool escape_html) const override {
-            return "[" + language->get_agent_name(m_ag) + "]" + m_f->to_string(language, escape_html);
-        }
+        [[nodiscard]] const formula_ptr &get_f()  const { return m_f;  }
+        [[nodiscard]] const agent       &get_ag() const { return m_ag; }
 
     private:
         agent m_ag;

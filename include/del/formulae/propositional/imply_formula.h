@@ -29,7 +29,12 @@
 namespace del {
     class imply_formula : public formula {
     public:
-        imply_formula(const formula_ptr f1, const formula_ptr f2);
+        imply_formula(formula_ptr f1, formula_ptr f2) :
+                m_f1{std::move(f1)},
+                m_f2{std::move(f2)} {
+            m_type = formula_type::imply_formula;
+            m_modal_depth = std::max(m_f1->get_modal_depth(), m_f2->get_modal_depth());
+        }
 
         imply_formula(const imply_formula&) = delete;
         imply_formula& operator=(const imply_formula&) = delete;
@@ -37,18 +42,8 @@ namespace del {
         imply_formula(imply_formula&&) = default;
         imply_formula& operator=(imply_formula&&) = default;
 
-//        ~imply_formula() = default;
-
-        [[nodiscard]] bool holds_in(const kripke::state &s, const kripke::world_id &w) const override;
-        [[nodiscard]] bool is_propositional() const override;
-
-        [[nodiscard]] unsigned long get_modal_depth() const override;
-
-        [[nodiscard]] std::string to_string(const language_ptr &language, bool escape_html) const override {
-            return escape_html
-                ? "(" + m_f1->to_string(language, escape_html) + " -&gt; " + m_f2->to_string(language, escape_html) + ")"
-                : "(" + m_f1->to_string(language, escape_html) + " -> " + m_f2->to_string(language, escape_html) + ")";
-        }
+        [[nodiscard]] const formula_ptr &get_f1() const { return m_f1; }
+        [[nodiscard]] const formula_ptr &get_f2() const { return m_f2; }
 
     private:
         formula_ptr m_f1, m_f2;

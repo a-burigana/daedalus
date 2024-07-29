@@ -26,13 +26,15 @@
 
 #include "../formula.h"
 #include "../../language/language_types.h"
-#include "../../semantics/kripke/states/states_types.h"
-#include "../../language/language.h"
 
 namespace del {
     class atom_formula : public formula {
     public:
-        explicit atom_formula(atom atom);
+        explicit atom_formula(atom atom) :
+                m_atom{atom} {
+            m_type = formula_type::atom_formula;
+            m_modal_depth = 0;
+        }
 
         atom_formula(const atom_formula&) = delete;
         atom_formula& operator=(const atom_formula&) = delete;
@@ -40,14 +42,7 @@ namespace del {
         atom_formula(atom_formula&&) = default;
         atom_formula& operator=(atom_formula&&) = default;
 
-        [[nodiscard]] bool holds_in(const kripke::state &s, const kripke::world_id &w) const override;
-        [[nodiscard]] bool is_propositional() const override;
-
-        [[nodiscard]] unsigned long get_modal_depth() const override;
-
-        [[nodiscard]] std::string to_string(const language_ptr &language, bool escape_html) const override {
-            return language->get_atom_name(m_atom);
-        }
+        [[nodiscard]] const atom &get_atom() const { return m_atom; }
 
     private:
         atom m_atom;

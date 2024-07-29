@@ -26,12 +26,16 @@
 
 #include "../../language/language_types.h"
 #include "../formula.h"
-#include "../../semantics/kripke/states/states_types.h"
 
 namespace del {
     class diamond_formula : public formula {
     public:
-        diamond_formula(agent ag, const formula_ptr f);
+        diamond_formula(agent ag, formula_ptr f) :
+                m_ag{ag},
+                m_f{std::move(f)} {
+            m_type = formula_type::diamond_formula;
+            m_modal_depth = m_f->get_modal_depth() + 1;
+        };
 
         diamond_formula(const diamond_formula&) = delete;
         diamond_formula& operator=(const diamond_formula&) = delete;
@@ -39,18 +43,8 @@ namespace del {
         diamond_formula(diamond_formula&&) = default;
         diamond_formula& operator=(diamond_formula&&) = default;
 
-//        ~diamond_formula() = default;
-
-        [[nodiscard]] bool holds_in(const kripke::state &s, const kripke::world_id &w) const override;
-        [[nodiscard]] bool is_propositional() const override;
-
-        [[nodiscard]] unsigned long get_modal_depth() const override;
-
-        [[nodiscard]] std::string to_string(const language_ptr &language, bool escape_html) const override {
-            return escape_html
-                ? "&lt;" + language->get_agent_name(m_ag) + "&gt;" + m_f->to_string(language, escape_html)
-                : "<"    + language->get_agent_name(m_ag) + ">"    + m_f->to_string(language, escape_html);
-        }
+        [[nodiscard]] const formula_ptr &get_f()  const { return m_f;  }
+        [[nodiscard]] const agent       &get_ag() const { return m_ag; }
 
     private:
         agent m_ag;

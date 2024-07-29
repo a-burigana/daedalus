@@ -22,6 +22,7 @@
 // SOFTWARE.
 
 #include "formula_tester.h"
+#include "../include/del/semantics/kripke/model_checker.h"
 #include "builder/state_builder.h"
 #include "../include/del/formulae/propositional/and_formula.h"
 #include "../include/del/formulae/propositional/atom_formula.h"
@@ -45,8 +46,10 @@ void formula_tester::test_CB_1() {
     del::formula_deque fs = {heads, looking_a};     // , has_key_a};
     del::formula_ptr f = std::make_shared<del::and_formula>(std::move(fs));
 
-    assert(f->holds_in(s, 0));
-    assert(not f->holds_in(s, 1));
+    assert(kripke::model_checker::holds_in(s, 0, *f));
+    assert(not kripke::model_checker::holds_in(s, 1, *f));
+//    assert(f->holds_in(s, 0));
+//    assert(not f->holds_in(s, 1));
 }
 
 void formula_tester::test_CB_2() {
@@ -61,7 +64,8 @@ void formula_tester::test_CB_2() {
 
     assert(s.satisfies(K_a_not_opened));
     assert(not s.satisfies(K_a_opened));
-    assert(K_a_not_opened->holds_in(s, 1));
+    assert(kripke::model_checker::holds_in(s, 1, *K_a_not_opened));
+//    assert(K_a_not_opened->holds_in(s, 1));
 }
 
 void formula_tester::test_CB_3() {
@@ -76,5 +80,6 @@ void formula_tester::test_CB_3() {
     del::formula_ptr K_c_K_b_K_a_not_opened = std::make_shared<del::box_formula>(c, K_b_K_a_not_opened);
 
     assert(s.satisfies(K_c_K_b_K_a_not_opened));
-    assert(K_c_K_b_K_a_not_opened->holds_in(s, 1));
+    assert(kripke::model_checker::holds_in(s, 1, *K_c_K_b_K_a_not_opened));
+//    assert(K_c_K_b_K_a_not_opened->holds_in(s, 1));
 }

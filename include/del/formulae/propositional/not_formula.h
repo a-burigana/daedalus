@@ -25,12 +25,15 @@
 #define DAEDALUS_NOT_FORMULA_H
 
 #include "../formula.h"
-#include "../../language/language.h"
 
 namespace del {
     class not_formula : public formula {
     public:
-        explicit not_formula(formula_ptr f);
+        explicit not_formula(formula_ptr f) :
+                m_f{std::move(f)} {
+            m_type = formula_type::not_formula;
+            m_modal_depth = m_f->get_modal_depth();
+        }
 
         not_formula(const not_formula&) = delete;
         not_formula& operator=(const not_formula&) = delete;
@@ -38,17 +41,7 @@ namespace del {
         not_formula(not_formula&&) = default;
         not_formula& operator=(not_formula&&) = default;
 
-//        ~not_formula() = default;
-
-        [[nodiscard]] bool holds_in(const kripke::state &s, const kripke::world_id &w) const override;
-        [[nodiscard]] bool is_propositional() const override;
-
-        [[nodiscard]] unsigned long get_modal_depth() const override;
-        [[nodiscard]] formula_ptr get_f() const { return m_f; };
-
-        [[nodiscard]] std::string to_string(const language_ptr &language, bool escape_html) const override {
-            return "~" + m_f->to_string(language, escape_html);
-        }
+        [[nodiscard]] const formula_ptr &get_f() const { return m_f; }
 
     private:
         formula_ptr m_f;

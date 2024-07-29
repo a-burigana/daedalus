@@ -29,22 +29,16 @@
 namespace del {
     class true_formula : public formula {
     public:
-        true_formula() = default;
+        true_formula() {
+            m_type = formula_type::true_formula;
+            m_modal_depth = 0;
+        }
 
         true_formula(const true_formula&) = delete;
         true_formula& operator=(const true_formula&) = delete;
 
         true_formula(true_formula&&) = default;
         true_formula& operator=(true_formula&&) = default;
-
-        [[nodiscard]] bool holds_in(const kripke::state &s, const kripke::world_id &w) const override;
-        [[nodiscard]] bool is_propositional() const override;
-
-        [[nodiscard]] unsigned long get_modal_depth() const override;
-
-        [[nodiscard]] std::string to_string(const language_ptr &language, bool escape_html) const override {
-            return "true";
-        }
     };
 }
 

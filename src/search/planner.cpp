@@ -26,6 +26,7 @@
 #include <iostream>
 #include "../../include/search/planner.h"
 #include "../../include/utils/time_utils.h"
+#include "../../include/utils/printer/formula_printer.h"
 
 using namespace search;
 
@@ -37,7 +38,8 @@ node_deque planner::search(const planning_task &task, const strategy strategy, c
     std::cout << "------------------ CURRENT TASK ------------------" << std::endl;
     std::cout << " - DOMAIN:  " << task.get_domain_name() << std::endl;
     std::cout << " - PROBLEM: " << task.get_problem_id() << std::endl;
-    std::cout << " - GOAL:    " << task.get_goal()->to_string(task.get_language(), false) << std::endl;
+    std::cout << " - GOAL:    " << printer::formula_printer::to_string(*task.get_goal(), task.get_language(), false) << std::endl;
+//    std::cout << " - GOAL:    " << task.get_goal()->to_string(task.get_language(), false) << std::endl;
     std::cout << "--------------------------------------------------" << std::endl << std::endl;
 
     std::cout << "----------------- CONFIGURATION ------------------" << std::endl;

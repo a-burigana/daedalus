@@ -29,7 +29,12 @@
 namespace del {
     class or_formula : public formula {
     public:
-        explicit or_formula(formula_deque fs);
+        explicit or_formula(formula_deque fs) :
+                m_fs{std::move(fs)} {
+            m_type = formula_type::or_formula;
+            auto comp = [](const formula_ptr &f1, const formula_ptr &f2) { return f1->get_modal_depth() < f2->get_modal_depth(); };
+            m_modal_depth = (*std::max_element(m_fs.begin(), m_fs.end(), comp))->get_modal_depth();
+        }
 
         or_formula(const or_formula&) = delete;
         or_formula& operator=(const or_formula&) = delete;
@@ -37,21 +42,7 @@ namespace del {
         or_formula(or_formula&&) = default;
         or_formula& operator=(or_formula&&) = default;
 
-//        ~or_formula() = default;
-
-        [[nodiscard]] bool holds_in(const kripke::state &s, const kripke::world_id &w) const override;
-        [[nodiscard]] bool is_propositional() const override;
-
-        [[nodiscard]] unsigned long get_modal_depth() const override;
-
-        [[nodiscard]] std::string to_string(const language_ptr &language, bool escape_html) const override {
-            std::string f_and;
-
-            for (const formula_ptr &f : m_fs)
-                f_and += f->to_string(language, escape_html) + " \\/ ";
-
-            return "(" + f_and.substr(0, f_and.size() - 4) + ")";
-        }
+        [[nodiscard]] const formula_deque &get_fs() const { return m_fs; }
 
     private:
         formula_deque m_fs;

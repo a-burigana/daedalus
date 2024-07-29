@@ -96,6 +96,6 @@ add_executable(DAEDALUS
         tests/search_tester.h
         tests/builder/domains/switches.cpp
         tests/builder/domains/switches.h
-        src/del/semantics/delphic/states/signature.cpp include/del/semantics/delphic/states/signature.h src/del/semantics/delphic/states/possibility.cpp include/del/semantics/delphic/states/possibility.h src/utils/storage.cpp include/utils/storage.h src/del/semantics/delphic/actions/eventuality.cpp include/del/semantics/delphic/actions/eventuality.h src/del/semantics/delphic/update/union_updater.cpp include/del/semantics/delphic/update/union_updater.h src/del/semantics/kripke/model_checker.cpp include/del/semantics/kripke/model_checker.h src/utils/printer/formula_printer.cpp include/utils/printer/formula_printer.h include/del/formulas/formula_types.h include/del/formulas/all_formulas.h)
+        src/del/semantics/delphic/states/possibility.cpp include/del/semantics/delphic/states/possibility.h src/utils/storage.cpp include/utils/storage.h src/del/semantics/delphic/actions/eventuality.cpp include/del/semantics/delphic/actions/eventuality.h src/del/semantics/delphic/update/union_updater.cpp include/del/semantics/delphic/update/union_updater.h src/del/semantics/kripke/model_checker.cpp include/del/semantics/kripke/model_checker.h src/utils/printer/formula_printer.cpp include/utils/printer/formula_printer.h include/del/formulas/formula_types.h include/del/formulas/all_formulas.h src/del/semantics/delphic/model_checker.cpp include/del/semantics/delphic/model_checker.h)
 
 add_sanitizers(DAEDALUS)

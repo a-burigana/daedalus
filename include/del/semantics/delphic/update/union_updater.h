@@ -21,14 +21,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef DAEDALUS_SIGNATURE_H
-#define DAEDALUS_SIGNATURE_H
+#ifndef DAEDALUS_UNION_UPDATER_H
+#define DAEDALUS_UNION_UPDATER_H
+
+#include "../states/possibility.h"
+#include "../actions/eventuality.h"
+#include "../../../../utils/storage.h"
 
 namespace delphic {
-    class signature {
-    private:
-        unsigned long m_id;
+    class union_updater {
+    public:
+        static bool is_applicable(const possibility &w, const eventuality &e, const storage<possibility> &storage);
+        static bool is_applicable(const possibility_spectrum &W, const eventuality_spectrum &E, const storage<possibility> &storage);
+
+        static possibility update(const possibility &w, const eventuality &e, const storage<possibility> &storage);
+        static possibility update(const possibility_spectrum &W, const eventuality_spectrum &E, const storage<possibility> &storage);
+
+        static possibility bounded_update(const possibility &w, const eventuality &e, const storage<possibility> &storage);
+        static possibility bounded_update(const possibility_spectrum &W, const eventuality_spectrum &E, const storage<possibility> &storage);
     };
 }
 
-#endif //DAEDALUS_SIGNATURE_H
+#endif //DAEDALUS_UNION_UPDATER_H

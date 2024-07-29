@@ -46,37 +46,6 @@ bool model_checker::holds_in(const state &s, world_id w, const del::formula &f) 
         case del::formula_type::diamond_formula:
             return model_checker::holds_in(s, w, dynamic_cast<const del::diamond_formula &>(f));
     }
-
-//    return std::visit([&](auto &&arg) -> bool { return holds_in(s, w, arg); }, f);
-
-        /*using formula_type = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_same_v<formula_type, del::true_formula>)
-            return true;
-        else if constexpr (std::is_same_v<formula_type, del::false_formula>)
-            return false;
-        else if constexpr (std::is_same_v<formula_type, del::atom_formula>)
-            return s.get_label(w)[arg.get_atom()];
-        else if constexpr (std::is_same_v<formula_type, del::not_formula>)
-            return not model_checker::holds_in(s, w, *arg.get_f());
-        else if constexpr (std::is_same_v<formula_type, del::and_formula>) {
-            auto check = [&](const del::formula_ptr &f) { return model_checker::holds_in(s, w, *f); };
-            return std::all_of(arg.get_fs().begin(), arg.get_fs().end(), check);
-        } else if constexpr (std::is_same_v<formula_type, del::or_formula>) {
-            auto check = [&](const del::formula_ptr &f) { return model_checker::holds_in(s, w, *f); };
-            return std::any_of(arg.get_fs().begin(), arg.get_fs().end(), check);
-        } else if constexpr (std::is_same_v<formula_type, del::imply_formula>)
-            return not model_checker::holds_in(s, w, *arg.get_f1()) or model_checker::holds_in(s, w, *arg.get_f2());
-        else if constexpr (std::is_same_v<formula_type, del::box_formula>) {
-            const auto &worlds = s.get_agent_possible_worlds(arg.get_ag(), w);
-            return std::all_of(worlds.begin(), worlds.end(),
-                               [&](const world_id &v) { return model_checker::holds_in(s, v, *arg.get_f()); });
-        } else if constexpr (std::is_same_v<formula_type, del::diamond_formula>) {
-            const auto &worlds = s.get_agent_possible_worlds(arg.get_ag(), w);
-            return std::any_of(worlds.begin(), worlds.end(),
-                               [&](const world_id &v) { return model_checker::holds_in(s, v, *arg.get_f()); });
-        } else
-            return false;
-    }, f);*/
 }
 
 bool model_checker::holds_in(const state &s, world_id w, const del::atom_formula &f) {

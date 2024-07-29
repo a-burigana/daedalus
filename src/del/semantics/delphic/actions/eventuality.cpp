@@ -21,6 +21,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../../../../../include/del/semantics/kripke/states/signature.h"
+#include <utility>
+
+#include "../../../../../include/del/semantics/delphic/actions/eventuality.h"
 
 using namespace delphic;
+
+eventuality::eventuality(del::formula_ptr pre, postconditions &post, eventuality::information_state state) :
+    m_pre{std::move(pre)},
+    m_post{std::move(post)},
+    m_information_state{std::move(state)} {
+    m_is_ontic = not m_post.empty();
+}
+
+del::formula_ptr eventuality::get_pre() const {
+    return m_pre;
+}
+
+postconditions eventuality::get_post() const {
+    return m_post;
+}
+
+const eventuality::agent_information_state &eventuality::get_information_state(del::agent ag) const {
+    return m_information_state[ag];
+}
+
+bool eventuality::is_ontic() const {
+    return m_is_ontic;
+}

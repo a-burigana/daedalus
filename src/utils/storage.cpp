@@ -25,32 +25,6 @@
 #include <memory>
 
 template<typename Elem>
-wrapper<Elem>::wrapper(Elem value, unsigned long id) :
-        m_value{std::move(value)},
-        m_id{id} {}
-
-template<typename Elem>
-const Elem &wrapper<Elem>::get_value() const {
-    return m_value;
-}
-
-template<typename Elem>
-unsigned long wrapper<Elem>::get_id() const {
-    return m_id;
-}
-
-template<typename Elem>
-typename storage<Elem>::elem_wrapper_ptr storage<Elem>::push(Elem &elem) {
-    wrapper<elem_ptr> wrap = wrapper<elem_ptr>(std::make_shared<Elem>(std::move(elem)), m_storage_deque.size());
-    auto result = m_storage_set.emplace(std::move(wrap));
-
-    if (result.second)
-        m_storage_deque.push_back(result.first->get_value());
-
-    return *result.first;
-}
-
-template<typename Elem>
-typename storage<Elem>::elem_ptr storage<Elem>::get(unsigned long id) const {
-    return m_storage_deque[id];
+typename storage<Elem>::elem_ptr storage<Elem>::emplace(Elem &&elem) {
+    return *m_storage.emplace(std::make_shared<Elem>(std::move(elem))).first;
 }

@@ -25,44 +25,13 @@
 #define DAEDALUS_STORAGE_H
 
 #include <memory>
-#include <set>
-#include <deque>
-#include <utility>
-
-template<typename Elem>
-class wrapper {
-public:
-    wrapper(Elem value, unsigned long id);
-
-    wrapper(const wrapper&) = default;
-    wrapper& operator=(const wrapper&) = default;
-
-    wrapper(wrapper&&) noexcept = default;
-    wrapper& operator=(wrapper&&) noexcept = default;
-
-    ~wrapper() = default;
-
-    const Elem &get_value() const;
-    unsigned long get_id() const;
-
-    bool operator==(const wrapper &rhs) const { return m_value == rhs.m_value; }
-    bool operator!=(const wrapper &rhs) const { return m_value != rhs.m_value; }
-    bool operator< (const wrapper &rhs) const { return m_value <  rhs.m_value; }
-    bool operator> (const wrapper &rhs) const { return m_value >  rhs.m_value; }
-    bool operator<=(const wrapper &rhs) const { return m_value <= rhs.m_value; }
-    bool operator>=(const wrapper &rhs) const { return m_value >= rhs.m_value; }
-
-private:
-    unsigned long m_id;
-    Elem m_value;
-};
+#include <unordered_set>
 
 template<typename Elem>
 class storage {
-public:
-    using elem_ptr         = std::shared_ptr<Elem>;
-    using elem_wrapper_ptr = wrapper<elem_ptr>;
+    using elem_ptr = std::shared_ptr<Elem>;
 
+public:
     storage() = default;
 
     storage(const storage&) = default;
@@ -73,12 +42,10 @@ public:
 
     ~storage() = default;
 
-    elem_wrapper_ptr push(Elem &elem);
-    elem_ptr get(unsigned long id) const;
+    elem_ptr emplace(Elem &&elem);
 
 private:
-    std::set<elem_wrapper_ptr> m_storage_set;
-    std::deque<elem_ptr> m_storage_deque;
+    std::unordered_set<Elem> m_storage;
 };
 
 #endif //DAEDALUS_STORAGE_H

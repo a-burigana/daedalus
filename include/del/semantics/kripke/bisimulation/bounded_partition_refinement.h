@@ -41,15 +41,10 @@ namespace kripke {
 
     class bounded_partition_refinement {
     public:
-        static std::pair<bool, state> contract(state &s, unsigned long k);
-
-        static bool contract(search::node_ptr &n);
-        static bool repeat_contraction(search::node_ptr &n);
+        static std::pair<bool, block_matrix> do_refinement_steps(const state &s, unsigned long k);
 
     private:
         static bool contraction_helper(search::node_ptr &n);
-
-        static bool do_refinement_steps(const state &s, unsigned long k, bpr_structures &structures);
 
         static void copy_partition(const state &s, unsigned long k, unsigned long h, partition &Q,
                                    block_matrix &worlds_blocks, block_id &count);
@@ -75,12 +70,6 @@ namespace kripke {
         static relations init_preimage(const state &s);
 
 //        static void update_structures(search::node_ptr &n);
-
-        // Bounded contraction
-        static state calculate_bounded_contraction(const state &s, unsigned long k, const block_matrix &worlds_blocks);
-
-        static std::vector<world_id> calculate_max_representatives(const state &s, unsigned long k,
-                                                                   const block_matrix &worlds_blocks);
     };
 }
 

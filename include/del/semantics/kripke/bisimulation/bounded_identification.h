@@ -21,30 +21,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../../../../../include/del/semantics/kripke/bisimulation/bisimulator.h"
-#include "../../../../../include/del/semantics/kripke/bisimulation/partition_refinement.h"
-#include "../../../../../include/del/semantics/kripke/bisimulation/bounded_contraction_builder.h"
+#ifndef DAEDALUS_BOUNDED_IDENTIFICATION_H
+#define DAEDALUS_BOUNDED_IDENTIFICATION_H
 
-using namespace kripke;
+#include <memory>
+#include <queue>
+#include "bounded_bisimulation_types.h"
+#include "../../../../utils/storage.h"
+#include "../states/states_types.h"
 
-std::pair<bool, state> bisimulator::contract(bisimulation_type type, state &s, unsigned long k) {
-    switch (type) {
-        case bisimulation_type::full:
-            return partition_refinement::contract(s);           // Classic Paige and Tarjan algorithm
-        case bisimulation_type::bounded:
-            return bounded_contraction_builder::calculate_rooted_contraction(s, k);
-    }
+namespace kripke {
+    class bounded_identification {
+    public:
+        static std::pair<signature_matrix, signature_map>
+            calculate_signatures(const state &s, unsigned long k, storage<signature> &signatures_storage);
+
+    private:
+        static void calculate_world_signature(const state &s, unsigned long k, world_id x, unsigned long h,
+                                              storage<signature> &signatures_storage, signature_matrix &worlds_signatures,
+                                              signature_map &sign_map);
+    };
 }
 
-//bool bisimulator::contract(bisimulation_type type, search::node_ptr &n) {
-//    switch (type) {
-//        case bisimulation_type::full:
-//            return partition_refinement::contract(n);           // Classic Paige and Tarjan algorithm
-//        case bisimulation_type::bounded:
-//            return bounded_partition_refinement::contract(n);
-//    }
-//}
-
-//bool bisimulator::repeat_contraction(search::node_ptr &n) {
-//    return bounded_partition_refinement::repeat_contraction(n);
-//}
+#endif //DAEDALUS_BOUNDED_IDENTIFICATION_H

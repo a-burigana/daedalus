@@ -29,16 +29,16 @@
 using namespace delphic;
 
 bool union_updater::is_applicable(const possibility &w, const eventuality &e, const storage<possibility> &storage) {
-    return model_checker::holds_in(w, *e.get_pre(), storage);
+    return model_checker::holds_in(w, *e.get_pre());
 }
 
 bool union_updater::is_applicable(const possibility_spectrum &W, const eventuality_spectrum &E,
                                   const storage <possibility> &storage) {
     return std::all_of(W.begin(), W.end(),
-        [&](const possibility_id w) {
+        [&](const possibility_ptr &w) {
             return std::any_of(E.begin(), E.end(),
                 [&](const eventuality_ptr &e) {
-                    return model_checker::holds_in(*storage.get(w), *e->get_pre(), storage);
+                    return model_checker::holds_in(*w, *e->get_pre());
             });
     });
 }
@@ -50,6 +50,7 @@ possibility union_updater::update(const possibility_spectrum &w, const eventuali
 }
 
 possibility union_updater::bounded_update(const possibility &w, const eventuality &e, const storage<possibility> &storage) {
+    // todo: implement
 }
 
 possibility union_updater::bounded_update(const possibility_spectrum &w, const eventuality_spectrum &e, const storage<possibility> &storage) {

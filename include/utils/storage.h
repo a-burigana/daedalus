@@ -45,7 +45,7 @@ public:
     elem_ptr emplace(Elem &&elem);
 
 private:
-    std::unordered_set<Elem> m_storage;
+    std::unordered_set<elem_ptr> m_storage;
 };
 
 #endif //DAEDALUS_STORAGE_H

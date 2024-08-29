@@ -32,6 +32,7 @@
 #include <unordered_map>
 #include "../../../../utils/bit_deque.h"
 #include "../states/states_types.h"
+#include "../../delphic/states/possibility.h"
 
 namespace kripke {
     using block_id         = unsigned long;
@@ -50,6 +51,21 @@ namespace kripke {
         relations r_1;
         block_id count;
     };
+
+    // CANONICAL BOUNDED CONTRACTIONS
+    using signature = delphic::possibility;
+    using signature_ptr = std::shared_ptr<signature>;
+    using signature_vector = std::vector<signature_ptr>;
+    using signature_matrix = std::vector<signature_vector>;
+    using signature_map = std::unordered_map<signature_ptr, std::pair<world_set, world_id>>;
+    using agent_information_state = delphic::possibility::agent_information_state;
+    using information_state = delphic::possibility::information_state;
+
+//    struct bi_structures {
+//        signature_matrix worlds_signatures;
+//        signature_map sign_map;
+//        std::vector<const world_id> worlds_max_reprs;
+//    };
 }
 
 #endif //DAEDALUS_BOUNDED_BISIMULATION_TYPES_H

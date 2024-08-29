@@ -25,7 +25,7 @@
 #define DAEDALUS_POSSIBILITY_H
 
 #include <memory>
-#include <set>
+#include <unordered_set>
 #include <vector>
 #include "../../kripke/states/label.h"
 #include "../../../formulas/formula.h"
@@ -34,11 +34,11 @@
 namespace delphic {
     class possibility;
     using possibility_ptr = std::shared_ptr<possibility>;
-    using possibility_id = unsigned long;
+//    using possibility_id = unsigned long;
 
     class possibility {
     public:
-        using agent_information_state = std::set<possibility_id>;
+        using agent_information_state = std::unordered_set<possibility_ptr>;
         using information_state = std::vector<agent_information_state>;
 
         possibility(del::language_ptr language, kripke::label_ptr label, information_state state);

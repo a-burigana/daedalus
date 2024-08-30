@@ -21,32 +21,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../../../../../include/del/semantics/delphic/states/possibility.h"
-#include "../../../../../include/del/semantics/delphic/model_checker.h"
 
-using namespace delphic;
+#ifndef DAEDALUS_EVENTUALITY_TYPES_H
+#define DAEDALUS_EVENTUALITY_TYPES_H
 
-possibility::possibility(del::language_ptr language, kripke::label_ptr label, agents_information_state state) :
-    m_language{std::move(language)},
-    m_label{std::move(label)},
-    m_information_state{std::move(state)} {}
+#include <memory>
+#include <unordered_set>
+#include <unordered_map>
+#include "../../../language/language_types.h"
+#include "../../../formulas/formula.h"
 
-del::language_ptr possibility::get_language() const {
-    return m_language;
+namespace delphic {
+    class eventuality;
+    using eventuality_ptr = std::shared_ptr<eventuality>;
+    using postconditions = std::unordered_map<del::atom, del::formula_ptr>;
+
+    using dynamic_information_state = std::unordered_set<eventuality_ptr>;
+    using agents_dynamic_information_state = std::vector<dynamic_information_state>;
 }
 
-const kripke::label &possibility::get_label() const {
-    return *m_label;
-}
-
-unsigned long possibility::get_depth() const {
-    return m_depth;
-}
-
-const information_state &possibility::get_information_state(del::agent ag) const {
-    return m_information_state[ag];
-}
-
-bool possibility::satisfies(const del::formula_ptr f) {
-    return model_checker::holds_in(*this, *f);
-}
+#endif //DAEDALUS_EVENTUALITY_TYPES_H

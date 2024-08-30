@@ -21,32 +21,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "../../../../../include/del/semantics/delphic/states/possibility_spectrum.h"
 #include "../../../../../include/del/semantics/delphic/states/possibility.h"
 #include "../../../../../include/del/semantics/delphic/model_checker.h"
 
+using namespace del;
 using namespace delphic;
 
-possibility::possibility(del::language_ptr language, kripke::label_ptr label, agents_information_state state) :
-    m_language{std::move(language)},
-    m_label{std::move(label)},
-    m_information_state{std::move(state)} {}
+possibility_spectrum::possibility_spectrum(del::language_ptr language,
+                                           delphic::information_state designated_possibilities) :
+        m_language{std::move(language)},
+        m_designated_possibilities{std::move(designated_possibilities)} {
+    m_max_depth = 0;
 
-del::language_ptr possibility::get_language() const {
+    for (const possibility_ptr &w : m_designated_possibilities)
+        if (w->get_depth() > m_max_depth)
+            m_max_depth = w->get_depth();
+}
+
+del::language_ptr possibility_spectrum::get_language() const {
     return m_language;
 }
 
-const kripke::label &possibility::get_label() const {
-    return *m_label;
+const information_state &possibility_spectrum::get_designated_possibilities() const {
+    return m_designated_possibilities;
 }
 
-unsigned long possibility::get_depth() const {
-    return m_depth;
+bool possibility_spectrum::satisfies(const del::formula_ptr &f) const {
+    return std::all_of(m_designated_possibilities.begin(), m_designated_possibilities.end(),
+                       [&](const possibility_ptr &w) { return model_checker::holds_in(*w, *f); });
 }
 
-const information_state &possibility::get_information_state(del::agent ag) const {
-    return m_information_state[ag];
-}
-
-bool possibility::satisfies(const del::formula_ptr f) {
-    return model_checker::holds_in(*this, *f);
+unsigned long long possibility_spectrum::get_max_depth() const {
+    return m_max_depth;
 }

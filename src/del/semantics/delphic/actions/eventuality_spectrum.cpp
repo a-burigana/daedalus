@@ -21,32 +21,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../../../../../include/del/semantics/delphic/states/possibility.h"
-#include "../../../../../include/del/semantics/delphic/model_checker.h"
+#include "../../../../../include/del/semantics/delphic/actions/eventuality_spectrum.h"
 
+using namespace del;
 using namespace delphic;
 
-possibility::possibility(del::language_ptr language, kripke::label_ptr label, agents_information_state state) :
-    m_language{std::move(language)},
-    m_label{std::move(label)},
-    m_information_state{std::move(state)} {}
+eventuality_spectrum::eventuality_spectrum(language_ptr language, std::string name,
+                                           dynamic_information_state designated_eventualities) :
+        m_language{std::move(language)},
+        m_name{std::move(name)},
+        m_designated_eventualities{std::move(designated_eventualities)} {}
 
-del::language_ptr possibility::get_language() const {
+language_ptr eventuality_spectrum::get_language() const {
     return m_language;
 }
 
-const kripke::label &possibility::get_label() const {
-    return *m_label;
+std::string eventuality_spectrum::get_name() const {
+    return m_name;
 }
 
-unsigned long possibility::get_depth() const {
-    return m_depth;
+const dynamic_information_state &eventuality_spectrum::get_designated_eventualities() const {
+    return m_designated_eventualities;
 }
 
-const information_state &possibility::get_information_state(del::agent ag) const {
-    return m_information_state[ag];
-}
-
-bool possibility::satisfies(const del::formula_ptr f) {
-    return model_checker::holds_in(*this, *f);
+unsigned long eventuality_spectrum::get_maximum_depth() const {
+    return m_maximum_depth;
 }

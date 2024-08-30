@@ -27,20 +27,16 @@
 #include <memory>
 #include <set>
 #include <vector>
+#include "eventuality_types.h"
 #include "../../kripke/states/label.h"
 #include "../../../formulas/formula.h"
 
 namespace delphic {
-    class eventuality;
-    using eventuality_ptr = std::shared_ptr<eventuality>;
-    using postconditions = std::map<del::atom, del::formula_ptr>;
+
 
     class eventuality {
     public:
-        using agent_information_state = std::set<eventuality_ptr>;
-        using information_state = std::vector<agent_information_state>;
-
-        eventuality(del::formula_ptr pre, postconditions &post, information_state state);
+        eventuality(del::formula_ptr pre, postconditions &post, agents_dynamic_information_state state);
 
         eventuality(const eventuality&) = default;
         eventuality& operator=(const eventuality&) = default;
@@ -52,18 +48,17 @@ namespace delphic {
 
         [[nodiscard]] del::formula_ptr get_pre() const;
         [[nodiscard]] postconditions get_post() const;
-        [[nodiscard]] const agent_information_state &get_information_state(del::agent ag) const;
+        [[nodiscard]] const dynamic_information_state &get_information_state(del::agent ag) const;
         [[nodiscard]] bool is_ontic() const;
+        [[nodiscard]] bool is_idle() const;
 
     private:
         del::formula_ptr m_pre;
         postconditions m_post;
-        information_state m_information_state;
+        agents_dynamic_information_state m_information_state;
         bool m_is_ontic;
+        bool m_is_idle;
     };
-
-    using eventuality_spectrum = eventuality::agent_information_state;
-
 }
 
 #endif //DAEDALUS_EVENTUALITY_H

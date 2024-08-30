@@ -27,21 +27,18 @@
 #include <memory>
 #include <unordered_set>
 #include <vector>
+#include "possibility_types.h"
 #include "../../kripke/states/label.h"
 #include "../../../formulas/formula.h"
 #include "../../../language/language.h"
 
 namespace delphic {
-    class possibility;
-    using possibility_ptr = std::shared_ptr<possibility>;
+
 //    using possibility_id = unsigned long;
 
     class possibility {
     public:
-        using agent_information_state = std::unordered_set<possibility_ptr>;
-        using information_state = std::vector<agent_information_state>;
-
-        possibility(del::language_ptr language, kripke::label_ptr label, information_state state);
+        possibility(del::language_ptr language, kripke::label_ptr label, agents_information_state state);
 
         possibility(const possibility&) = default;
         possibility& operator=(const possibility&) = default;
@@ -53,18 +50,17 @@ namespace delphic {
 
         [[nodiscard]] del::language_ptr get_language() const;
         [[nodiscard]] const kripke::label &get_label() const;
-        [[nodiscard]] const agent_information_state &get_information_state(del::agent ag) const;
+        [[nodiscard]] unsigned long get_depth() const;
+        [[nodiscard]] const information_state &get_information_state(del::agent ag) const;
 
         bool satisfies(del::formula_ptr f);
 
     private:
         del::language_ptr m_language;
         kripke::label_ptr m_label;      // todo: move label outside kripke
-        information_state m_information_state;
+        agents_information_state m_information_state;
         unsigned long m_depth;
     };
-
-    using possibility_spectrum = possibility::agent_information_state;
 }
 
 #endif //DAEDALUS_POSSIBILITY_H

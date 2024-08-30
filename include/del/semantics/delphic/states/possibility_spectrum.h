@@ -21,32 +21,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../../../../../include/del/semantics/delphic/states/possibility.h"
-#include "../../../../../include/del/semantics/delphic/model_checker.h"
+#ifndef DAEDALUS_POSSIBILITY_SPECTRUM_H
+#define DAEDALUS_POSSIBILITY_SPECTRUM_H
 
-using namespace delphic;
+#include "../../../language/language.h"
+#include "possibility_types.h"
+#include "../../../formulas/formula.h"
 
-possibility::possibility(del::language_ptr language, kripke::label_ptr label, agents_information_state state) :
-    m_language{std::move(language)},
-    m_label{std::move(label)},
-    m_information_state{std::move(state)} {}
+namespace delphic {
+    class possibility_spectrum {
+    public:
+        possibility_spectrum(del::language_ptr language, information_state designated_possibilities);
 
-del::language_ptr possibility::get_language() const {
-    return m_language;
+        possibility_spectrum(const possibility_spectrum&) = delete;
+        possibility_spectrum& operator=(const possibility_spectrum&) = delete;
+
+        possibility_spectrum(possibility_spectrum&&) = default;
+        possibility_spectrum& operator=(possibility_spectrum&&) = default;
+
+        ~possibility_spectrum() = default;
+
+        [[nodiscard]] const information_state &get_designated_possibilities() const;
+
+        [[nodiscard]] del::language_ptr get_language() const;
+        [[nodiscard]] unsigned long long get_max_depth() const;
+        [[nodiscard]] bool satisfies(const del::formula_ptr &f) const;
+
+    private:
+        del::language_ptr m_language;
+        information_state m_designated_possibilities;
+        unsigned long long m_max_depth;
+    };
 }
 
-const kripke::label &possibility::get_label() const {
-    return *m_label;
-}
-
-unsigned long possibility::get_depth() const {
-    return m_depth;
-}
-
-const information_state &possibility::get_information_state(del::agent ag) const {
-    return m_information_state[ag];
-}
-
-bool possibility::satisfies(const del::formula_ptr f) {
-    return model_checker::holds_in(*this, *f);
-}
+#endif //DAEDALUS_POSSIBILITY_SPECTRUM_H

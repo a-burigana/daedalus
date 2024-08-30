@@ -21,32 +21,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../../../../../include/del/semantics/delphic/states/possibility.h"
-#include "../../../../../include/del/semantics/delphic/model_checker.h"
+#ifndef DAEDALUS_EVENTUALITY_SPECTRUM_H
+#define DAEDALUS_EVENTUALITY_SPECTRUM_H
 
-using namespace delphic;
+#include "../../../language/language.h"
+#include "eventuality_types.h"
 
-possibility::possibility(del::language_ptr language, kripke::label_ptr label, agents_information_state state) :
-    m_language{std::move(language)},
-    m_label{std::move(label)},
-    m_information_state{std::move(state)} {}
+namespace delphic {
+    class eventuality_spectrum {
+    public:
+        eventuality_spectrum(del::language_ptr language, std::string name, dynamic_information_state designated_eventualities);
 
-del::language_ptr possibility::get_language() const {
-    return m_language;
+        eventuality_spectrum(const eventuality_spectrum&) = delete;
+        eventuality_spectrum& operator=(const eventuality_spectrum&) = delete;
+
+        eventuality_spectrum(eventuality_spectrum&&) = default;
+        eventuality_spectrum& operator=(eventuality_spectrum&&) = default;
+
+        ~eventuality_spectrum() = default;
+
+        [[nodiscard]] del::language_ptr get_language() const;
+        [[nodiscard]] std::string get_name() const;
+        [[nodiscard]] const dynamic_information_state &get_designated_eventualities() const;
+
+        [[nodiscard]] unsigned long get_maximum_depth() const;
+
+    private:
+        del::language_ptr m_language;
+        std::string m_name;
+        dynamic_information_state m_designated_eventualities;
+        unsigned long m_maximum_depth;
+    };
 }
 
-const kripke::label &possibility::get_label() const {
-    return *m_label;
-}
-
-unsigned long possibility::get_depth() const {
-    return m_depth;
-}
-
-const information_state &possibility::get_information_state(del::agent ag) const {
-    return m_information_state[ag];
-}
-
-bool possibility::satisfies(const del::formula_ptr f) {
-    return model_checker::holds_in(*this, *f);
-}
+#endif //DAEDALUS_EVENTUALITY_SPECTRUM_H

@@ -27,11 +27,12 @@
 
 using namespace delphic;
 
-eventuality::eventuality(del::formula_ptr pre, postconditions &post, eventuality::information_state state) :
+eventuality::eventuality(del::formula_ptr pre, postconditions &post, agents_dynamic_information_state state) :
     m_pre{std::move(pre)},
     m_post{std::move(post)},
     m_information_state{std::move(state)} {
     m_is_ontic = not m_post.empty();
+    m_is_idle = m_pre->get_type() == del::formula_type::true_formula and m_post.empty();
 }
 
 del::formula_ptr eventuality::get_pre() const {
@@ -42,10 +43,14 @@ postconditions eventuality::get_post() const {
     return m_post;
 }
 
-const eventuality::agent_information_state &eventuality::get_information_state(del::agent ag) const {
+const dynamic_information_state &eventuality::get_information_state(del::agent ag) const {
     return m_information_state[ag];
 }
 
 bool eventuality::is_ontic() const {
     return m_is_ontic;
+}
+
+bool eventuality::is_idle() const {
+    return m_is_idle;
 }

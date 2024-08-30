@@ -44,7 +44,7 @@ bounded_identification::calculate_signatures(const state &s, unsigned long k, st
 void bounded_identification::calculate_world_signature(const state &s, const unsigned long k, const world_id x,
                                                        const unsigned long h, storage<signature> &signatures_storage,
                                                        signature_matrix &worlds_signatures, signature_map &sign_map) {
-    information_state xs = information_state(s.get_language()->get_agents_number());
+    agents_information_state xs = agents_information_state(s.get_language()->get_agents_number());
 
     if (h > 0)
         for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)

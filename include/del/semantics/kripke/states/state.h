@@ -35,7 +35,6 @@
 namespace kripke {
     class state {
     public:
-
         state(del::language_ptr language, unsigned long long worlds_number, relations relations,
               label_vector valuation, world_set designated_worlds);
 

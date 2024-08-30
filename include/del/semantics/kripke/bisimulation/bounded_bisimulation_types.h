@@ -58,8 +58,8 @@ namespace kripke {
     using signature_vector = std::vector<signature_ptr>;
     using signature_matrix = std::vector<signature_vector>;
     using signature_map = std::unordered_map<signature_ptr, std::pair<world_set, world_id>>;
-    using agent_information_state = delphic::possibility::agent_information_state;
-    using information_state = delphic::possibility::information_state;
+    using information_state = delphic::information_state;
+    using agents_information_state = delphic::agents_information_state;
 
 //    struct bi_structures {
 //        signature_matrix worlds_signatures;

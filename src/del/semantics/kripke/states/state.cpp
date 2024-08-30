@@ -80,9 +80,8 @@ unsigned long long state::get_max_depth() const {
 }
 
 bool state::satisfies(const formula_ptr &f) const {
-    const auto check = [&](const world_id wd) { return model_checker::holds_in(*this, wd, *f); };
-//    const auto check = [&](const world_id wd) { return f->holds_in(*this, wd); };
-    return std::all_of(m_designated_worlds.begin(), m_designated_worlds.end(), check);
+    return std::all_of(m_designated_worlds.begin(), m_designated_worlds.end(),
+                       [&](const world_id wd) { return model_checker::holds_in(*this, wd, *f); });
 }
 
 void state::calculate_worlds_depth() {

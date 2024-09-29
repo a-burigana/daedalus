@@ -39,7 +39,7 @@ del::formula_ptr eventuality::get_pre() const {
     return m_pre;
 }
 
-postconditions eventuality::get_post() const {
+postconditions eventuality::get_postconditions() const {
     return m_post;
 }
 

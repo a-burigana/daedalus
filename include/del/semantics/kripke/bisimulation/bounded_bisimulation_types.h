@@ -57,7 +57,7 @@ namespace kripke {
     using signature_ptr = std::shared_ptr<signature>;
     using signature_vector = std::vector<signature_ptr>;
     using signature_matrix = std::vector<signature_vector>;
-    using signature_map = std::unordered_map<signature_ptr, std::pair<world_set, world_id>>;
+    using signature_map = std::unordered_map<signature_ptr, std::pair<std::unique_ptr<world_set>, world_id>>;
     using information_state = delphic::information_state;
     using agents_information_state = delphic::agents_information_state;
 

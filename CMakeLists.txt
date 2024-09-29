@@ -70,8 +70,8 @@ add_executable(DAEDALUS
         tests/builder/action_builder.h
         include/del/formulas/propositional/true_formula.h
         include/del/formulas/propositional/false_formula.h
-        tests/bisimulation_tester.cpp
-        tests/bisimulation_tester.h
+        tests/bisimulation/bisimulation_tester.cpp
+        tests/bisimulation/bisimulation_tester.h
         tests/printer.cpp
         tests/printer.h
         tests/builder/domains/coin_in_the_box.cpp

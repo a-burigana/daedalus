@@ -34,7 +34,10 @@ namespace kripke {
     class bounded_identification {
     public:
         static std::pair<signature_matrix, signature_map>
-            calculate_signatures(const state &s, unsigned long k, storage<signature> &signatures_storage);
+        calculate_signatures(const state &s, unsigned long k, storage<signature> &signatures_storage);
+
+        static void calculate_world_signature(const state &s, unsigned long k, world_id x, unsigned long h,
+                                              storage<signature> &signatures_storage, signature_matrix &worlds_signatures);
 
     private:
         static void calculate_world_signature(const state &s, unsigned long k, world_id x, unsigned long h,

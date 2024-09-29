@@ -25,6 +25,7 @@
 #define DAEDALUS_POSSIBILITY_H
 
 #include <memory>
+#include <optional>
 #include <unordered_set>
 #include <vector>
 #include "possibility_types.h"
@@ -38,7 +39,8 @@ namespace delphic {
 
     class possibility {
     public:
-        possibility(del::language_ptr language, kripke::label_ptr label, agents_information_state state);
+        possibility(del::language_ptr language, kripke::label label, agents_information_state state,
+                    unsigned long bound, std::optional<unsigned long> world = std::nullopt);
 
         possibility(const possibility&) = default;
         possibility& operator=(const possibility&) = default;
@@ -50,16 +52,29 @@ namespace delphic {
 
         [[nodiscard]] del::language_ptr get_language() const;
         [[nodiscard]] const kripke::label &get_label() const;
-        [[nodiscard]] unsigned long get_depth() const;
+        [[nodiscard]] unsigned long get_bound() const;
         [[nodiscard]] const information_state &get_information_state(del::agent ag) const;
 
         bool satisfies(del::formula_ptr f);
 
+        bool operator<(const possibility &rhs) const;
+
+        bool operator>(const possibility &rhs) const;
+
+        bool operator<=(const possibility &rhs) const;
+
+        bool operator>=(const possibility &rhs) const;
+
+        bool operator==(const possibility &rhs) const;
+
+        bool operator!=(const possibility &rhs) const;
+
     private:
         del::language_ptr m_language;
-        kripke::label_ptr m_label;      // todo: move label outside kripke
+        kripke::label m_label;      // todo: move label outside kripke
         agents_information_state m_information_state;
-        unsigned long m_depth;
+        unsigned long m_bound;
+        std::optional<unsigned long> m_world;
     };
 }
 

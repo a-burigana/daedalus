@@ -126,7 +126,7 @@ std::pair<bool, state> bounded_contraction_builder::calculate_canonical_contract
                     if (s.get_depth(y) <= k) {
                         signature_ptr sign_y = worlds_signatures[b_x-1][y];
 
-                        auto y_reprs = bit_deque{max_reprs_bitset & sign_map.at(sign_y).first.get_bitset()};   // We compute the maximal representatives of y in its (b(x)-1)-block
+                        auto y_reprs = bit_deque{max_reprs_bitset & sign_map.at(sign_y).first->get_bitset()};   // We compute the maximal representatives of y in its (b(x)-1)-block
                         world_id f_y = y_reprs.get_bitset().find_first();
 
                         for (const world_id yr : y_reprs)
@@ -195,7 +195,7 @@ bounded_contraction_builder::calculate_max_signatures(const state &s, unsigned l
         const signature_ptr &sign = worlds_signatures[k - s.get_depth(current)][current];       // We take the representative signature of 'current'
         const auto &[worlds, max_representative] = sign_map.at(sign);                           // max_representative is a world in 'worlds' with higher bound
 
-        update_max_representative_sign(s, k, worlds, max_representative, represented, worlds_signatures, worlds_max_signs, worlds_max_reprs);   // We update the maximal representative signature of the worlds in 'worlds'
+        update_max_representative_sign(s, k, *worlds, max_representative, represented, worlds_signatures, worlds_max_signs, worlds_max_reprs);   // We update the maximal representative signature of the worlds in 'worlds'
         update_to_visit_worlds(s, k, to_visit, current, represented);                                                                           // We add the next worlds to process into the to_visit queue
     }
     return {std::move(worlds_signatures), std::move(worlds_max_signs), std::move(sign_map), std::move(worlds_max_reprs)};

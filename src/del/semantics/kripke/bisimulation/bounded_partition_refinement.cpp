@@ -30,7 +30,7 @@
 using namespace kripke;
 
 std::pair<bool, block_matrix> bounded_partition_refinement::do_refinement_steps(const state &s, unsigned long k) {
-    bpr_structures structures = init_structures(s, k+1);
+    bpr_structures structures = init_structures(s, k);
 
     partition &Q = structures.Q;
     block_matrix &worlds_blocks = structures.worlds_blocks;

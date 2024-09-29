@@ -35,8 +35,8 @@ possibility_spectrum::possibility_spectrum(del::language_ptr language,
     m_max_depth = 0;
 
     for (const possibility_ptr &w : m_designated_possibilities)
-        if (w->get_depth() > m_max_depth)
-            m_max_depth = w->get_depth();
+        if (w->get_bound() > m_max_depth)
+            m_max_depth = w->get_bound();
 }
 
 del::language_ptr possibility_spectrum::get_language() const {

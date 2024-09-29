@@ -111,7 +111,7 @@ void node::set_to_apply_action(kripke::action_deque actions) {
 }
 
 void node::set_original_state(kripke::state_ptr s) {
-    m_original_state = s;
+    m_original_state = std::move(s);
 }
 
 void node::clear_original_state() {

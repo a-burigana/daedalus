@@ -107,8 +107,9 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, node
                         const unsigned long b, unsigned long long &id, const daedalus::tester::printer_ptr &printer) {
     kripke::state_ptr s0 = task.get_initial_state();
     node_deque frontier = init_frontier(s0, strategy, b, previous_iter_frontier);
+//    node_deque next_level_frontier;
     unsigned long goal_depth = task.get_goal()->get_modal_depth();
-    unsigned long long max_tree_depth = 0;
+    unsigned long long max_tree_depth = 0, is_bisim_tree_depth = 0;     // is_bisim_tree_depth: deepest level of the search tree such that all nodes in the previous levels have is_bisim = true
 
     if (not previous_iter_frontier.empty())
         for (const node_ptr &n : previous_iter_frontier)
@@ -117,8 +118,11 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, node
 
     if (printer) print_max_tree_depth(printer, max_tree_depth);
 
-    while (not frontier.empty()) {
+    while (not frontier.empty()) { // and not next_level_frontier.empty()) {
         node_ptr n = frontier.front();
+
+        if (previous_iter_frontier.empty())
+            is_bisim_tree_depth = n->get_tree_depth();
 
         if (n->get_tree_depth() > max_tree_depth) {
             max_tree_depth = n->get_tree_depth();
@@ -136,10 +140,16 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, node
 
         if (not path.empty()) return path;
 
-        if (strategy != strategy::unbounded_search and
-            not n->get_to_apply_actions().empty())  // If there exists a node n_ calculated above such that n_.is_bisim
-            previous_iter_frontier.push_back(n);    // is false, then we need to expand it in the next iteration
+        if (strategy != strategy::unbounded_search and not n->get_to_apply_actions().empty()    // If there exists a node n_ calculated above such that n_.is_bisim
+            and n->get_tree_depth() == is_bisim_tree_depth)
+            previous_iter_frontier.push_back(n);                                                // is false, then we need to expand it in the next iteration
+
         frontier.pop_front();
+
+//        if (frontier.empty()) {
+//            frontier = std::move(next_level_frontier);
+//            next_level_frontier.clear();
+//        }
     }
     return {};
 }
@@ -151,7 +161,7 @@ node_deque planner::init_frontier(kripke::state_ptr &s0, const strategy strategy
     if (previous_iter_frontier.empty()) {   // If this is the first iteration
         node_ptr n0 = init_node(strategy, s0, nullptr, true, nullptr, 0, b);
         if (n0)
-        frontier.push_back(std::move(n0));
+            frontier.push_back(std::move(n0));
     } else {
         frontier = std::move(previous_iter_frontier);
         previous_iter_frontier.clear();
@@ -165,11 +175,11 @@ node_deque planner::init_frontier(kripke::state_ptr &s0, const strategy strategy
 node_deque planner::expand_node(const planning_task &task, const strategy strategy, node_ptr &n,
                                 const kripke::action_deque &actions, node_deque &frontier, const unsigned long goal_depth,
                                 unsigned long long &id, const daedalus::tester::printer_ptr &printer) {
-    kripke::action_deque to_apply_actions;
+    kripke::action_deque to_reapply_actions;
     bool is_dead_node = true;
 
     for (const kripke::action_ptr &a : actions)
-        if (kripke::updater::is_applicable(*n->get_state(), *a)) {         // For all applicable actions. Let n_ be the
+        if (kripke::updater::is_applicable(*n->get_state(), *a)) {      // For all applicable actions. Let n_ be the
             node_ptr n_ = update_node(strategy, n, a, id, goal_depth);  // result of updating node n with 'a'
             if (printer) print_applying_action(printer, a, n_, strategy);
 
@@ -184,13 +194,13 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
                 }
 
                 if (not n_->is_bisim())                                 // If n_.is_bisim is false, we need to
-                    to_apply_actions.push_back(a);                      // reapply 'a' to n in the next iteration
+                    to_reapply_actions.push_back(a);                    // reapply 'a' to n in the next iteration
 
                 frontier.push_back(std::move(n_));                      // We update the frontier
             } else if (strategy != strategy::unbounded_search)          // If the update is unsuccessful, we need to
-                to_apply_actions.push_back(a);                          // reapply 'a' to n in the next iteration
+                to_reapply_actions.push_back(a);                        // reapply 'a' to n in the next iteration
         }
-    n->set_to_apply_action(std::move(to_apply_actions));                // We set the actions that have to be reapplied
+    n->set_to_apply_action(std::move(to_reapply_actions));              // We set the actions that have to be reapplied
     if (printer) print_end_expanding_node(printer, n, strategy, is_dead_node, n->get_to_apply_actions().empty());
 
     return {};
@@ -229,6 +239,11 @@ node_ptr planner::update_node(const strategy strategy, const node_ptr &n, const 
             kripke::state_ptr s_ = std::make_shared<kripke::state>(kripke::updater::product_update(*n->get_state(), *a));
             return init_node(strategy, s_, a, true, n, ++id);
         } case strategy::iterative_bounded_search:
+//            if (n->get_state()->get_worlds_number() == 6 and a->get_name() == "a_not_knows_b_0") {
+            if (n->get_state()->get_worlds_number() == 4 and a->get_name() == "a_not_knows_b_3") {
+                int x = 0;
+                ++x;
+            }
             if (n->is_bisim() or n->get_bound() - a->get_maximum_depth() >= goal_depth) {
                 kripke::state_ptr s_ = std::make_shared<kripke::state>(kripke::updater::product_update(*n->get_state(), *a));
 
@@ -246,7 +261,7 @@ void planner::refresh_node(node_ptr &n) {
     n->clear_non_bisim_children();  // n'.is_bisim == false. We have to discard them before we move to the next iteration
 
     if (not n->is_bisim()) {                                        // If we can still do some refinement steps
-        auto [is_bisim, s_contr] = kripke::bisimulator::contract(kripke::bisimulation_type::bounded, *n->get_original_state(), n->get_bound());    // We do another refinement step
+        auto [is_bisim, s_contr] = kripke::bisimulator::contract(kripke::bisimulation_type::rooted, *n->get_original_state(), n->get_bound());    // We do another refinement step
         n->set_is_bisim(is_bisim);                                  // And we update the value of is_bisim
         n->set_state(std::make_shared<kripke::state>(std::move(s_contr)));
         if (is_bisim) n->set_original_state(nullptr);
@@ -257,7 +272,7 @@ node_ptr planner::init_node(const strategy strategy, const kripke::state_ptr &s,
                             const node_ptr &parent, unsigned long long id, unsigned long b) {
     kripke::bisimulation_type bisim_type = strategy == strategy::unbounded_search
             ? kripke::bisimulation_type::full
-            : kripke::bisimulation_type::bounded;
+            : kripke::bisimulation_type::rooted;
 
     auto [is_bisim, s_contr] = kripke::bisimulator::contract(bisim_type, *s, b);
     node_ptr n = std::make_shared<node>(id, std::make_shared<kripke::state>(std::move(s_contr)), a, b, is_bisim and was_bisim, parent);

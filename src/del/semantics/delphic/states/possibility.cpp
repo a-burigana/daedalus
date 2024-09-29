@@ -26,21 +26,24 @@
 
 using namespace delphic;
 
-possibility::possibility(del::language_ptr language, kripke::label_ptr label, agents_information_state state) :
+possibility::possibility(del::language_ptr language, kripke::label label, agents_information_state state,
+                         unsigned long bound, std::optional<unsigned long> world) :
     m_language{std::move(language)},
     m_label{std::move(label)},
-    m_information_state{std::move(state)} {}
+    m_information_state{std::move(state)},
+    m_bound{bound},
+    m_world{world} {}
 
 del::language_ptr possibility::get_language() const {
     return m_language;
 }
 
 const kripke::label &possibility::get_label() const {
-    return *m_label;
+    return m_label;
 }
 
-unsigned long possibility::get_depth() const {
-    return m_depth;
+unsigned long possibility::get_bound() const {
+    return m_bound;
 }
 
 const information_state &possibility::get_information_state(del::agent ag) const {
@@ -49,4 +52,14 @@ const information_state &possibility::get_information_state(del::agent ag) const
 
 bool possibility::satisfies(const del::formula_ptr f) {
     return model_checker::holds_in(*this, *f);
+}
+
+bool possibility::operator==(const possibility &rhs) const {
+    return m_bound == rhs.m_bound and
+           m_label == rhs.m_label and
+           m_information_state == rhs.m_information_state;
+}
+
+bool possibility::operator!=(const possibility &rhs) const {
+    return not (rhs == *this);
 }

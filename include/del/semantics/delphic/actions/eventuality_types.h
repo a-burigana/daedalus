@@ -33,11 +33,14 @@
 
 namespace delphic {
     class eventuality;
+    class eventuality_spectrum;
     using eventuality_ptr = std::shared_ptr<eventuality>;
-    using postconditions = std::unordered_map<del::atom, del::formula_ptr>;
+    using eventuality_spectrum_ptr = std::shared_ptr<eventuality_spectrum>;
 
     using dynamic_information_state = std::unordered_set<eventuality_ptr>;
     using agents_dynamic_information_state = std::vector<dynamic_information_state>;
+
+    using postconditions = std::unordered_map<del::atom, del::formula_ptr>;
 }
 
 #endif //DAEDALUS_EVENTUALITY_TYPES_H

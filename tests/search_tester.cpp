@@ -31,7 +31,7 @@
 #include "../tests/formula_tester.h"
 #include "../tests/update_tester.h"
 #include "../tests/printer.h"
-#include "../tests/bisimulation_tester.h"
+#include "bisimulation/bisimulation_tester.h"
 #include "../tests/action_tester.h"
 #include "../include/search/planner.h"
 #include "../tests/builder/domains/coin_in_the_box.h"

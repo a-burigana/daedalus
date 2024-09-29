@@ -29,10 +29,14 @@
 
 namespace delphic {
     class possibility;
+    class possibility_spectrum;
     using possibility_ptr = std::shared_ptr<possibility>;
+    using possibility_spectrum_ptr = std::shared_ptr<possibility_spectrum>;
 
     using information_state = std::unordered_set<possibility_ptr>;
     using agents_information_state = std::vector<information_state>;
+
+    using possibility_map = std::unordered_map<possibility_ptr, possibility_ptr>;
 }
 
 #endif //DAEDALUS_POSSIBILITY_TYPES_H

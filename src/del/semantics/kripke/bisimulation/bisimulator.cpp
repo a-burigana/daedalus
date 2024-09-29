@@ -27,12 +27,15 @@
 
 using namespace kripke;
 
-std::pair<bool, state> bisimulator::contract(bisimulation_type type, state &s, unsigned long k) {
+std::pair<bool, state> bisimulator::contract(bisimulation_type type, state &s, unsigned long k,
+                                             storage<delphic::possibility> *signatures_storage) {
     switch (type) {
         case bisimulation_type::full:
             return partition_refinement::contract(s);           // Classic Paige and Tarjan algorithm
-        case bisimulation_type::bounded:
+        case bisimulation_type::rooted:
             return bounded_contraction_builder::calculate_rooted_contraction(s, k);
+//        case bisimulation_type::canonical:
+//            return bounded_contraction_builder::calculate_canonical_contraction(s, k, *signatures_storage);
     }
 }
 

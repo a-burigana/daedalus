@@ -29,11 +29,14 @@
 #include "../../../language/language.h"
 #include "bisimulation_types.h"
 #include "../../../../search/search_types.h"
+#include "bounded_bisimulation_types.h"
+#include "../../../../utils/storage.h"
 
 namespace kripke {
     class bisimulator {
     public:
-        static std::pair<bool, state> contract(bisimulation_type type, state &s, unsigned long k = 0);
+        static std::pair<bool, state> contract(bisimulation_type type, state &s, unsigned long k = 0,
+                                               storage<delphic::possibility> *signatures_storage = nullptr);
 //        static bool contract(bisimulation_type type, search::node_ptr &n);
 //        static bool repeat_contraction(search::node_ptr &n);
     };

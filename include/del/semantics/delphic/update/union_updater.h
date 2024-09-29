@@ -24,21 +24,29 @@
 #ifndef DAEDALUS_UNION_UPDATER_H
 #define DAEDALUS_UNION_UPDATER_H
 
-#include "../states/possibility.h"
-#include "../actions/eventuality.h"
+#include "../../../../../include/del/semantics/delphic/states/possibility_spectrum.h"
+#include "../../../../../include/del/semantics/delphic/actions/eventuality_spectrum.h"
 #include "../../../../utils/storage.h"
+#include "../../kripke/states/label.h"
 
 namespace delphic {
     class union_updater {
     public:
-        static bool is_applicable(const possibility &w, const eventuality &e, const storage<possibility> &storage);
-        static bool is_applicable(const possibility_spectrum &W, const eventuality_spectrum &E, const storage<possibility> &storage);
+        static bool is_applicable(const possibility_ptr &w, const eventuality_ptr &e);
+        static bool is_applicable(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
 
-        static possibility update(const possibility &w, const eventuality &e, const storage<possibility> &storage);
-        static possibility update(const possibility_spectrum &W, const eventuality_spectrum &E, const storage<possibility> &storage);
+//        static possibility_ptr update(const possibility_ptr &w, const eventuality_ptr &e, storage<possibility> &storage);
+        static possibility_spectrum_ptr bounded_update(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E, unsigned long b, storage<possibility> &storage);
 
-        static possibility bounded_update(const possibility &w, const eventuality &e, const storage<possibility> &storage);
-        static possibility bounded_update(const possibility_spectrum &W, const eventuality_spectrum &E, const storage<possibility> &storage);
+        static possibility_ptr bounded_update(const possibility_ptr &w, const eventuality_ptr &e, unsigned long b,
+                                              storage<possibility> &possibility_storage);
+//        static possibility bounded_update(const possibility_spectrum &W, const eventuality_spectrum &E, storage<possibility> &storage);
+
+    private:
+        static void bounded_update_helper(const possibility_ptr &w, const eventuality_ptr &e, unsigned long b,
+                                          std::vector<possibility_map> &updated_possibilities, storage<possibility> &possibility_storage);
+
+        static kripke::label update_label(const possibility_ptr &w, const eventuality_ptr &e);
     };
 }
 

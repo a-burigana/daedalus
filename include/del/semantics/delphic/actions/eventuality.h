@@ -47,7 +47,7 @@ namespace delphic {
         ~eventuality() = default;
 
         [[nodiscard]] del::formula_ptr get_pre() const;
-        [[nodiscard]] postconditions get_post() const;
+        [[nodiscard]] postconditions get_postconditions() const;
         [[nodiscard]] const dynamic_information_state &get_information_state(del::agent ag) const;
         [[nodiscard]] bool is_ontic() const;
         [[nodiscard]] bool is_idle() const;

@@ -60,6 +60,13 @@ node_deque planner::search(const planning_task &task, const strategy strategy, c
     node_deque path;
     auto start = std::chrono::steady_clock::now();
 
+    // If the initial state satisfies the goal, we immediately terminate
+    if (task.get_initial_state()->satisfies(task.get_goal())) {
+        node_ptr n0 = init_node(strategy, task.get_initial_state(), nullptr, true, nullptr, 0, task.get_goal()->get_modal_depth());
+        if (printer) print_goal_found(printer, n0);
+        return extract_path(n0);
+    }
+
     switch (strategy) {
         case strategy::unbounded_search:
             path = unbounded_search(task, printer);

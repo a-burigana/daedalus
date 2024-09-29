@@ -53,7 +53,7 @@ kripke::state consecutive_numbers::build_initial_state(unsigned long n) {
     language_ptr language = consecutive_numbers::build_language(n);
 
     world_id worlds_number = n;
-    world_set designated_worlds = world_set{worlds_number, world_list{0, 1}};        // n/2      // We assume n >= 2
+    world_set designated_worlds = world_set{worlds_number, world_list{0, 1}};           // We assume n >= 2
 
     relations r(language->get_agents_number());
 
@@ -101,76 +101,20 @@ action_deque consecutive_numbers::build_actions(unsigned long n) {
     formula_deque fs_a, fs_b;
 
     for (unsigned long k = 0; k <= n; ++k) {
-        formula_ptr has_a_k     = std::make_shared<atom_formula>(language->get_atom_id("has_a_" + std::to_string(k)));
-        formula_ptr has_b_k     = std::make_shared<atom_formula>(language->get_atom_id("has_b_" + std::to_string(k)));
-
-//        formula_ptr B_a_has_a_k = std::make_shared<box_formula>(a, has_a_k);
-        formula_ptr B_a_has_b_k = std::make_shared<box_formula>(a, has_b_k);
-        formula_ptr B_b_has_a_k = std::make_shared<box_formula>(b, has_a_k);
-//        formula_ptr B_b_has_b_k = std::make_shared<box_formula>(b, has_b_k);
-
-        formula_ptr f_a         = std::make_shared<not_formula>(B_a_has_b_k);
-        formula_ptr f_b         = std::make_shared<not_formula>(B_b_has_a_k);
-
-        actions.push_back(std::make_shared<action>(std::move(action_builder::build_public_announcement("a_not_knows_b_" + std::to_string(k), language, f_a))));
-        actions.push_back(std::make_shared<action>(std::move(action_builder::build_public_announcement("b_not_knows_a_" + std::to_string(k), language, f_b))));
-//        formula_ptr f_b         = std::make_shared<and_formula>(formula_deque{B_b_has_a_k, B_a_has_a_k});
-
-//        fs_a.push_back(std::move(f_a));
-//        fs_b.push_back(std::move(f_b));
-    }
-//
-//    formula_ptr psi_a = std::make_shared<or_formula>(std::move(fs_a));
-//    formula_ptr psi_b = std::make_shared<or_formula>(std::move(fs_b));
-//
-//    formula_ptr not_psi_a = std::make_shared<not_formula>(psi_a);
-//    formula_ptr not_psi_b = std::make_shared<not_formula>(psi_b);
-//
-////    actions.push_back(std::make_shared<action>(std::move(action_builder::build_public_announcement("a_knows_b_n", language, psi_a))));
-////    actions.push_back(std::make_shared<action>(std::move(action_builder::build_public_announcement("b_knows_a_n", language, psi_b))));
-//    actions.push_back(std::make_shared<action>(std::move(action_builder::build_public_announcement("a_not_knows_b_n", language, not_psi_a))));
-//    actions.push_back(std::make_shared<action>(std::move(action_builder::build_public_announcement("b_not_knows_a_n", language, not_psi_b))));
-
-    /*for (unsigned long k = 0; k <= n; ++k) {
-        formula_ptr has_a_k     = std::make_shared<atom_formula>(language->get_atom_id("has_a_" + std::to_string(k)));
-        formula_ptr has_b_k     = std::make_shared<atom_formula>(language->get_atom_id("has_b_" + std::to_string(k)));
+        formula_ptr has_a_k = std::make_shared<atom_formula>(language->get_atom_id("has_a_" + std::to_string(k)));
+        formula_ptr has_b_k = std::make_shared<atom_formula>(language->get_atom_id("has_b_" + std::to_string(k)));
 
         formula_ptr B_a_has_b_k = std::make_shared<box_formula>(a, has_b_k);
         formula_ptr B_b_has_a_k = std::make_shared<box_formula>(b, has_a_k);
 
-        formula_ptr f_a         = std::make_shared<and_formula>(formula_deque{B_a_has_b_k, has_b_k});
-        formula_ptr f_b         = std::make_shared<and_formula>(formula_deque{B_b_has_a_k, has_a_k});
+        formula_ptr f_a = std::make_shared<not_formula>(B_a_has_b_k);
+        formula_ptr f_b = std::make_shared<not_formula>(B_b_has_a_k);
 
-        formula_ptr not_f_a     = std::make_shared<not_formula>(f_a);
-        formula_ptr not_f_b     = std::make_shared<not_formula>(f_b);
-
-        actions.push_back(std::make_shared<action>(std::move(action_builder::build_public_announcement("a_not_knows_b_" + std::to_string(k), language, not_f_a))));
-        actions.push_back(std::make_shared<action>(std::move(action_builder::build_public_announcement("b_not_knows_a_" + std::to_string(k), language, not_f_b))));
+        actions.push_back(std::make_shared<action>(std::move(
+                action_builder::build_public_announcement("a_not_knows_b_" + std::to_string(k), language, f_a))));
+        actions.push_back(std::make_shared<action>(std::move(
+                action_builder::build_public_announcement("b_not_knows_a_" + std::to_string(k), language, f_b))));
     }
-
-    formula_ptr has_b_n_minus_1 = std::make_shared<atom_formula>(language->get_atom_id("has_b_" + std::to_string(n-1)));
-    formula_ptr has_a_n_minus_2 = std::make_shared<atom_formula>(language->get_atom_id("has_a_" + std::to_string(n-2)));
-
-    formula_ptr B_a_has_b_n_minus_1 = std::make_shared<box_formula>(a, has_b_n_minus_1);
-    formula_ptr B_b_has_a_n_minus_2 = std::make_shared<box_formula>(b, has_a_n_minus_2);
-
-    formula_ptr f_a = std::make_shared<and_formula>(formula_deque{B_a_has_b_n_minus_1, has_a_n_minus_2, has_b_n_minus_1});
-    formula_ptr f_b = std::make_shared<and_formula>(formula_deque{B_b_has_a_n_minus_2, has_b_n_minus_1, has_a_n_minus_2});
-
-    actions.push_back(std::make_shared<action>(std::move(action_builder::build_public_announcement("tell_a", language, f_a))));
-    actions.push_back(std::make_shared<action>(std::move(action_builder::build_public_announcement("tell_b", language, f_b))));*/
-
-
-//    if (k < n) {
-//        formula_ptr has_a_k_plus_1 = std::make_shared<atom_formula>(language->get_atom_id("has_a_" + std::to_string(k+1)));
-//        formula_ptr has_b_k_plus_1 = std::make_shared<atom_formula>(language->get_atom_id("has_b_" + std::to_string(k+1)));
-//
-//        formula_ptr f_a_1 = std::make_shared<and_formula>(formula_deque{B_a_has_b_k, has_a_k_plus_1});
-//        formula_ptr f_b_1 = std::make_shared<and_formula>(formula_deque{B_b_has_a_k, has_b_k_plus_1});
-//
-//        actions.push_back(std::make_shared<action>(std::move(action_builder::build_public_announcement("a_tells_plus_" + std::to_string(k+1), language, f_a_1))));
-//        actions.push_back(std::make_shared<action>(std::move(action_builder::build_public_announcement("b_tells_plus_" + std::to_string(k+1), language, f_b_1))));
-//    }
     return actions;
 }
 
@@ -184,13 +128,6 @@ search::planning_task consecutive_numbers::build_task(unsigned long n) {
     agent b = language->get_agent_id("b");
 
     unsigned long n_a = n, n_b = n - 1;
-//    unsigned long n_ag = n/2 % 2 == 0 ? n - n/2 : n - n/2 - 1;
-
-//    formula_ptr has_a_n     = std::make_shared<atom_formula>(language->get_atom_id("has_a_" + std::to_string(n_a)));
-//    formula_ptr has_b_n     = std::make_shared<atom_formula>(language->get_atom_id("has_b_" + std::to_string(n_b)));
-//    formula_ptr B_a_has_b_n = std::make_shared<box_formula>(a, std::move(has_b_n));
-//    formula_ptr B_b_has_a_n = std::make_shared<box_formula>(b, std::move(has_a_n));
-//    formula_ptr goal        = std::make_shared<and_formula>(formula_deque{std::move(B_a_has_b_n), std::move(B_b_has_a_n)});
 
     formula_ptr has_b_n_b     = std::make_shared<atom_formula>(language->get_atom_id("has_b_" + std::to_string(n_b)));
     formula_ptr B_a_has_b_n_b = std::make_shared<box_formula>(a, std::move(has_b_n_b));

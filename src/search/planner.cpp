@@ -107,7 +107,6 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, node
                         const unsigned long b, unsigned long long &id, const daedalus::tester::printer_ptr &printer) {
     kripke::state_ptr s0 = task.get_initial_state();
     node_deque frontier = init_frontier(s0, strategy, b, previous_iter_frontier);
-//    node_deque next_level_frontier;
     unsigned long goal_depth = task.get_goal()->get_modal_depth();
     unsigned long long max_tree_depth = 0, is_bisim_tree_depth = 0;     // is_bisim_tree_depth: deepest level of the search tree such that all nodes in the previous levels have is_bisim = true
 
@@ -118,7 +117,7 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, node
 
     if (printer) print_max_tree_depth(printer, max_tree_depth);
 
-    while (not frontier.empty()) { // and not next_level_frontier.empty()) {
+    while (not frontier.empty()) {
         node_ptr n = frontier.front();
 
         if (previous_iter_frontier.empty())
@@ -145,11 +144,6 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, node
             previous_iter_frontier.push_back(n);                                                // is false, then we need to expand it in the next iteration
 
         frontier.pop_front();
-
-//        if (frontier.empty()) {
-//            frontier = std::move(next_level_frontier);
-//            next_level_frontier.clear();
-//        }
     }
     return {};
 }
@@ -239,11 +233,6 @@ node_ptr planner::update_node(const strategy strategy, const node_ptr &n, const 
             kripke::state_ptr s_ = std::make_shared<kripke::state>(kripke::updater::product_update(*n->get_state(), *a));
             return init_node(strategy, s_, a, true, n, ++id);
         } case strategy::iterative_bounded_search:
-//            if (n->get_state()->get_worlds_number() == 6 and a->get_name() == "a_not_knows_b_0") {
-            if (n->get_state()->get_worlds_number() == 4 and a->get_name() == "a_not_knows_b_3") {
-                int x = 0;
-                ++x;
-            }
             if (n->is_bisim() or n->get_bound() - a->get_maximum_depth() >= goal_depth) {
                 kripke::state_ptr s_ = std::make_shared<kripke::state>(kripke::updater::product_update(*n->get_state(), *a));
 

@@ -24,10 +24,8 @@
 #include "consecutive_numbers.h"
 #include "../../../include/del/formulas/propositional/atom_formula.h"
 #include "../../../include/del/formulas/modal/box_formula.h"
-#include "../../../include/del/formulas/propositional/or_formula.h"
 #include "../../../include/del/formulas/propositional/not_formula.h"
 #include "../action_builder.h"
-#include "../../../include/del/formulas/propositional/and_formula.h"
 #include <memory>
 #include <string>
 
@@ -127,7 +125,7 @@ search::planning_task consecutive_numbers::build_task(unsigned long n) {
     agent a = language->get_agent_id("a");
     agent b = language->get_agent_id("b");
 
-    unsigned long n_a = n, n_b = n - 1;
+    unsigned long n_b = n - 1;      //  n_a = n,
 
     formula_ptr has_b_n_b     = std::make_shared<atom_formula>(language->get_atom_id("has_b_" + std::to_string(n_b)));
     formula_ptr B_a_has_b_n_b = std::make_shared<box_formula>(a, std::move(has_b_n_b));
@@ -137,7 +135,7 @@ search::planning_task consecutive_numbers::build_task(unsigned long n) {
 }
 
 std::vector<search::planning_task> consecutive_numbers::build_tasks() {
-    const unsigned long N_MIN_TASKS = 2, N_MAX_TASK = 5;
+    const unsigned long N_MIN_TASKS = 4, N_MAX_TASK = 20;
     std::vector<search::planning_task> tasks;
 
     for (unsigned long n = N_MIN_TASKS; n <= N_MAX_TASK; ++n)

@@ -76,7 +76,7 @@ int main() {
 //    for (const auto &a : actions)
 //        printer::print_action(*a, OUT_PATH + "actions/consecutive_numbers/" + std::to_string(n) + "/");
 
-    for (int n = 2; n <= 2; ++n) {
+    for (int n = 2; n <= 4; ++n) {
         auto cn_task = consecutive_numbers::build_task(n);
 
         printer::print_results(cn_task, search::strategy::unbounded_search, OUT_PATH);

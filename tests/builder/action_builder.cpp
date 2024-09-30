@@ -112,6 +112,31 @@ action action_builder::build_private_ontic(std::string name, const language_ptr 
     return action{language, std::move(name), events_number, q, pre, post, is_ontic, designated_events};
 }
 
+action action_builder::build_public_sensing(std::string name, const del::language_ptr &language,
+                                            const del::formula_ptr &f_pre, const formula_ptr &sensed) {
+    const event_id events_number = 2;
+    action_relations q(language->get_agents_number());
+
+    for (agent ag = 0; ag < language->get_agents_number(); ++ag) {
+        q[ag] = action_agent_relations(events_number);
+        q[ag][0] = event_set(events_number, event_deque{0});
+        q[ag][1] = event_set(events_number, event_deque{1});
+    }
+
+    preconditions pre(events_number);
+    formula_ptr not_sensed = std::make_shared<not_formula>(sensed);
+
+    pre[0] = std::make_shared<and_formula>(formula_deque{f_pre, sensed});
+    pre[1] = std::make_shared<and_formula>(formula_deque{f_pre, not_sensed});
+
+    postconditions post = postconditions(events_number);
+    boost::dynamic_bitset<> is_ontic(events_number);
+
+    event_deque designated_events = {0, 1};
+
+    return action{language, std::move(name), events_number, q, pre, post, is_ontic, designated_events};
+}
+
 action action_builder::build_private_sensing(std::string name, const language_ptr &language, const formula_ptr &f_pre,
                                              const agent_set &fo_ags) {
     const event_id events_number = 2;
@@ -138,7 +163,6 @@ action action_builder::build_private_sensing(std::string name, const language_pt
     pre[1] = std::make_shared<true_formula>();
 
     postconditions post = postconditions(events_number);
-
     boost::dynamic_bitset<> is_ontic(events_number);
 
     event_deque designated_events = {0};

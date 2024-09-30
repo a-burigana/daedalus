@@ -35,32 +35,35 @@ namespace daedalus::tester {
     class action_builder {
     public:
         static action build_public_announcement(std::string name, const del::language_ptr &language,
-                                                     const del::formula_ptr &f_pre);
+                                                const del::formula_ptr &f_pre);
 
         static action build_public_ontic(std::string name, const del::language_ptr &language,
-                                              const del::formula_ptr &f_pre, const event_post &e_post);
+                                         const del::formula_ptr &f_pre, const event_post &e_post);
 
         static action build_private_ontic(std::string name, const del::language_ptr &language,
-                                               const del::formula_ptr &f_pre, const event_post &e_post,
-                                               const del::agent_set &fo_ags);
+                                          const del::formula_ptr &f_pre, const event_post &e_post,
+                                          const del::agent_set &fo_ags);
+
+        static action build_public_sensing(std::string name, const del::language_ptr &language,
+                                           const del::formula_ptr &f_pre, const del::formula_ptr &sensed);
 
         static action build_private_sensing(std::string name, const del::language_ptr &language,
-                                                 const del::formula_ptr &f_pre, const del::agent_set &fo_ags);
+                                            const del::formula_ptr &f_pre, const del::agent_set &fo_ags);
 
         static action build_semi_private_sensing(std::string name, const del::language_ptr &language,
-                                                      const del::formula_ptr &f_pre, const del::formula_ptr &sensed,
-                                                      const del::agent_set &fo_ags, const del::agent_set &po_ags);
+                                                 const del::formula_ptr &f_pre, const del::formula_ptr &sensed,
+                                                 const del::agent_set &fo_ags, const del::agent_set &po_ags);
 
         static action build_semi_private_announcement(std::string name, const del::language_ptr &language,
-                                                           const del::formula_ptr &f_pre, const del::formula_ptr &announced,
-                                                           const del::agent_set &fo_ags, const del::agent_set &po_ags);
+                                                      const del::formula_ptr &f_pre, const del::formula_ptr &announced,
+                                                      const del::agent_set &fo_ags, const del::agent_set &po_ags);
 
         static action build_quasi_private_announcement(std::string name, const del::language_ptr &language,
-                                                            const del::formula_ptr &f_pre_1, const del::formula_ptr &f_pre_2,
-                                                            const del::agent_set &fo_ags_1, const del::agent_set &fo_ags_2);
+                                                       const del::formula_ptr &f_pre_1, const del::formula_ptr &f_pre_2,
+                                                       const del::agent_set &fo_ags_1, const del::agent_set &fo_ags_2);
 
         static action build_private_announcement(std::string name, const del::language_ptr &language,
-                                                      const del::formula_ptr &f_pre, const del::agent_set &fo_ags);
+                                                 const del::formula_ptr &f_pre, const del::agent_set &fo_ags);
     };
 }
 

@@ -32,6 +32,7 @@
 #include "../tests/builder/state_builder.h"
 #include "../include/del/semantics/kripke/bisimulation/bounded_identification.h"
 #include "utils/storage.cpp"
+#include "../tests/builder/domains/tiger.h"
 #include <string>
 
 #define OUT_PATH std::string{"../tests/out/"}
@@ -67,6 +68,41 @@ void storage_test() {
 }
 
 int main() {
+//    auto tasks = coin_in_the_box::build_tasks();
+//
+//    for (const auto &task : tasks) {
+//        search::planner::search(task, search::strategy::iterative_bounded_search);
+//        search::planner::search(task, search::strategy::unbounded_search);
+//    }
+
+//    auto cc_task = collaboration_communication::build_task(3, 3, 2, 3);
+//    printer::print_task(cc_task, OUT_PATH);
+//    search::planner::search(cc_task, search::strategy::iterative_bounded_search);
+//    search::planner::search(cc_task, search::strategy::unbounded_search);
+
+    search::planning_task tiger_task = tiger::build_task(5, 3);
+//    printer::print_task(tiger_task, OUT_PATH);
+
+    printer::print_results(tiger_task, search::strategy::unbounded_search, OUT_PATH);
+    printer::print_results(tiger_task, search::strategy::iterative_bounded_search, OUT_PATH);
+
+//    action_deque as = {tiger_task.get_action("right"), tiger_task.get_action("right"), tiger_task.get_action("listen_3"),
+//                       tiger_task.get_action("right"), tiger_task.get_action("look_4"), tiger_task.get_action("open_4"),
+//                       tiger_task.get_action("save_princess_4")};
+
+
+//    action_deque as = {tiger_task.get_action("listen_1"), tiger_task.get_action("right"), tiger_task.get_action("open_2"), tiger_task.get_action("look_2"), tiger_task.get_action("save_princess_2")};
+//    printer::print_states(tiger_task, as, OUT_PATH, true, bisimulation_type::full);
+
+//    printer::print_results(tiger_task, search::strategy::iterative_bounded_search, OUT_PATH);
+
+//    state s = tiger::build_initial_state(4, 2);
+//    printer::print_state(s, OUT_PATH + "states/tiger/4_2/", "s0");
+//
+//    for (const action_ptr &a : tiger_task.get_actions())
+//        printer::print_action(*a, OUT_PATH + tiger_task.get_domain_name() + "/" + tiger_task.get_problem_id() + "/");
+
+
 //    int n = 6;
 //    auto cn_task = consecutive_numbers::build_task(n);
 
@@ -76,12 +112,12 @@ int main() {
 //    for (const auto &a : actions)
 //        printer::print_action(*a, OUT_PATH + "actions/consecutive_numbers/" + std::to_string(n) + "/");
 
-    for (int n = 2; n <= 4; ++n) {
-        auto cn_task = consecutive_numbers::build_task(n);
-
-        printer::print_results(cn_task, search::strategy::unbounded_search, OUT_PATH);
-        printer::print_results(cn_task, search::strategy::iterative_bounded_search, OUT_PATH);
-    }
+//    for (int n = 2; n <= 4; ++n) {
+//        auto cn_task = consecutive_numbers::build_task(n);
+//
+//        printer::print_results(cn_task, search::strategy::unbounded_search, OUT_PATH);
+//        printer::print_results(cn_task, search::strategy::iterative_bounded_search, OUT_PATH);
+//    }
 
 //    unsigned long b = 4;
 //    const auto &[is_bisim, s_contr] = bisimulator::contract(bisimulation_type::rooted, *s, b);
@@ -122,21 +158,6 @@ int main() {
 
 //    action_tester::test_switches_actions(5, OUT_PATH);
 
-//    auto cn_task = consecutive_numbers::build_task(2);
-//    auto actions = cn_task.get_actions({"a_tells_minus_0"});
-//    auto actions = cn_task.get_actions({"b_not_knows_a_1", "a_not_knows_b_2", "b_not_knows_a_3", "a_tells_minus_3"});
-//    printer::print_state(*cn_task.get_initial_state(), OUT_PATH + "product_update/" + consecutive_numbers::get_name() + "/" + cn_task.get_problem_id() + "/", "s0");
-//    printer::print_states(*cn_task.get_initial_state(), actions, OUT_PATH + "product_update/" + consecutive_numbers::get_name() + "/" + cn_task.get_problem_id() + "/", "s0");
-
-//    assert(cn_task.get_initial_state()->satisfies(actions.front()->get_precondition(0)));
-
-//    search_tester::run_coin_in_the_box_search_tests();
-//    search_tester::print_consecutive_numbers_search_tests();
-
-//    search_tester::print_coin_in_the_box_time_results();
-//    search_tester::print_consecutive_numbers_time_results();
-//    search_tester::print_selective_communication_time_results();
-//    search_tester::print_collaboration_communication_time_results();
-
+//
     return 0;
 }

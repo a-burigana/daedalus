@@ -23,25 +23,43 @@
 
 #include "domain_utils.h"
 #include <deque>
+#include <functional>
 #include <vector>
 
 using namespace daedalus::tester;
 using namespace del;
 
 bitset_deque domain_utils::all_combinations(unsigned long set_size) {
-    return combinations_helper(set_size);
+    const combination_checker checker = [&](const boost::dynamic_bitset<> &bs) { return true; };
+    return combinations_helper(set_size, checker);
 }
 
 bitset_deque domain_utils::all_combinations_with(unsigned long set_size, const boost::dynamic_bitset<> &filter) {
-    return combinations_helper(set_size, filter, true, true);
+    const combination_checker checker = [&](const boost::dynamic_bitset<> &bs) { return filter.is_subset_of(bs); };
+    return combinations_helper(set_size, checker);
 }
 
 bitset_deque domain_utils::all_combinations_without(unsigned long set_size, const boost::dynamic_bitset<> &filter) {
-    return combinations_helper(set_size, filter, true, false);
+    const combination_checker checker = [&](const boost::dynamic_bitset<> &bs) { return (bs & filter).none(); };
+    return combinations_helper(set_size, checker);
 }
 
-bitset_deque domain_utils::combinations_helper(unsigned long set_size, const boost::dynamic_bitset<> &filter,
-                                               bool to_check_filter, bool include_elems) {
+bitset_deque domain_utils::all_sized_combinations(unsigned long set_size, unsigned long comb_size) {
+    const combination_checker checker = [&](const boost::dynamic_bitset<> &bs) { return bs.count() == comb_size; };
+    return combinations_helper(set_size, checker);
+}
+
+bitset_deque domain_utils::all_sized_combinations_with(unsigned long set_size, unsigned long comb_size, const boost::dynamic_bitset<> &filter) {
+    const combination_checker checker = [&](const boost::dynamic_bitset<> &bs) { return filter.is_subset_of(bs) and bs.count() == comb_size; };
+    return combinations_helper(set_size, checker);
+}
+
+bitset_deque domain_utils::all_sized_combinations_without(unsigned long set_size, unsigned long comb_size, const boost::dynamic_bitset<> &filter) {
+    const combination_checker checker = [&](const boost::dynamic_bitset<> &bs) { return (bs & filter).none() and bs.count() == comb_size; };
+    return combinations_helper(set_size, checker);
+}
+
+bitset_deque domain_utils::combinations_helper(unsigned long set_size, const combination_checker &checker) {
     bitset_deque result;
     auto n = static_cast<unsigned long>(std::exp2(set_size));
 
@@ -54,10 +72,7 @@ bitset_deque domain_utils::combinations_helper(unsigned long set_size, const boo
             j /= 2;
         }
 
-        bool is_good_combination = include_elems ? filter.is_subset_of(bs) : (bs & filter).none();
-
-        if (not to_check_filter or is_good_combination)
-            result.push_back(bs);
+        if (checker(bs)) result.push_back(bs);
     }
     return result;
 }

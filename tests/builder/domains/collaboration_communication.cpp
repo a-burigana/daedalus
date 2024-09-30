@@ -62,7 +62,7 @@ collaboration_communication::build_language(unsigned long agents_no, unsigned lo
 }
 
 kripke::state collaboration_communication::build_initial_state(unsigned long agents_no, unsigned long rooms_no,
-                                                            unsigned long boxes_no) {
+                                                               unsigned long boxes_no) {
     language_ptr language = collaboration_communication::build_language(agents_no, rooms_no, boxes_no);
 
     ulong_vector all_rooms_but_2(rooms_no - 1);

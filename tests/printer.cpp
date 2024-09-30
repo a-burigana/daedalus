@@ -118,6 +118,21 @@ void printer::print_states(const kripke::state &s, const kripke::action_deque &a
     print_states(s_, as_, path, new_name, apply_contraction, type, k);
 }
 
+void printer::print_states(const search::planning_task &task, const kripke::action_deque &as, const std::string &path,
+                           bool apply_contraction, kripke::bisimulation_type type, unsigned long k) {
+    print_states(*task.get_initial_state(), as, path + task.get_domain_name() +  "/" + task.get_problem_id() + "/product_update/",
+                 "s0", apply_contraction, type, k);
+}
+
+void printer::print_task(const search::planning_task &task, const std::string &path) {
+    std::string task_path = path + task.get_domain_name() + "/" + task.get_problem_id() + "/";
+
+    print_state(*task.get_initial_state(), task_path + "initial_state/", "s0");
+
+    for (const action_ptr &a : task.get_actions())
+        printer::print_action(*a,task_path + "actions/");
+}
+
 void printer::print_results(const search::planning_task &task, search::strategy strategy, const std::string &out_path) {
     std::string out_task_path =
             out_path + "search/" + task.get_domain_name() + "/problem_" + task.get_problem_id() + "/";

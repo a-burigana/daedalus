@@ -60,6 +60,12 @@ namespace daedalus::tester {
                                  const std::string &name, bool apply_contraction = false,
                                  bisimulation_type type = bisimulation_type::full, unsigned long k = 0);
 
+        static void print_states(const search::planning_task &task, const action_deque &as, const std::string &path,
+                                 bool apply_contraction = false, bisimulation_type type = bisimulation_type::full,
+                                 unsigned long k = 0);
+
+        static void print_task(const search::planning_task &task, const std::string &path);
+
         static void print_results(const search::planning_task &task, search::strategy strategy, const std::string &out_path);
         static void print_time_results(const search::planning_task &task, std::ofstream &table);
 

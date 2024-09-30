@@ -33,6 +33,8 @@
 #include "../include/del/semantics/kripke/bisimulation/bounded_identification.h"
 #include "utils/storage.cpp"
 #include "../tests/builder/domains/tiger.h"
+#include "../tests/builder/domains/gossip.h"
+#include "../include/utils/printer/formula_printer.h"
 #include <string>
 
 #define OUT_PATH std::string{"../tests/out/"}
@@ -68,27 +70,26 @@ void storage_test() {
 }
 
 int main() {
-//    auto tasks = coin_in_the_box::build_tasks();
+    search::planning_task gossip_task = gossip::build_task(7, 4, 1);
+////    printer::print_task(gossip_task, OUT_PATH);
+    search::planner::search(gossip_task, search::strategy::iterative_bounded_search);
+    search::planner::search(gossip_task, search::strategy::unbounded_search);
+
+
+//    state s = gossip::build_initial_state(3);
+//    printer::print_state(s, OUT_PATH + "gossip/3/states/", "s0");
 //
-//    for (const auto &task : tasks) {
-//        search::planner::search(task, search::strategy::iterative_bounded_search);
-//        search::planner::search(task, search::strategy::unbounded_search);
-//    }
+//    auto actions = gossip::build_actions(3);
+//
+//    for (const action_ptr &a : actions)
+//        printer::print_action(*a, OUT_PATH + "gossip/3/actions/");
 
-//    auto cc_task = collaboration_communication::build_task(3, 3, 2, 3);
-//    printer::print_task(cc_task, OUT_PATH);
-//    search::planner::search(cc_task, search::strategy::iterative_bounded_search);
-//    search::planner::search(cc_task, search::strategy::unbounded_search);
-
-    search::planning_task tiger_task = tiger::build_task(5, 3);
+//    search::planning_task tiger_task = tiger::build_task(5, 3);
 //    printer::print_task(tiger_task, OUT_PATH);
 
-    printer::print_results(tiger_task, search::strategy::unbounded_search, OUT_PATH);
-    printer::print_results(tiger_task, search::strategy::iterative_bounded_search, OUT_PATH);
+//    printer::print_results(tiger_task, search::strategy::unbounded_search, OUT_PATH);
+//    printer::print_results(tiger_task, search::strategy::iterative_bounded_search, OUT_PATH);
 
-//    action_deque as = {tiger_task.get_action("right"), tiger_task.get_action("right"), tiger_task.get_action("listen_3"),
-//                       tiger_task.get_action("right"), tiger_task.get_action("look_4"), tiger_task.get_action("open_4"),
-//                       tiger_task.get_action("save_princess_4")};
 
 
 //    action_deque as = {tiger_task.get_action("listen_1"), tiger_task.get_action("right"), tiger_task.get_action("open_2"), tiger_task.get_action("look_2"), tiger_task.get_action("save_princess_2")};

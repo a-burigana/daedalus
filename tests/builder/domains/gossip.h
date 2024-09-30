@@ -33,12 +33,17 @@ namespace daedalus::tester {
     public:
         static std::string get_name();
 
-        static del::language_ptr build_language(unsigned long n);
-        static kripke::state build_initial_state(unsigned long n);
+        static del::language_ptr build_language(unsigned long agents_no, unsigned long secrets_no);
+        static kripke::state build_initial_state(unsigned long agents_no, unsigned long secrets_no);
 
-        static kripke::action_deque build_actions(unsigned long n);
-        static search::planning_task build_task(unsigned long n);
+        static kripke::action_deque build_actions(unsigned long agents_no, unsigned long secrets_no);
+        static search::planning_task build_task(unsigned long agents_no, unsigned long secrets_no, unsigned long goal_id);
         static std::vector<search::planning_task> build_tasks();
+
+        static del::formula_ptr build_goal(unsigned long agents_no, unsigned long secrets_no, unsigned long goal_id);
+    private:
+        static kripke::action build_tell(unsigned long agents_no, unsigned long secrets_no, del::agent ag_1, del::agent ag_2);
+
     };
 }
 

@@ -22,6 +22,15 @@
 // SOFTWARE.
 
 #include "gossip.h"
+#include "domain_utils.h"
+#include "../action_builder.h"
+#include "../../../include/del/formulas/propositional/atom_formula.h"
+#include "../../../include/del/formulas/modal/box_formula.h"
+#include "../../../include/del/formulas/propositional/not_formula.h"
+#include "../../../include/del/formulas/propositional/and_formula.h"
+#include <memory>
+#include <string>
+#include <utility>
 
 using namespace daedalus::tester;
 using namespace del;
@@ -30,13 +39,155 @@ std::string gossip::get_name() {
     return "gossip";
 }
 
-del::language_ptr gossip::build_language(unsigned long n) {
-    name_vector atom_names(n), agent_names(n);
+del::language_ptr gossip::build_language(unsigned long agents_no, unsigned long secrets_no) {
+    name_vector atom_names(secrets_no), agent_names(agents_no);
 
-    for (unsigned long i = 0; i < n; ++i) {
-        atom_names[i]  = "secret_" + std::to_string(i);
-        agent_names[i] = "ag_"     + std::to_string(i);
-    }
+    for (unsigned long i = 0; i < secrets_no; ++i)
+        atom_names[i] = "s_" + std::to_string(i);
+
+    for (unsigned long i = 0; i < agents_no; ++i)
+        agent_names[i] = "ag_" + std::to_string(i);
 
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
+}
+
+kripke::state gossip::build_initial_state(unsigned long agents_no, unsigned long secrets_no) {
+    language_ptr language = gossip::build_language(agents_no, secrets_no);
+
+    const auto worlds_number = static_cast<const world_id>(std::exp2(secrets_no));
+    world_id count = 0;
+
+    label_vector ls = label_vector(worlds_number);
+    auto secrets_combinations = domain_utils::all_combinations(secrets_no);
+
+    for (const auto &combination: secrets_combinations)
+        ls[count++] = label{combination};
+
+    boost::dynamic_bitset<> all_worlds(worlds_number);
+    all_worlds.set();
+
+    relations r(language->get_agents_number());
+
+    for (agent ag = 0; ag < language->get_agents_number(); ++ag) {
+        r[ag] = agent_relation(worlds_number);
+
+        for (world_id w = 0; w < worlds_number; ++w)
+            r[ag][w] = world_set(all_worlds);
+    }
+
+    for (agent ag = 0; ag < secrets_no; ++ag)
+        for (world_id w = 0; w < worlds_number; ++w)
+            for (world_id v = 0; v < worlds_number; ++v)
+                if (ls[w][ag] != ls[v][ag])
+                    r[ag][w].remove(v);
+
+    world_id designated;
+
+    for (world_id w = 0; w < worlds_number; ++w)
+        if ((*ls[w]).all()) designated = w;
+
+    world_set designated_worlds = world_set{worlds_number, world_list{designated}};
+
+    return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
+}
+
+kripke::action_deque gossip::build_actions(unsigned long agents_no, unsigned long secrets_no) {
+    action_deque actions;
+
+    for (unsigned long ag_1 = 0; ag_1 < secrets_no; ++ag_1)
+        for (unsigned long ag_2 = 0; ag_2 < agents_no; ++ag_2)
+            if (ag_1 != ag_2)
+                actions.push_back(std::make_shared<action>(build_tell(agents_no, secrets_no, ag_1, ag_2)));
+
+    return actions;
+}
+
+search::planning_task gossip::build_task(unsigned long agents_no, unsigned long secrets_no, unsigned long goal_id) {
+    std::string name = gossip::get_name();
+    std::string id   = std::to_string(agents_no) + "_" + std::to_string(secrets_no) + "_" + std::to_string(goal_id);
+    language_ptr language = gossip::build_language(agents_no, secrets_no);
+
+    state s0 = gossip::build_initial_state(agents_no, secrets_no);
+    action_deque actions = gossip::build_actions(agents_no, secrets_no);
+    formula_ptr goal = gossip::build_goal(agents_no, secrets_no, goal_id);
+
+    return search::planning_task{std::move(name), std::move(id), language, std::move(s0), std::move(actions), std::move(goal)};
+}
+
+std::vector<search::planning_task> gossip::build_tasks() {
+    const unsigned long N_MIN_AGS = 3, N_MAX_AGS = 7, N_MIN_SECRETS = 2, MIN_GOAL_ID = 1, MAX_GOAL_ID = 9;
+    std::vector<search::planning_task> tasks;
+
+    for (unsigned long agents_no = N_MIN_AGS; agents_no <= N_MAX_AGS; ++agents_no)
+        for (unsigned long secrets_no = N_MIN_SECRETS; secrets_no <= agents_no; ++secrets_no)
+            for (unsigned long goal_id = MIN_GOAL_ID; goal_id <= MAX_GOAL_ID; ++goal_id)
+                tasks.push_back(build_task(agents_no, secrets_no, goal_id));
+
+    return tasks;
+}
+
+kripke::action gossip::build_tell(unsigned long agents_no, unsigned long secrets_no, del::agent ag_1, del::agent ag_2) {
+    language_ptr language = gossip::build_language(agents_no, secrets_no);
+
+    agent_set fo_ags = agent_set(language->get_agents_number());
+    fo_ags[ag_1] = true;
+    fo_ags[ag_2] = true;
+
+    formula_ptr s_1 = std::make_shared<atom_formula>(ag_1);     // index of ag_1 is the same as index of s_1
+    formula_ptr K_ag_2_s_1 = std::make_shared<box_formula>(ag_2, s_1);
+    formula_ptr not_K_ag_2_s_1 = std::make_shared<not_formula>(K_ag_2_s_1);
+
+    formula_deque fs = {s_1, not_K_ag_2_s_1};
+    formula_ptr f_pre = std::make_shared<and_formula>(fs);
+
+    std::string name = "tell_" + std::to_string(ag_1) + "_" + std::to_string(ag_2);
+
+    return action_builder::build_private_sensing(std::move(name), language, f_pre, fo_ags);
+}
+
+del::formula_ptr gossip::build_goal(unsigned long agents_no, unsigned long secrets_no, unsigned long goal_id) {
+    assert(1 <= goal_id and goal_id <= 9);
+
+    language_ptr language = gossip::build_language(agents_no, secrets_no);
+    formula_ptr goal;
+
+    formula_deque fs_two, fs_some, fs_all;
+
+    fs_two.push_back(std::make_shared<atom_formula>(0));
+    fs_two.push_back(std::make_shared<atom_formula>(1));
+
+    for (del::agent ag = 0; ag < secrets_no; ++ag) {
+        if (ag < secrets_no / 2)
+            fs_some.push_back(std::make_shared<atom_formula>(ag));
+
+        fs_all.push_back(std::make_shared<atom_formula>(ag));
+    }
+
+    formula_ptr two_secrets  = std::make_shared<and_formula>(std::move(fs_two));
+    formula_ptr some_secrets = std::make_shared<and_formula>(std::move(fs_some));
+    formula_ptr all_secrets  = std::make_shared<and_formula>(std::move(fs_all));
+
+    formula_deque fs;
+
+    if (goal_id <= 3) {
+        for (del::agent ag = 0; ag <= 1; ++ag)
+            fs.push_back(
+                    std::make_shared<box_formula>(ag, (goal_id == 1 ? two_secrets  :    // 2 agents know 2 secrets
+                                                      (goal_id == 2 ? some_secrets :    // 2 agents know some secrets
+                                                      all_secrets))));                  // 2 agents know all secrets
+    } else if (goal_id <= 6) {
+        for (del::agent ag = 0; ag < language->get_agents_number() / 3; ++ag)
+            fs.push_back(
+                    std::make_shared<box_formula>(ag, (goal_id == 4 ? two_secrets  :    // Some agents know 2 secrets
+                                                      (goal_id == 5 ? some_secrets :    // Some agents know some secrets
+                                                      all_secrets))));                  // Some agents know all secrets
+    } else if (goal_id <= 9) {
+        for (del::agent ag = 0; ag < language->get_agents_number(); ++ag)
+            fs.push_back(
+                    std::make_shared<box_formula>(ag, (goal_id == 7 ? two_secrets  :    // All agents know 2 secrets
+                                                      (goal_id == 8 ? some_secrets :    // All agents know some secrets
+                                                      all_secrets))));                  // All agents know all secrets
+    }
+
+    return std::make_shared<and_formula>(std::move(fs));
 }

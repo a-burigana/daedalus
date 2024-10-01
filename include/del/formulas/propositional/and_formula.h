@@ -34,7 +34,8 @@ namespace del {
                 m_fs{std::move(fs)} {
             m_type = formula_type::and_formula;
             auto comp = [](const formula_ptr &f1, const formula_ptr &f2) { return f1->get_modal_depth() < f2->get_modal_depth(); };
-            m_modal_depth = (*std::max_element(m_fs.begin(), m_fs.end(), comp))->get_modal_depth();
+
+            m_modal_depth = m_fs.empty() ? 0 : (*std::max_element(m_fs.begin(), m_fs.end(), comp))->get_modal_depth();
         }
 
         and_formula(const and_formula&) = delete;

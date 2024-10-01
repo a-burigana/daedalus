@@ -27,18 +27,28 @@
 #include "../../../include/del/language/language.h"
 #include "../../../include/del/semantics/kripke/states/state.h"
 #include "../../../include/search/planning_task.h"
+#include "../../../include/del/del_types.h"
 
 namespace daedalus::tester {
     class grapevine {
     public:
         static std::string get_name();
 
-        static del::language_ptr build_language(unsigned long n);
-        static kripke::state build_initial_state(unsigned long n);
+        static del::language_ptr build_language(unsigned long agents_no, unsigned long secrets_no);
+        static kripke::state build_initial_state(unsigned long agents_no, unsigned long secrets_no);
 
-        static kripke::action_deque build_actions(unsigned long n);
-        static search::planning_task build_task(unsigned long n);
+        static kripke::action_deque build_actions(unsigned long agents_no, unsigned long secrets_no);
+        static search::planning_task build_task(unsigned long agents_no, unsigned long secrets_no, unsigned long learning_ags_no);
         static std::vector<search::planning_task> build_tasks();
+
+    private:
+        static kripke::action build_tell(unsigned long agents_no, unsigned long secrets_no, del::agent ag_1,
+                                         const del::agent_set &fo_ags);
+
+        static kripke::action build_left(unsigned long agents_no, unsigned long secrets_no, del::agent ag);
+        static kripke::action build_right(unsigned long agents_no, unsigned long secrets_no, del::agent ag);
+
+        static del::formula_ptr build_goal(unsigned long agents_no, unsigned long secrets_no, unsigned long learning_ags_no);
     };
 }
 

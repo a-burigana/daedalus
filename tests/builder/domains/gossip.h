@@ -40,10 +40,10 @@ namespace daedalus::tester {
         static search::planning_task build_task(unsigned long agents_no, unsigned long secrets_no, unsigned long goal_id);
         static std::vector<search::planning_task> build_tasks();
 
-        static del::formula_ptr build_goal(unsigned long agents_no, unsigned long secrets_no, unsigned long goal_id);
     private:
         static kripke::action build_tell(unsigned long agents_no, unsigned long secrets_no, del::agent ag_1, del::agent ag_2);
 
+        static del::formula_ptr build_goal(unsigned long agents_no, unsigned long secrets_no, unsigned long goal_id);
     };
 }
 

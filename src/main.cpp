@@ -35,6 +35,7 @@
 #include "../tests/builder/domains/tiger.h"
 #include "../tests/builder/domains/gossip.h"
 #include "../include/utils/printer/formula_printer.h"
+#include "../tests/builder/domains/grapevine.h"
 #include <string>
 
 #define OUT_PATH std::string{"../tests/out/"}
@@ -70,14 +71,18 @@ void storage_test() {
 }
 
 int main() {
-    search::planning_task gossip_task = gossip::build_task(7, 4, 1);
-////    printer::print_task(gossip_task, OUT_PATH);
-    search::planner::search(gossip_task, search::strategy::iterative_bounded_search);
-    search::planner::search(gossip_task, search::strategy::unbounded_search);
+    search::planning_task gr_task = grapevine::build_task(6, 3, 3);
+//    daedalus::tester::printer::print_task(gr_task, OUT_PATH);
+
+    search::planner::search(gr_task, search::strategy::iterative_bounded_search);
+//    daedalus::tester::printer::print_results(gr_task, search::strategy::iterative_bounded_search, OUT_PATH);
+
+//    search::planner::search(gr_task, search::strategy::unbounded_search);
 
 
-//    state s = gossip::build_initial_state(3);
-//    printer::print_state(s, OUT_PATH + "gossip/3/states/", "s0");
+//    state s = grapevine::build_initial_state(3, 3);
+//    daedalus::tester::printer::print_state(s, OUT_PATH + "grapevine/3_3/states/", "s0");
+
 //
 //    auto actions = gossip::build_actions(3);
 //

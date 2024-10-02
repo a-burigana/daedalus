@@ -72,11 +72,14 @@ void storage_test() {
 }
 
 int main() {
-    search::planning_task amc_task = active_muddy_children::build_task(8, 5, true);
+//    const auto cb_tasks = coin_in_the_box::build_tasks();
+    search_tester::print_coin_in_the_box_time_results();
+
+//    search::planning_task amc_task = active_muddy_children::build_task(7, 5, true);
 //    search::planner::search(amc_task, search::strategy::iterative_bounded_search);
-    daedalus::tester::printer::print_results(amc_task, search::strategy::iterative_bounded_search, OUT_PATH);
-    daedalus::tester::printer::print_results(amc_task, search::strategy::unbounded_search, OUT_PATH);
-    daedalus::tester::printer::print_task(amc_task, OUT_PATH);
+//    daedalus::tester::printer::print_results(amc_task, search::strategy::iterative_bounded_search, OUT_PATH);
+//    daedalus::tester::printer::print_results(amc_task, search::strategy::unbounded_search, OUT_PATH);
+//    daedalus::tester::printer::print_task(amc_task, OUT_PATH);
 
 
 

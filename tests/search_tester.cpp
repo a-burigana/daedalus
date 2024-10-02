@@ -167,7 +167,7 @@ void search_tester::print_time_results(const std::vector<planning_task> &tasks, 
     std::string table_name = table_path + "results.csv";
     std::ofstream table = std::ofstream{table_name};
 
-    table << "Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Plan length (IBDS);#Nodes (IBDS);Time (IBDS);Plan length (US);#Nodes (US);Time (US)" << std::endl;
+    table << "Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Bound (IBDS);Plan length (IBDS);#Nodes (IBDS);Time (IBDS);Plan length (US);#Nodes (US);Time (US)" << std::endl;
 
     for (const planning_task &task : tasks)
         printer::print_time_results(task, table);

@@ -161,6 +161,7 @@ void printer::print_time_results(const search::planning_task &task, std::ofstrea
     unsigned long goal_depth = task.get_goal()->get_modal_depth();
 
     table
+        << task.get_domain_name() << ";"
         << task.get_problem_id() << ";"
         << atoms_no << ";" << agents_no << ";"
         << task.get_initial_state()->get_worlds_number() << ";" << actions_no << ";" << goal_depth << ";";
@@ -176,6 +177,7 @@ void printer::print_time_results(const search::planning_task &task, std::ofstrea
     double time_IBDS = static_cast<double>(delta_IBDS) / 1000;
 
     table
+        << std::to_string(path_IBDS.back()->get_bound()) << ";"
         << std::to_string(plan_length_IBDS) << ";"
         << path_IBDS.back()->get_id() << ";"
         << std::to_string(time_IBDS) << ";";

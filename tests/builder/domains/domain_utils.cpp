@@ -34,6 +34,11 @@ bitset_deque domain_utils::all_combinations(unsigned long set_size) {
     return combinations_helper(set_size, checker);
 }
 
+bitset_deque domain_utils::all_non_empty_combinations(unsigned long set_size) {
+    const combination_checker checker = [&](const boost::dynamic_bitset<> &bs) { return bs.any(); };
+    return combinations_helper(set_size, checker);
+}
+
 bitset_deque domain_utils::all_combinations_with(unsigned long set_size, const boost::dynamic_bitset<> &filter) {
     const combination_checker checker = [&](const boost::dynamic_bitset<> &bs) { return filter.is_subset_of(bs); };
     return combinations_helper(set_size, checker);

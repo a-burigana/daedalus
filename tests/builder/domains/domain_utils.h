@@ -47,6 +47,8 @@ namespace daedalus::tester {
         }
 
         static bitset_deque all_combinations(unsigned long set_size);
+        static bitset_deque all_non_empty_combinations(unsigned long set_size);
+
         static bitset_deque all_combinations_with(unsigned long set_size, const boost::dynamic_bitset<> &filter);
         static bitset_deque all_combinations_without(unsigned long set_size, const boost::dynamic_bitset<> &filter);
 

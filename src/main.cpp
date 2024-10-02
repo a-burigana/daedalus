@@ -36,6 +36,7 @@
 #include "../tests/builder/domains/gossip.h"
 #include "../include/utils/printer/formula_printer.h"
 #include "../tests/builder/domains/grapevine.h"
+#include "../tests/builder/domains/active_muddy_children.h"
 #include <string>
 
 #define OUT_PATH std::string{"../tests/out/"}
@@ -71,17 +72,23 @@ void storage_test() {
 }
 
 int main() {
-    search::planning_task gr_task = grapevine::build_task(6, 3, 3);
+    search::planning_task amc_task = active_muddy_children::build_task(8, 5, true);
+//    search::planner::search(amc_task, search::strategy::iterative_bounded_search);
+    daedalus::tester::printer::print_results(amc_task, search::strategy::iterative_bounded_search, OUT_PATH);
+    daedalus::tester::printer::print_results(amc_task, search::strategy::unbounded_search, OUT_PATH);
+    daedalus::tester::printer::print_task(amc_task, OUT_PATH);
+
+
+
+
+//    search::planning_task gr_task = grapevine::build_task(6, 3, 3);
 //    daedalus::tester::printer::print_task(gr_task, OUT_PATH);
 
-    search::planner::search(gr_task, search::strategy::iterative_bounded_search);
+//    search::planner::search(gr_task, search::strategy::iterative_bounded_search);
 //    daedalus::tester::printer::print_results(gr_task, search::strategy::iterative_bounded_search, OUT_PATH);
 
 //    search::planner::search(gr_task, search::strategy::unbounded_search);
 
-
-//    state s = grapevine::build_initial_state(3, 3);
-//    daedalus::tester::printer::print_state(s, OUT_PATH + "grapevine/3_3/states/", "s0");
 
 //
 //    auto actions = gossip::build_actions(3);

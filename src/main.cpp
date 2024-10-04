@@ -21,6 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "../include/utils/clipp.h"
 #include "../tests/search_tester.h"
 #include "../tests/action_tester.h"
 #include "../tests/builder/domains/consecutive_numbers.h"

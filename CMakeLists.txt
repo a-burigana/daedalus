@@ -23,6 +23,7 @@ find_package(Sanitizers) # Sanitizers
 
 add_executable(DAEDALUS
         src/main.cpp
+        include/utils/clipp.h
         src/del/semantics/kripke/states/state.cpp
         include/del/semantics/kripke/states/state.h
         src/del/semantics/kripke/actions/action.cpp

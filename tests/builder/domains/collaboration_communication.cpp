@@ -312,7 +312,6 @@ kripke::action collaboration_communication::build_sense(unsigned long agents_no,
     formula_ptr sensed = std::make_shared<atom_formula>(language->get_atom_id("in_room_" + std::to_string(r) + "_box_" + std::to_string(b)));
 
     formula_deque fs = in_room_agents(language, r, looking_ags);
-//    fs.push_back(std::make_shared<atom_formula>(language->get_atom_id("in_room_" + std::to_string(rooms_no) + "_" + ag_name)));
 
     formula_ptr f_pre = std::make_shared<and_formula>(std::move(fs));
 
@@ -335,24 +334,20 @@ kripke::action collaboration_communication::build_tell(unsigned long agents_no, 
     std::string ag_name = language->get_agent_name(ag);
 
     formula_ptr in_room_box  = std::make_shared<atom_formula>(language->get_atom_id("in_room_" + std::to_string(r) + "_box_" + std::to_string(b)));
-//    formula_ptr in_room_r_ag = std::make_shared<atom_formula>(language->get_atom_id("in_room_" + std::to_string(r) + "_" + ag_name));
 
-//    formula_ptr B_a_in_room_box = std::make_shared<box_formula>(ag, in_room_box);
     formula_ptr D_a_in_room_box = std::make_shared<diamond_formula>(ag, in_room_box);
 
-    formula_deque fs_2 = in_room_agents(language, r, fo_ags); // , fs_2 = fs_1;
-//    fs_1.push_back(B_a_in_room_box);
-    fs_2.push_back(D_a_in_room_box);
+    formula_deque fs = in_room_agents(language, r, fo_ags);
+    fs.push_back(D_a_in_room_box);
 
-//    formula_ptr f_pre_1 = std::make_shared<and_formula>(std::move(fs_1));
-    formula_ptr f_pre_2 = std::make_shared<and_formula>(std::move(fs_2));
+    formula_ptr f_pre = std::make_shared<and_formula>(std::move(fs));
 
     std::string fo_str;
     to_string(fo_ags, fo_str);
     std::reverse(fo_str.begin(), fo_str.end());
     std::string name = "tell_" + ag_name + "_in_room_" + std::to_string(r) + "_box_" + std::to_string(b) + "_" + fo_str;
 
-    return action_builder::build_private_announcement(std::move(name), language, f_pre_2, fo_ags);
+    return action_builder::build_private_announcement(std::move(name), language, f_pre, fo_ags);
 }
 
 del::formula_deque collaboration_communication::in_room_agents(const del::language_ptr &language, unsigned long r,

@@ -77,12 +77,12 @@ void storage_test() {
 }
 
 int main() {
-    const auto cc_task = collaboration_communication::build_task(2, 3, 2, 1);
-    const auto cc_task_ = delphic::delphic_utils::convert(cc_task);
-
-    daedalus::tester::printer::print_results(cc_task, search::strategy::iterative_bounded_search, OUT_PATH);
-    daedalus::tester::printer::print_results(cc_task, search::strategy::unbounded_search, OUT_PATH);
-    daedalus::tester::printer::print_delphic_results(cc_task_, search::strategy::unbounded_search, OUT_PATH);
+//    const auto cc_task = collaboration_communication::build_task(2, 3, 2, 1);
+//    const auto cc_task_ = delphic::delphic_utils::convert(cc_task);
+//
+//    daedalus::tester::printer::print_results(cc_task, search::strategy::iterative_bounded_search, OUT_PATH);
+//    daedalus::tester::printer::print_results(cc_task, search::strategy::unbounded_search, OUT_PATH);
+//    daedalus::tester::printer::print_delphic_results(cc_task_, search::strategy::unbounded_search, OUT_PATH);
 
 //    const auto as = cc_task.get_actions({"left_a_11", "sense_a_in_room_1_box_1_10", "left_b_11", "sense_b_in_room_1_box_1_11"});
 //
@@ -98,10 +98,14 @@ int main() {
 //    search::planner::search(cb_task, search::strategy::iterative_bounded_search);
 //    search::planner::search(cb_task, search::strategy::unbounded_search);
 
-//    for (const auto &task : coin_in_the_box::build_tasks()) {
-//        const auto &task_ = delphic_utils::convert(task);
-//        search::delphic_planner::search(task_, search::strategy::unbounded_search);
-//    }
+    for (const auto &task : coin_in_the_box::build_tasks()) {
+        const auto &task_ = delphic_utils::convert(task);
+
+        daedalus::tester::printer::print_results(task, search::strategy::iterative_bounded_search, OUT_PATH);
+        daedalus::tester::printer::print_results(task, search::strategy::unbounded_search, OUT_PATH);
+        search::delphic_planner::search(task_, search::strategy::unbounded_search);
+    }
+
 //    daedalus::tester::printer::print_delphic_results(cb_task_, search::strategy::unbounded_search, OUT_PATH);
 
 //    daedalus::tester::printer::print_task(cb_task, OUT_PATH);

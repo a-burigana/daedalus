@@ -47,8 +47,19 @@ namespace kripke {
     using action_relations       = std::vector<action_agent_relations>;
 
     using preconditions  = std::vector<del::formula_ptr>;
-    using event_post     = std::map<del::atom, del::formula_ptr>;
+    using event_post     = std::unordered_map<del::atom, del::formula_ptr>;
     using postconditions = std::vector<event_post>;
+
+    enum class action_type : uint8_t {
+        public_ontic,
+        private_ontic,
+        semi_private_sensing,
+        public_sensing,
+        private_announcement,
+        semi_private_announcement,
+        quasi_private_announcement,
+        public_announcement
+    };
 }
 
 #endif //DAEDALUS_ACTIONS_TYPES_H

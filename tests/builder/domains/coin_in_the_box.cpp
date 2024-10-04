@@ -340,28 +340,33 @@ kripke::action coin_in_the_box::build_peek(const del::agent ag, const agent_set 
 
 kripke::action coin_in_the_box::build_shout(const agent ag, const agent_set &fo_ags) {
     language_ptr language = coin_in_the_box::build_language();
-    agent_set ag_set(language->get_agents_number()), fo_ags_2 = fo_ags;
-    ag_set[ag] = true;
-    fo_ags_2[ag] = false;
+//    agent_set ag_set(language->get_agents_number()); // , fo_ags_2 = fo_ags;
+//    ag_set[ag] = true;
+//    fo_ags_2[ag] = false;
 
     formula_ptr announced         = std::make_shared<atom_formula>(language->get_atom_id("heads"));
-    formula_ptr B_a_announced     = std::make_shared<box_formula>(ag, announced);
+//    formula_ptr B_a_announced     = std::make_shared<box_formula>(ag, announced);
     formula_ptr D_a_announced     = std::make_shared<diamond_formula>(ag, announced);
 
-    formula_deque fs_1 = looking_agents(language, fo_ags), fs_2 = fs_1;
-    fs_1.push_back(B_a_announced);
-    fs_2.push_back(D_a_announced);
+//    formula_deque fs_1 = looking_agents(language, fo_ags), fs_2 = fs_1;
+//    fs_1.push_back(B_a_announced);
+//    fs_2.push_back(D_a_announced);
+//
+//    formula_ptr f_pre_1 = std::make_shared<and_formula>(std::move(fs_1));
+//    formula_ptr f_pre_2 = std::make_shared<and_formula>(std::move(fs_2));
 
-    formula_ptr f_pre_1 = std::make_shared<and_formula>(std::move(fs_1));
-    formula_ptr f_pre_2 = std::make_shared<and_formula>(std::move(fs_2));
+    formula_deque fs = looking_agents(language, fo_ags);
+    fs.push_back(D_a_announced);
+    formula_ptr f_pre = std::make_shared<and_formula>(fs);
 
     std::string fo_str;
     to_string(fo_ags, fo_str);
     std::reverse(fo_str.begin(), fo_str.end());
     std::string name = "shout_" + language->get_agent_name(ag) + "_" + fo_str;
 
-    return action_builder::build_quasi_private_announcement(std::move(name), language, f_pre_1, f_pre_2, ag_set,
-                                                            fo_ags_2);
+    return action_builder::build_private_announcement(std::move(name), language, f_pre, fo_ags);
+//    return action_builder::build_quasi_private_announcement(std::move(name), language, f_pre_1, f_pre_2, ag_set,
+//                                                            fo_ags_2);
 }
 
 action coin_in_the_box::build_walk_in(del::agent ag, const agent_set &fo_ags) {

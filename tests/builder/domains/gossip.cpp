@@ -142,7 +142,7 @@ kripke::action gossip::build_tell(unsigned long agents_no, unsigned long secrets
 
     std::string name = "tell_" + std::to_string(ag_1) + "_" + std::to_string(ag_2);
 
-    return action_builder::build_private_sensing(std::move(name), language, f_pre, fo_ags);
+    return action_builder::build_private_announcement(std::move(name), language, f_pre, fo_ags);
 }
 
 del::formula_ptr gossip::build_goal(unsigned long agents_no, unsigned long secrets_no, unsigned long goal_id) {

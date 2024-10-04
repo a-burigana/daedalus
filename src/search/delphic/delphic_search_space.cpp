@@ -21,20 +21,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef DAEDALUS_SEARCH_TYPES_H
-#define DAEDALUS_SEARCH_TYPES_H
+#include "../../../include/search/delphic/delphic_search_space.h"
 
-#include <memory>
-#include <deque>
-#include <list>
+using namespace search;
 
-namespace search {
-    class node;
-    using node_ptr   = std::shared_ptr<node>;
-    using node_deque = std::list<node_ptr>;     // TODO; CHANGE BACK TO DEQUE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-    class delphic_node;
-    using delphic_node_ptr   = std::shared_ptr<delphic_node>;
-    using delphic_node_deque = std::list<delphic_node_ptr>;
+delphic_node::delphic_node(unsigned long long id, delphic::possibility_spectrum_ptr state, delphic::eventuality_spectrum_ptr action,
+           delphic_node_ptr parent) :
+        m_id{id},
+        m_state{std::move(state)},
+        m_action{std::move(action)},
+        m_parent{std::move(parent)} {
+    m_tree_depth = m_parent ? m_parent->get_tree_depth() + 1 : 0;
 }
-#endif //DAEDALUS_SEARCH_TYPES_H
+
+unsigned long long delphic_node::get_id() const {
+    return m_id;
+}
+
+unsigned long long delphic_node::get_tree_depth() const {
+    return m_tree_depth;
+}
+
+delphic::possibility_spectrum_ptr delphic_node::get_state() const {
+    return m_state;
+}
+
+delphic::eventuality_spectrum_ptr delphic_node::get_action() const {
+    return m_action;
+}
+
+delphic_node_ptr delphic_node::get_parent() const {
+    return m_parent;
+}
+
+const delphic_node_deque &delphic_node::get_children() const {
+    return m_children;
+}
+
+void delphic_node::add_child(const delphic_node_ptr &child) {
+    m_children.emplace_back(child);
+}

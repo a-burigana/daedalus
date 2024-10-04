@@ -25,6 +25,7 @@
 #define DAEDALUS_POSSIBILITY_TYPES_H
 
 #include <memory>
+#include <deque>
 #include <unordered_set>
 
 namespace delphic {
@@ -37,6 +38,8 @@ namespace delphic {
     using agents_information_state = std::vector<information_state>;
 
     using possibility_map = std::unordered_map<possibility_ptr, possibility_ptr>;
+    using information_state_map = std::unordered_map<possibility_ptr, information_state>;
+    using possibility_deque = std::deque<possibility_ptr>;
 }
 
 #endif //DAEDALUS_POSSIBILITY_TYPES_H

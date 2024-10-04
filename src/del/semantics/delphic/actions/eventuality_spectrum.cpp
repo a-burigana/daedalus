@@ -22,18 +22,25 @@
 // SOFTWARE.
 
 #include "../../../../../include/del/semantics/delphic/actions/eventuality_spectrum.h"
+#include "../../../../../include/del/semantics/delphic/delphic_utils.h"
+#include "../../../../../include/del/semantics/kripke/actions/action.h"
 
 using namespace del;
 using namespace delphic;
 
-eventuality_spectrum::eventuality_spectrum(language_ptr language, std::string name,
+eventuality_spectrum::eventuality_spectrum(language_ptr language, action_type type, std::string name,
                                            dynamic_information_state designated_eventualities) :
         m_language{std::move(language)},
+        m_type{type},
         m_name{std::move(name)},
         m_designated_eventualities{std::move(designated_eventualities)} {}
 
 language_ptr eventuality_spectrum::get_language() const {
     return m_language;
+}
+
+action_type eventuality_spectrum::get_type() const {
+    return m_type;
 }
 
 std::string eventuality_spectrum::get_name() const {
@@ -46,4 +53,11 @@ const dynamic_information_state &eventuality_spectrum::get_designated_eventualit
 
 unsigned long eventuality_spectrum::get_maximum_depth() const {
     return m_maximum_depth;
+}
+
+std::ostream &delphic::operator<<(std::ostream &os, const eventuality_spectrum &E) {
+    kripke::action a = delphic_utils::convert(E);
+    os << a;
+
+    return os;
 }

@@ -50,6 +50,10 @@ const information_state &possibility::get_information_state(del::agent ag) const
     return m_information_state[ag];
 }
 
+void possibility::set_information_state(del::agent ag, delphic::information_state &is) {
+    m_information_state[ag] = std::move(is);
+}
+
 bool possibility::satisfies(const del::formula_ptr f) {
     return model_checker::holds_in(*this, *f);
 }

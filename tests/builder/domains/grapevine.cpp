@@ -197,7 +197,7 @@ kripke::action grapevine::build_tell(unsigned long agents_no, unsigned long secr
     std::reverse(fo_str.begin(), fo_str.end());
     std::string name = "tell_" + std::to_string(ag_1) + "_" + fo_str;
 
-    return action_builder::build_private_sensing(std::move(name), language, f_pre, all_fo);
+    return action_builder::build_private_announcement(std::move(name), language, f_pre, all_fo);
 }
 
 kripke::action grapevine::build_left(unsigned long agents_no, unsigned long secrets_no, del::agent ag) {

@@ -29,10 +29,11 @@
 
 using namespace kripke;
 
-action::action(del::language_ptr language, std::string name, unsigned long long events_number, action_relations relations,
+action::action(del::language_ptr language, action_type type, std::string name, unsigned long long events_number, action_relations relations,
                preconditions pre, postconditions post, boost::dynamic_bitset<> is_ontic,
                event_deque designated_events) :
        m_language{std::move(language)},
+       m_type{type},
        m_name{std::move(name)},
        m_events_number{events_number},
        m_relations{std::move(relations)},
@@ -45,6 +46,10 @@ action::action(del::language_ptr language, std::string name, unsigned long long 
 
 del::language_ptr action::get_language() const {
     return m_language;
+}
+
+action_type action::get_type() const {
+    return m_type;
 }
 
 std::string action::get_name() const {

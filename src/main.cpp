@@ -37,6 +37,11 @@
 #include "../include/utils/printer/formula_printer.h"
 #include "../tests/builder/domains/grapevine.h"
 #include "../tests/builder/domains/active_muddy_children.h"
+#include "../include/search/delphic/delphic_planning_task.h"
+#include "../include/del/semantics/delphic/delphic_utils.h"
+#include "../include/del/semantics/delphic/update/union_updater.h"
+#include "../include/search/delphic/delphic_planner.h"
+#include "../tests/builder/domains/selective_communication.h"
 #include <string>
 
 #define OUT_PATH std::string{"../tests/out/"}
@@ -72,11 +77,66 @@ void storage_test() {
 }
 
 int main() {
-//    const auto cb_tasks = coin_in_the_box::build_tasks();
-    search_tester::print_coin_in_the_box_time_results();
+    const auto cc_task = collaboration_communication::build_task(2, 3, 2, 1);
+    const auto cc_task_ = delphic::delphic_utils::convert(cc_task);
 
-//    search::planning_task amc_task = active_muddy_children::build_task(7, 5, true);
-//    search::planner::search(amc_task, search::strategy::iterative_bounded_search);
+//    daedalus::tester::printer::print_results(cc_task, search::strategy::iterative_bounded_search, OUT_PATH);
+//    daedalus::tester::printer::print_results(cc_task, search::strategy::unbounded_search, OUT_PATH);
+//    daedalus::tester::printer::print_delphic_results(cc_task_, search::strategy::unbounded_search, OUT_PATH);
+
+    const auto as = cc_task.get_actions({"left_a_11", "sense_a_in_room_1_box_1_10", "left_b_11", "sense_b_in_room_1_box_1_11"});
+
+    daedalus::tester::printer::print_state(*cc_task.get_initial_state(), OUT_PATH + "collaboration_communication/problem_2_3_2_g1/product_update/", "s0");
+    daedalus::tester::printer::print_states(*cc_task.get_initial_state(), as, OUT_PATH + "collaboration_communication/problem_2_3_2_g1/product_update/", "s0");
+
+    const auto as_ = cc_task_.get_actions({"left_a_11", "sense_a_in_room_1_box_1_10", "left_b_11", "sense_b_in_room_1_box_1_11"});
+    daedalus::tester::printer::print_states(cc_task_.get_initial_state(), as_, OUT_PATH + "delphic/collaboration_communication/problem_2_3_2_g1/union_update/", "s0");
+
+//    auto W1 = delphic::union_updater::update(cc_task_.get_initial_state(), as_[0]);
+//    auto W2 = delphic::union_updater::update(cc_task_.get_initial_state(), as_[0]);
+
+//    search::planner::search(cb_task, search::strategy::iterative_bounded_search);
+//    search::planner::search(cb_task, search::strategy::unbounded_search);
+
+//    for (const auto &task : coin_in_the_box::build_tasks()) {
+//        const auto &task_ = delphic_utils::convert(task);
+//        search::delphic_planner::search(task_, search::strategy::unbounded_search);
+//    }
+//    daedalus::tester::printer::print_delphic_results(cb_task_, search::strategy::unbounded_search, OUT_PATH);
+
+//    daedalus::tester::printer::print_task(cb_task, OUT_PATH);
+
+//    search_tester::print_coin_in_the_box_time_results();
+
+//    search::planning_task sc_task = selective_communication::build_task(3, 5, 2);
+//    search::delphic_planning_task sc_task_ = delphic::delphic_utils::convert(sc_task);
+
+//    search::planner::search(sc_task, search::strategy::iterative_bounded_search);
+//    search::delphic_planner::search(sc_task_, search::strategy::unbounded_search);
+
+//    search::planning_task g_task = gossip::build_task(5, 2, 9);
+//    search::delphic_planning_task g_task_ = delphic::delphic_utils::convert(g_task);
+
+//    search::planner::search(g_task, search::strategy::iterative_bounded_search);
+//    search::delphic_planner::search(g_task_, search::strategy::unbounded_search);
+
+//    auto s0 = g_task.get_initial_state();
+//    auto a0 = g_task.get_action("tell_0_1");
+//    auto s1 = kripke::updater::product_update(*s0, *a0);
+//
+//    daedalus::tester::printer::print_state(*s0, OUT_PATH + "gossip/2_1_1/states/", "s0");
+//    daedalus::tester::printer::print_state( s1, OUT_PATH + "gossip/2_1_1/states/", "s0_tell_0_1");
+//
+//    auto W0 = g_task_.get_initial_state();
+//    auto E0 = g_task_.get_action("tell_0_1");
+//    auto W1 = delphic::union_updater::update(W0, E0);
+//
+//    auto s0_ = delphic::delphic_utils::convert(*W0);
+//    auto s1_ = delphic::delphic_utils::convert(*W1);
+//
+//    daedalus::tester::printer::print_state(s0_, OUT_PATH + "delphic/gossip/2_1_1/states/", "s0");
+//    daedalus::tester::printer::print_state(s1_, OUT_PATH + "delphic/gossip/2_1_1/states/", "s0_tell_0_1");
+
 //    daedalus::tester::printer::print_results(amc_task, search::strategy::iterative_bounded_search, OUT_PATH);
 //    daedalus::tester::printer::print_results(amc_task, search::strategy::unbounded_search, OUT_PATH);
 //    daedalus::tester::printer::print_task(amc_task, OUT_PATH);

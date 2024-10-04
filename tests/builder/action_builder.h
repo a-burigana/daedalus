@@ -47,9 +47,6 @@ namespace daedalus::tester {
         static action build_public_sensing(std::string name, const del::language_ptr &language,
                                            const del::formula_ptr &f_pre, const del::formula_ptr &sensed);
 
-        static action build_private_sensing(std::string name, const del::language_ptr &language,
-                                            const del::formula_ptr &f_pre, const del::agent_set &fo_ags);
-
         static action build_semi_private_sensing(std::string name, const del::language_ptr &language,
                                                  const del::formula_ptr &f_pre, const del::formula_ptr &sensed,
                                                  const del::agent_set &fo_ags, const del::agent_set &po_ags);

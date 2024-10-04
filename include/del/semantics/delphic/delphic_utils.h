@@ -21,44 +21,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef DAEDALUS_EVENTUALITY_H
-#define DAEDALUS_EVENTUALITY_H
+#ifndef DAEDALUS_DELPHIC_UTILS_H
+#define DAEDALUS_DELPHIC_UTILS_H
 
-#include <memory>
-#include <set>
-#include <vector>
-#include "eventuality_types.h"
-#include "../../kripke/states/label.h"
-#include "../../../formulas/formula.h"
+#include "states/possibility_spectrum.h"
+#include "actions/eventuality_spectrum.h"
+#include "../kripke/states/state.h"
+#include "../kripke/actions/action.h"
+#include "../../../search/planning_task.h"
+#include "../../../search/delphic/delphic_planning_task.h"
 
 namespace delphic {
-    class eventuality {
+    class delphic_utils {
     public:
-        eventuality(del::formula_ptr pre, postconditions &post, agents_dynamic_information_state state);
+        static possibility_spectrum convert(const kripke::state  &s);
+        static eventuality_spectrum convert(const kripke::action &a);
 
-        eventuality(const eventuality&) = default;
-        eventuality& operator=(const eventuality&) = default;
+        static kripke::state  convert(const possibility_spectrum &W);
+        static kripke::action convert(const eventuality_spectrum &E);
 
-        eventuality(eventuality&&) = default;
-        eventuality& operator=(eventuality&&) = default;
-
-        ~eventuality() = default;
-
-        [[nodiscard]] del::formula_ptr get_pre() const;
-        [[nodiscard]] postconditions get_postconditions() const;
-        [[nodiscard]] const dynamic_information_state &get_information_state(del::agent ag) const;
-        [[nodiscard]] bool is_ontic() const;
-        [[nodiscard]] bool is_idle() const;
-
-        void set_information_state(del::agent ag, dynamic_information_state &is);
-
-    private:
-        del::formula_ptr m_pre;
-        postconditions m_post;
-        agents_dynamic_information_state m_information_state;
-        bool m_is_ontic;
-        bool m_is_idle;
+        static search::delphic_planning_task convert(const search::planning_task &task);
     };
 }
 
-#endif //DAEDALUS_EVENTUALITY_H
+#endif //DAEDALUS_DELPHIC_UTILS_H

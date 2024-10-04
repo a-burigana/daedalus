@@ -30,6 +30,9 @@
 #include "../include/del/semantics/kripke/update/updater.h"
 #include "../include/del/semantics/kripke/bisimulation/bisimulator.h"
 #include "../include/search/planner.h"
+#include "../include/search/delphic/delphic_planner.h"
+#include "../include/del/semantics/delphic/delphic_utils.h"
+#include "../include/del/semantics/delphic/update/union_updater.h"
 #include "../include/utils/time_utils.h"
 #include "../include/utils/timer.h"
 #include <filesystem>
@@ -118,6 +121,22 @@ void printer::print_states(const kripke::state &s, const kripke::action_deque &a
     print_states(s_, as_, path, new_name, apply_contraction, type, k);
 }
 
+void
+printer::print_states(const delphic::possibility_spectrum_ptr &W, const delphic::action_deque &as, const std::string &path,
+                      const std::string &name) {
+    auto W_ = delphic::union_updater::update(W, as.front());
+    std::string new_name = name + "_" + as.front()->get_name();
+
+    print_state(delphic::delphic_utils::convert(*W_), path, new_name);
+    delphic::action_deque as_ = as;
+    as_.pop_front();
+
+    if (as_.empty())
+        return;
+
+    print_states(W_, as_, path, new_name);
+}
+
 void printer::print_states(const search::planning_task &task, const kripke::action_deque &as, const std::string &path,
                            bool apply_contraction, kripke::bisimulation_type type, unsigned long k) {
     print_states(*task.get_initial_state(), as, path + task.get_domain_name() +  "/" + task.get_problem_id() + "/product_update/",
@@ -151,6 +170,27 @@ void printer::print_results(const search::planning_task &task, search::strategy 
 
         if (not out_path.empty())
             daedalus::tester::printer::print_state(*node->get_state(), out_task_path + strategy_str, state_name);
+    }
+}
+
+void printer::print_delphic_results(const search::delphic_planning_task &task, search::strategy strategy,
+                                    const std::string &out_path) {
+    std::string out_task_path =
+            out_path + "search/delphic/" + task.get_domain_name() + "/problem_" + task.get_problem_id() + "/";
+    std::string strategy_str = strategy == search::strategy::unbounded_search
+                               ? "unbounded/"
+                               : "iter_bounded/";
+
+    printer search_printer(true, out_task_path + strategy_str, "search_tree.txt");
+    search::delphic_node_deque path = search::delphic_planner::search(task, strategy, std::make_unique<printer>(std::move(search_printer)));
+    std::string state_name = "s0";
+
+    for (const auto &node: path) {
+        if (node->get_action())
+            state_name += "_" + node->get_action()->get_name();
+
+        if (not out_path.empty())
+            daedalus::tester::printer::print_state(delphic::delphic_utils::convert(*node->get_state()), out_task_path + strategy_str, state_name);
     }
 }
 

@@ -24,14 +24,17 @@
 #include "../../../../../include/del/semantics/delphic/states/possibility_spectrum.h"
 #include "../../../../../include/del/semantics/delphic/states/possibility.h"
 #include "../../../../../include/del/semantics/delphic/model_checker.h"
+#include "../../../../../include/del/semantics/delphic/delphic_utils.h"
+#include "../../../../../include/del/semantics/kripke/states/state.h"
 
 using namespace del;
 using namespace delphic;
 
-possibility_spectrum::possibility_spectrum(del::language_ptr language,
-                                           delphic::information_state designated_possibilities) :
+possibility_spectrum::possibility_spectrum(del::language_ptr language, delphic::information_state designated_possibilities):
+//                                           unsigned long possibilities_number) :
         m_language{std::move(language)},
         m_designated_possibilities{std::move(designated_possibilities)} {
+//        m_possibilities_number{possibilities_number}
     m_max_depth = 0;
 
     for (const possibility_ptr &w : m_designated_possibilities)
@@ -52,6 +55,30 @@ bool possibility_spectrum::satisfies(const del::formula_ptr &f) const {
                        [&](const possibility_ptr &w) { return model_checker::holds_in(*w, *f); });
 }
 
+//unsigned long possibility_spectrum::get_possibilities_number() const {
+//    return m_possibilities_number;
+//}
+
+bool possibility_spectrum::is_designated(const possibility_ptr &w) const {
+    return std::any_of(m_designated_possibilities.begin(), m_designated_possibilities.end(),
+                       [&](const possibility_ptr &w_d) { return *w_d == *w; });
+
+//    for (const auto &w_d : m_designated_possibilities)
+//        if (*w_d == *w)
+//            return true;
+//
+//    return false;
+
+//    return m_designated_possibilities.find(w) != m_designated_possibilities.end();
+}
+
 unsigned long long possibility_spectrum::get_max_depth() const {
     return m_max_depth;
+}
+
+std::ostream &delphic::operator<<(std::ostream &os, const possibility_spectrum &W) {
+    kripke::state s = delphic_utils::convert(W);
+    os << s;
+
+    return os;
 }

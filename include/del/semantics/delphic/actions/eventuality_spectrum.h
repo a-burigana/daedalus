@@ -30,7 +30,7 @@
 namespace delphic {
     class eventuality_spectrum {
     public:
-        eventuality_spectrum(del::language_ptr language, std::string name, dynamic_information_state designated_eventualities);
+        eventuality_spectrum(del::language_ptr language, action_type type, std::string name, dynamic_information_state designated_eventualities);
 
         eventuality_spectrum(const eventuality_spectrum&) = delete;
         eventuality_spectrum& operator=(const eventuality_spectrum&) = delete;
@@ -41,13 +41,18 @@ namespace delphic {
         ~eventuality_spectrum() = default;
 
         [[nodiscard]] del::language_ptr get_language() const;
+        [[nodiscard]] action_type get_type() const;
         [[nodiscard]] std::string get_name() const;
         [[nodiscard]] const dynamic_information_state &get_designated_eventualities() const;
 
         [[nodiscard]] unsigned long get_maximum_depth() const;
 
+        friend std::ostream &operator<<(std::ostream &os, const eventuality_spectrum &act);
+
     private:
         del::language_ptr m_language;
+        action_type m_type;
+
         std::string m_name;
         dynamic_information_state m_designated_eventualities;
         unsigned long m_maximum_depth;

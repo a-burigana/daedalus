@@ -28,6 +28,7 @@
 #include "../../../../../include/del/semantics/delphic/actions/eventuality_spectrum.h"
 #include "../../../../utils/storage.h"
 #include "../../kripke/states/label.h"
+#include "../../../del_types.h"
 
 namespace delphic {
     class union_updater {
@@ -35,16 +36,28 @@ namespace delphic {
         static bool is_applicable(const possibility_ptr &w, const eventuality_ptr &e);
         static bool is_applicable(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
 
-//        static possibility_ptr update(const possibility_ptr &w, const eventuality_ptr &e, storage<possibility> &storage);
-        static possibility_spectrum_ptr bounded_update(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E, unsigned long b, storage<possibility> &storage);
-
-        static possibility_ptr bounded_update(const possibility_ptr &w, const eventuality_ptr &e, unsigned long b,
-                                              storage<possibility> &possibility_storage);
-//        static possibility bounded_update(const possibility_spectrum &W, const eventuality_spectrum &E, storage<possibility> &storage);
+        static possibility_spectrum_ptr update(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
 
     private:
-        static void bounded_update_helper(const possibility_ptr &w, const eventuality_ptr &e, unsigned long b,
-                                          std::vector<possibility_map> &updated_possibilities, storage<possibility> &possibility_storage);
+        static possibility_spectrum_ptr update_public_ontic(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
+        static possibility_spectrum_ptr update_private_ontic(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
+        static possibility_spectrum_ptr update_semi_private_sensing(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
+        static possibility_spectrum_ptr update_public_sensing(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
+        static possibility_spectrum_ptr update_private_announcement(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
+        static possibility_spectrum_ptr update_semi_private_announcement(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
+        static possibility_spectrum_ptr update_quasi_private_announcement(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
+        static possibility_spectrum_ptr update_public_announcement(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
+
+        static possibility_spectrum_ptr update_public_private_action(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E, const del::agent_set& o_ags);
+        static possibility_spectrum_ptr update_semi_private_action(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E, const del::agent_set& o_ags);
+
+        static void update_possibilities(const possibility_spectrum_ptr &W, const eventuality_ptr &e,
+                                         const del::agent_set &o_ags, possibility_map &update_map, bool negated = false);
+
+        static void update_information_states(const possibility_spectrum_ptr &W, const del::agent_set &obs_ags, const del::agent_set &o_ags, possibility_map &update_map);
+        static void update_information_states(const possibility_spectrum_ptr &W, const del::agent_set &o_ags, possibility_map &update_map_0, possibility_map &update_map_1);
+
+        static void update_designated(const possibility_spectrum_ptr &W, information_state &designated, possibility_map &update_map);
 
         static kripke::label update_label(const possibility_ptr &w, const eventuality_ptr &e);
     };

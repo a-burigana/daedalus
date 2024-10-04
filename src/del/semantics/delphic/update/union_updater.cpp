@@ -26,8 +26,10 @@
 #include "../../../../../include/del/semantics/delphic/actions/eventuality.h"
 #include "../../../../../include/del/semantics/delphic/model_checker.h"
 #include "../../../../utils/storage.cpp"
-#include <algorithm>
+#include <iterator>
+#include <memory>
 #include <unordered_map>
+#include <vector>
 
 using namespace delphic;
 
@@ -37,46 +39,285 @@ bool union_updater::is_applicable(const possibility_ptr &w, const eventuality_pt
 
 bool union_updater::is_applicable(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E) {
     return std::all_of(W->get_designated_possibilities().begin(), W->get_designated_possibilities().end(),
-        [&](const possibility_ptr &w) {
-            return std::any_of(E->get_designated_eventualities().begin(), E->get_designated_eventualities().end(),
-                [&](const eventuality_ptr &e) {
-                    return model_checker::holds_in(*w, *e->get_pre());
-            });
-    });
+                       [&](const possibility_ptr &w) {
+                           return std::any_of(E->get_designated_eventualities().begin(),
+                                              E->get_designated_eventualities().end(),
+                                              [&](const eventuality_ptr &e) {
+                                                  return model_checker::holds_in(*w, *e->get_pre());
+                                              });
+                       });
 }
 
-/*possibility union_updater::update(const possibility &w, const eventuality &e, storage<possibility> &possibility_storage) {
+possibility_spectrum_ptr
+union_updater::update(const delphic::possibility_spectrum_ptr &W, const delphic::eventuality_spectrum_ptr &E) {
+    switch (E->get_type()) {
+        case action_type::public_announcement:
+            return update_public_announcement(W, E);
+        case action_type::public_sensing:
+            return update_public_sensing(W, E);
+        case action_type::public_ontic:
+            return update_public_ontic(W, E);
+        case action_type::private_announcement:
+            return update_private_announcement(W, E);
+        case action_type::private_ontic:
+            return update_private_ontic(W, E);
+        case action_type::semi_private_announcement:
+            return update_semi_private_announcement(W, E);
+        case action_type::semi_private_sensing:
+            return update_semi_private_sensing(W, E);
+        case action_type::quasi_private_announcement:
+            return update_quasi_private_announcement(W, E);
+    }
 }
 
-possibility union_updater::update(const possibility_spectrum &w, const eventuality_spectrum &e, storage<possibility> &possibility_storage) {
-}*/
+possibility_spectrum_ptr
+union_updater::update_public_announcement(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E) {
+    del::agent_set o_ags(W->get_language()->get_agents_number());
+    return update_public_private_action(W, E, o_ags);
+}
 
-possibility_spectrum_ptr union_updater::bounded_update(const delphic::possibility_spectrum_ptr &W, const delphic::eventuality_spectrum_ptr &E,
-                                                       const unsigned long b, storage<delphic::possibility> &possibility_storage) {
-    auto updated_possibilities = std::vector<possibility_map>(b+1);
+possibility_spectrum_ptr
+union_updater::update_public_sensing(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E) {
+    del::agent_set o_ags(W->get_language()->get_agents_number());
+    return update_public_private_action(W, E, o_ags);
+}
 
+possibility_spectrum_ptr
+union_updater::update_public_ontic(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E) {
+    del::agent_set o_ags(W->get_language()->get_agents_number());
+    return update_public_private_action(W, E, o_ags);
+}
+
+possibility_spectrum_ptr
+union_updater::update_private_announcement(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E) {
+    del::agent_set o_ags(W->get_language()->get_agents_number());
+    eventuality_ptr e = *E->get_designated_eventualities().begin();
+
+    for (del::agent ag = 0; ag < W->get_language()->get_agents_number(); ++ag)
+        if (e->get_information_state(ag).find(e) == e->get_information_state(ag).end())
+            o_ags[ag] = true;
+
+    return update_public_private_action(W, E, o_ags);
+}
+
+possibility_spectrum_ptr
+union_updater::update_private_ontic(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E) {
+    del::agent_set o_ags(W->get_language()->get_agents_number());
+    eventuality_ptr e = *E->get_designated_eventualities().begin();
+
+    for (del::agent ag = 0; ag < W->get_language()->get_agents_number(); ++ag)
+        if (e->get_information_state(ag).find(e) == e->get_information_state(ag).end())
+            o_ags[ag] = true;
+
+    return update_public_private_action(W, E, o_ags);
+}
+
+possibility_spectrum_ptr
+union_updater::update_semi_private_sensing(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E) {
+    del::agent_set o_ags(W->get_language()->get_agents_number());
+    eventuality_ptr e = *E->get_designated_eventualities().begin();
+
+    for (del::agent ag = 0; ag < W->get_language()->get_agents_number(); ++ag)
+        if (e->get_information_state(ag).find(e) == e->get_information_state(ag).end())
+            o_ags[ag] = true;
+
+    return update_semi_private_action(W, E, o_ags);
+}
+
+possibility_spectrum_ptr
+union_updater::update_semi_private_announcement(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E) {
+    del::agent_set o_ags(W->get_language()->get_agents_number());
+    eventuality_ptr e = *E->get_designated_eventualities().begin();
+
+    for (del::agent ag = 0; ag < W->get_language()->get_agents_number(); ++ag)
+        if (e->get_information_state(ag).find(e) == e->get_information_state(ag).end())
+            o_ags[ag] = true;
+
+    return update_semi_private_action(W, E, o_ags);
+}
+
+possibility_spectrum_ptr
+union_updater::update_quasi_private_announcement(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E) {
+
+}
+
+possibility_spectrum_ptr union_updater::update_public_private_action(const delphic::possibility_spectrum_ptr &W,
+                                                                     const delphic::eventuality_spectrum_ptr &E, const del::agent_set &o_ags) {
+    information_state designated;
+    del::agent_set fo_ags(W->get_language()->get_agents_number());
+    fo_ags.set();
+
+    for (const eventuality_ptr &e : E->get_designated_eventualities()) {
+        possibility_map update_map;
+
+        update_possibilities(W, e, o_ags, update_map);
+        update_information_states(W, fo_ags, o_ags, update_map);
+        update_designated(W, designated, update_map);
+    }
+
+    return std::make_shared<possibility_spectrum>(W->get_language(), std::move(designated));
+}
+
+possibility_spectrum_ptr union_updater::update_semi_private_action(const delphic::possibility_spectrum_ptr &W,
+                                                                   const delphic::eventuality_spectrum_ptr &E, const del::agent_set &o_ags) {
+    information_state designated;
+    possibility_map update_map;
+    unsigned long count = 0;
+    std::vector<eventuality_ptr> es;
+
+    for (const eventuality_ptr &e : E->get_designated_eventualities())
+        es.push_back(e);
+
+    del::agent actor;
+
+    for (del::agent ag = 0; ag < W->get_language()->get_agents_number(); ++ag) {
+        const auto &is = es[0]->get_information_state(ag);
+
+        if (is.size() == 1 and is.find(es[0]) != is.end()) {
+            actor = ag;
+            break;
+        }
+    }
+
+    del::agent_set po_ags(W->get_language()->get_agents_number());
+
+    for (del::agent ag = 0; ag < W->get_language()->get_agents_number(); ++ag)
+        if (ag != actor and not o_ags[ag])
+            po_ags[ag] = true;
+
+    update_possibilities(W, es[0], o_ags, update_map);
+    update_possibilities(W, es[1], o_ags, update_map);
+
+    update_information_states(W, po_ags, o_ags, update_map);
+    update_designated(W, designated, update_map);
+
+    return std::make_shared<possibility_spectrum>(W->get_language(), std::move(designated));
+}
+
+void union_updater::update_possibilities(const delphic::possibility_spectrum_ptr &W, const delphic::eventuality_ptr &e,
+                                         const del::agent_set &o_ags, delphic::possibility_map &update_map, bool negated) {
+    information_state to_visit, visited;
+
+    for (const auto &w: W->get_designated_possibilities())
+        to_visit.emplace(w);
+
+    while (not to_visit.empty()) {
+        auto first = to_visit.begin();
+        const possibility_ptr &current = *first;
+        possibility_ptr updated = nullptr;
+
+        if (current->satisfies(e->get_pre()) != negated) {
+            agents_information_state is = agents_information_state(W->get_language()->get_agents_number());
+            kripke::label l = e->is_ontic() ? update_label(current, e) : current->get_label();
+            updated = std::make_shared<possibility>(W->get_language(), std::move(l), std::move(is));
+        }
+
+        if (updated)
+            update_map[current] = updated;
+
+        visited.emplace(current);
+
+//        if (updated) {
+        for (del::agent ag = 0; ag < W->get_language()->get_agents_number(); ++ag)
+            for (const possibility_ptr &w: current->get_information_state(ag))
+                if (not o_ags[ag]) {
+                    if (visited.find(w) == visited.end())
+                        to_visit.emplace(w);
+                } else {
+                    if (visited.find(w) == visited.end()) {
+                        update_map[w] = w;
+                        visited.emplace(w);
+                    }
+                }
+//        }
+        to_visit.erase(first);
+    }
+}
+
+void union_updater::update_information_states(const delphic::possibility_spectrum_ptr &W, const del::agent_set &obs_ags,
+                                              const del::agent_set &o_ags, delphic::possibility_map &update_map) {
+    std::vector<information_state_map> agents_is_map(W->get_language()->get_agents_number());
+
+    for (auto &[old_w, new_w] : update_map)
+        if (new_w and new_w != old_w) {
+            for (del::agent ag = 0; ag < W->get_language()->get_agents_number(); ++ag)
+                if (o_ags[ag]) {
+                    agents_is_map[ag][new_w] = old_w->get_information_state(ag);
+                } else if (obs_ags[ag]) {
+                    for (const possibility_ptr &old_v: old_w->get_information_state(ag))
+                        if (auto new_v = update_map[old_v]; new_v) {
+                            if (agents_is_map[ag].find(new_w) == agents_is_map[ag].end())
+                                agents_is_map[ag][new_w] = information_state{new_v};
+                            else
+                                agents_is_map[ag][new_w].emplace(new_v);
+                        }
+                } else {
+                    agents_is_map[ag][new_w] = information_state{new_w};
+                }
+        }
+
+    for (auto &[old_w, new_w] : update_map)
+        if (new_w and new_w != old_w)
+            for (del::agent ag = 0; ag < W->get_language()->get_agents_number(); ++ag)
+                new_w->set_information_state(ag, agents_is_map[ag][new_w]);
+}
+
+void union_updater::update_information_states(const delphic::possibility_spectrum_ptr &W, const del::agent_set &o_ags,
+                                              delphic::possibility_map &update_map_0, delphic::possibility_map &update_map_1) {
+    std::vector<information_state_map> agents_is_map(W->get_language()->get_agents_number());
+    for (auto &[old_w, new_w] : update_map_0)
+        if (new_w and new_w != old_w) {
+            for (del::agent ag = 0; ag < W->get_language()->get_agents_number(); ++ag)
+                if (not o_ags[ag]) {
+                    for (const possibility_ptr &old_v: old_w->get_information_state(ag))
+                        if (auto new_v = update_map_0[old_v]; new_v) {
+                            if (agents_is_map[ag].find(new_w) == agents_is_map[ag].end())
+                                agents_is_map[ag][new_w] = information_state{new_v};
+                            else
+                                agents_is_map[ag][new_w].emplace(new_v);
+                        }
+//                        if (auto new_v0 = update_map_0[old_v]; new_v0) {
+//                            information_state is = new_v0->get_information_state(ag);
+//                            is.emplace(new_w);
+//                        } else if (auto new_v1 = update_map_1[old_v]; new_v1) {
+//                            information_state is = new_v0->get_information_state(ag);
+//                            is.emplace(new_w);
+//                        }
+                }
+        }
+
+    for (auto &[old_w, new_w] : update_map_1)
+        if (new_w and new_w != old_w) {
+            for (del::agent ag = 0; ag < W->get_language()->get_agents_number(); ++ag)
+                if (not o_ags[ag]) {
+                    for (const possibility_ptr &old_v: old_w->get_information_state(ag))
+                        if (auto new_v0 = update_map_0[old_v]; new_v0) {
+                            information_state is = new_v0->get_information_state(ag);
+                            is.emplace(new_w);
+                        } else if (auto new_v1 = update_map_1[old_v]; new_v1) {
+                            information_state is = new_v0->get_information_state(ag);
+                            is.emplace(new_w);
+                        }
+                }
+        }
+}
+
+void union_updater::update_designated(const delphic::possibility_spectrum_ptr &W, information_state &designated, delphic::possibility_map &update_map) {
     for (const possibility_ptr &w : W->get_designated_possibilities())
-        for (const eventuality_ptr &e : E->get_designated_eventualities())
-            if (is_applicable(w, e))
-                bounded_update_helper(w, e, b, updated_possibilities, possibility_storage);
-
-    information_state W_;
-
-    for (auto &[_, w] : updated_possibilities[b])
-        W_.emplace(std::move(w));
-
-    return std::make_shared<possibility_spectrum>(W->get_language(), std::move(W_));
+        if (update_map[w])
+            designated.emplace(update_map[w]);
 }
 
-possibility_ptr union_updater::bounded_update(const possibility_ptr &w, const eventuality_ptr &e, const unsigned long b,
-                                              storage<possibility> &possibility_storage) {
+kripke::label union_updater::update_label(const delphic::possibility_ptr &w, const delphic::eventuality_ptr &e) {
+    kripke::label l = w->get_label();
 
+    for (const auto &[p, post] : e->get_postconditions())
+        l.update(p, model_checker::holds_in(*w, *post));
 
-//    signature sign_x_h = signature{s.get_language(), std::make_shared<label>(s.get_label(x)), std::move(xs)};       // We create the h-signature of x (h being x's bound),
-//    worlds_signatures[h][x] = signatures_storage.emplace(std::move(sign_x_h));
+    return std::move(l);
 }
 
-void union_updater::bounded_update_helper(const possibility_ptr &w, const eventuality_ptr &e, unsigned long b,
+/*void union_updater::bounded_update_helper(const possibility_ptr &w, const eventuality_ptr &e, unsigned long b,
                                           std::vector<possibility_map> &updated_possibilities, storage<possibility> &possibility_storage) {
     agents_information_state ws = agents_information_state(w->get_language()->get_agents_number());
 
@@ -92,18 +333,4 @@ void union_updater::bounded_update_helper(const possibility_ptr &w, const eventu
 
     possibility w_b = possibility{w->get_language(), update_label(w, e), std::move(ws), b};     // We create the b-possibility w_b,
     updated_possibilities[b][w] = possibility_storage.emplace(std::move(w_b));                  // we add it to the storage, and we put it into updated_possibilities[b][w]
-}
-
-kripke::label union_updater::update_label(const delphic::possibility_ptr &w, const delphic::eventuality_ptr &e) {
-    kripke::label l = w->get_label();
-
-    for (const auto &[p, post] : e->get_postconditions())
-        l.update(p, model_checker::holds_in(*w, *post));
-
-    return std::move(l);
-}
-
-/*
-possibility union_updater::bounded_update(const possibility_spectrum &w, const eventuality_spectrum &e, storage<possibility> &storage) {
-}
-*/
+}*/

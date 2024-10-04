@@ -31,7 +31,7 @@
 namespace delphic {
     class possibility_spectrum {
     public:
-        possibility_spectrum(del::language_ptr language, information_state designated_possibilities);
+        possibility_spectrum(del::language_ptr language, information_state designated_possibilities); // , unsigned long possibilities_number);
 
         possibility_spectrum(const possibility_spectrum&) = delete;
         possibility_spectrum& operator=(const possibility_spectrum&) = delete;
@@ -44,12 +44,17 @@ namespace delphic {
         [[nodiscard]] const information_state &get_designated_possibilities() const;
 
         [[nodiscard]] del::language_ptr get_language() const;
+//        [[nodiscard]] unsigned long get_possibilities_number() const;
+        [[nodiscard]] bool is_designated(const possibility_ptr &w) const;
         [[nodiscard]] unsigned long long get_max_depth() const;
         [[nodiscard]] bool satisfies(const del::formula_ptr &f) const;
+
+        friend std::ostream &operator<<(std::ostream &os, const possibility_spectrum &s);
 
     private:
         del::language_ptr m_language;
         information_state m_designated_possibilities;
+//        unsigned long m_possibilities_number;
         unsigned long long m_max_depth;
     };
 }

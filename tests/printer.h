@@ -30,9 +30,11 @@
 #include "../include/del/semantics/kripke/bisimulation/bisimulation_types.h"
 #include "../include/search/planning_task.h"
 #include "../include/search/strategies.h"
+#include "../include/search/delphic/delphic_planning_task.h"
 //#include "../include/search/planner.h"
 
 using namespace kripke;
+using namespace delphic;
 
 namespace daedalus::tester {
     class printer;
@@ -56,17 +58,22 @@ namespace daedalus::tester {
         static void print_state(const state &s, const std::string &path, const std::string &name);
         static void print_action(const action &a, const std::string &path);
 
-        static void print_states(const state &s, const action_deque &as, const std::string &path,
+        static void print_states(const state &s, const kripke::action_deque &as, const std::string &path,
                                  const std::string &name, bool apply_contraction = false,
                                  bisimulation_type type = bisimulation_type::full, unsigned long k = 0);
 
-        static void print_states(const search::planning_task &task, const action_deque &as, const std::string &path,
+        static void print_states(const possibility_spectrum_ptr &W, const delphic::action_deque &as, const std::string &path,
+                                 const std::string &name);
+
+        static void print_states(const search::planning_task &task, const kripke::action_deque &as, const std::string &path,
                                  bool apply_contraction = false, bisimulation_type type = bisimulation_type::full,
                                  unsigned long k = 0);
 
         static void print_task(const search::planning_task &task, const std::string &path);
 
         static void print_results(const search::planning_task &task, search::strategy strategy, const std::string &out_path);
+        static void print_delphic_results(const search::delphic_planning_task &task, search::strategy strategy, const std::string &out_path);
+
         static void print_time_results(const search::planning_task &task, std::ofstream &table);
 
     private:

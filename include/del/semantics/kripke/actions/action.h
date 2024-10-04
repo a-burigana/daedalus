@@ -34,7 +34,7 @@
 namespace kripke {
     class action {
     public:
-        action(del::language_ptr language, std::string name, unsigned long long events_number, action_relations relations,
+        action(del::language_ptr language, action_type type, std::string name, unsigned long long events_number, action_relations relations,
                preconditions pre, postconditions post, boost::dynamic_bitset<> is_ontic, event_deque designated_events);
 
         action(const action&) = delete;
@@ -46,6 +46,7 @@ namespace kripke {
         ~action() = default;
 
         [[nodiscard]] del::language_ptr get_language() const;
+        [[nodiscard]] action_type get_type() const;
         [[nodiscard]] std::string get_name() const;
         [[nodiscard]] unsigned long long get_events_number() const;
         [[nodiscard]] const event_set &get_agent_possible_events(del::agent ag, event_id e) const;
@@ -63,6 +64,8 @@ namespace kripke {
 
     private:
         del::language_ptr m_language;
+        action_type m_type;
+
         std::string m_name;
         unsigned long long m_events_number;
         action_relations m_relations;

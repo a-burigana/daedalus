@@ -54,3 +54,7 @@ bool eventuality::is_ontic() const {
 bool eventuality::is_idle() const {
     return m_is_idle;
 }
+
+void eventuality::set_information_state(del::agent ag, delphic::dynamic_information_state &is) {
+    m_information_state[ag] = std::move(is);
+}

@@ -25,11 +25,13 @@
 #ifndef DAEDALUS_EVENTUALITY_TYPES_H
 #define DAEDALUS_EVENTUALITY_TYPES_H
 
+#include <_types/_uint8_t.h>
 #include <memory>
 #include <unordered_set>
 #include <unordered_map>
 #include "../../../language/language_types.h"
 #include "../../../formulas/formula.h"
+#include "../../kripke/actions/actions_types.h"
 
 namespace delphic {
     class eventuality;
@@ -41,6 +43,9 @@ namespace delphic {
     using agents_dynamic_information_state = std::vector<dynamic_information_state>;
 
     using postconditions = std::unordered_map<del::atom, del::formula_ptr>;
+
+    using action_deque = std::deque<eventuality_spectrum_ptr>;
+    using action_type = kripke::action_type;
 }
 
 #endif //DAEDALUS_EVENTUALITY_TYPES_H

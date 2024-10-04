@@ -45,7 +45,6 @@ namespace delphic {
         static possibility_spectrum_ptr update_public_sensing(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
         static possibility_spectrum_ptr update_private_announcement(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
         static possibility_spectrum_ptr update_semi_private_announcement(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
-        static possibility_spectrum_ptr update_quasi_private_announcement(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
         static possibility_spectrum_ptr update_public_announcement(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
 
         static possibility_spectrum_ptr update_public_private_action(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E, const del::agent_set& o_ags);

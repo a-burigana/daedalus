@@ -65,8 +65,6 @@ union_updater::update(const delphic::possibility_spectrum_ptr &W, const delphic:
             return update_semi_private_announcement(W, E);
         case action_type::semi_private_sensing:
             return update_semi_private_sensing(W, E);
-        case action_type::quasi_private_announcement:
-            return update_quasi_private_announcement(W, E);
     }
 }
 
@@ -134,11 +132,6 @@ union_updater::update_semi_private_announcement(const possibility_spectrum_ptr &
             o_ags[ag] = true;
 
     return update_semi_private_action(W, E, o_ags);
-}
-
-possibility_spectrum_ptr
-union_updater::update_quasi_private_announcement(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E) {
-
 }
 
 possibility_spectrum_ptr union_updater::update_public_private_action(const delphic::possibility_spectrum_ptr &W,

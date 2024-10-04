@@ -55,10 +55,6 @@ namespace daedalus::tester {
                                                       const del::formula_ptr &f_pre, const del::formula_ptr &announced,
                                                       const del::agent_set &fo_ags, const del::agent_set &po_ags);
 
-        static action build_quasi_private_announcement(std::string name, const del::language_ptr &language,
-                                                       const del::formula_ptr &f_pre_1, const del::formula_ptr &f_pre_2,
-                                                       const del::agent_set &fo_ags_1, const del::agent_set &fo_ags_2);
-
         static action build_private_announcement(std::string name, const del::language_ptr &language,
                                                  const del::formula_ptr &f_pre, const del::agent_set &fo_ags);
     };

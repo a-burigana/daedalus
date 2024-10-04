@@ -57,7 +57,6 @@ namespace kripke {
         public_sensing,
         private_announcement,
         semi_private_announcement,
-        quasi_private_announcement,
         public_announcement
     };
 }

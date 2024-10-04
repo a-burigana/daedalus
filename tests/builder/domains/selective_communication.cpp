@@ -293,31 +293,22 @@ kripke::action selective_communication::build_sense(unsigned long agents_no, uns
 kripke::action selective_communication::build_tell(unsigned long agents_no, unsigned long rooms_no, del::agent ag,
                                                 unsigned long r, const del::agent_set &fo_ags) {
     language_ptr language = selective_communication::build_language(agents_no, rooms_no);
-    agent_set ag_set(language->get_agents_number()), fo_ags_2 = fo_ags;
-    ag_set[ag] = true;
-    fo_ags_2[ag] = false;
-
     std::string ag_name = language->get_agent_name(ag);
 
     formula_ptr q            = std::make_shared<atom_formula>(language->get_atom_id("q"));
-    formula_ptr in_room_r_ag = std::make_shared<atom_formula>(language->get_atom_id("in_room_" + std::to_string(r) + "_" + ag_name));
-
-    formula_ptr B_a_q = std::make_shared<box_formula>(ag, q);
     formula_ptr D_a_q = std::make_shared<diamond_formula>(ag, q);
 
-    formula_deque fs_1 = in_room_agents(language, r, fo_ags), fs_2 = fs_1;
-    fs_1.push_back(B_a_q);
-    fs_2.push_back(D_a_q);
+    formula_deque fs = in_room_agents(language, r, fo_ags);
+    fs.push_back(D_a_q);
 
-    formula_ptr f_pre_1 = std::make_shared<and_formula>(std::move(fs_1));
-    formula_ptr f_pre_2 = std::make_shared<and_formula>(std::move(fs_2));
+    formula_ptr f_pre = std::make_shared<and_formula>(std::move(fs));
 
     std::string fo_str;
     to_string(fo_ags, fo_str);
     std::reverse(fo_str.begin(), fo_str.end());
     std::string name = "tell_" + ag_name + "_" + std::to_string(r) + "_" + fo_str;
 
-    return action_builder::build_quasi_private_announcement(std::move(name), language, f_pre_1, f_pre_2, ag_set, fo_ags_2);
+    return action_builder::build_private_announcement(std::move(name), language, f_pre, fo_ags);
 }
 
 del::formula_deque selective_communication::in_room_agents(const del::language_ptr &language, unsigned long r,

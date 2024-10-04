@@ -327,10 +327,6 @@ kripke::action collaboration_communication::build_tell(unsigned long agents_no, 
                                                     unsigned long boxes_no, del::agent ag, unsigned long r,
                                                     unsigned long b, const del::agent_set &fo_ags) {
     language_ptr language = collaboration_communication::build_language(agents_no, rooms_no, boxes_no);
-    agent_set ag_set(language->get_agents_number()), fo_ags_2 = fo_ags;
-    ag_set[ag] = true;
-    fo_ags_2[ag] = false;
-
     std::string ag_name = language->get_agent_name(ag);
 
     formula_ptr in_room_box  = std::make_shared<atom_formula>(language->get_atom_id("in_room_" + std::to_string(r) + "_box_" + std::to_string(b)));

@@ -54,8 +54,8 @@ namespace delphic {
         static void update_possibilities(const possibility_spectrum_ptr &W, const eventuality_ptr &e,
                                          const del::agent_set &o_ags, possibility_map &update_map, bool negated = false);
 
-        static void update_information_states(const possibility_spectrum_ptr &W, const del::agent_set &obs_ags, const del::agent_set &o_ags, possibility_map &update_map);
-        static void update_information_states(const possibility_spectrum_ptr &W, const del::agent_set &o_ags, possibility_map &update_map_0, possibility_map &update_map_1);
+        static void update_information_states(const possibility_spectrum_ptr &W, const del::agent_set &o_ags, possibility_map &update_map);
+        static void update_information_states(const possibility_spectrum_ptr &W, const del::agent_set &po_ags, const del::agent_set &o_ags, const del::formula_ptr &f_pre, possibility_map &update_map);
 
         static void update_designated(const possibility_spectrum_ptr &W, information_state &designated, possibility_map &update_map);
 

@@ -80,17 +80,17 @@ int main() {
     const auto cc_task = collaboration_communication::build_task(2, 3, 2, 1);
     const auto cc_task_ = delphic::delphic_utils::convert(cc_task);
 
-//    daedalus::tester::printer::print_results(cc_task, search::strategy::iterative_bounded_search, OUT_PATH);
-//    daedalus::tester::printer::print_results(cc_task, search::strategy::unbounded_search, OUT_PATH);
-//    daedalus::tester::printer::print_delphic_results(cc_task_, search::strategy::unbounded_search, OUT_PATH);
+    daedalus::tester::printer::print_results(cc_task, search::strategy::iterative_bounded_search, OUT_PATH);
+    daedalus::tester::printer::print_results(cc_task, search::strategy::unbounded_search, OUT_PATH);
+    daedalus::tester::printer::print_delphic_results(cc_task_, search::strategy::unbounded_search, OUT_PATH);
 
-    const auto as = cc_task.get_actions({"left_a_11", "sense_a_in_room_1_box_1_10", "left_b_11", "sense_b_in_room_1_box_1_11"});
-
-    daedalus::tester::printer::print_state(*cc_task.get_initial_state(), OUT_PATH + "collaboration_communication/problem_2_3_2_g1/product_update/", "s0");
-    daedalus::tester::printer::print_states(*cc_task.get_initial_state(), as, OUT_PATH + "collaboration_communication/problem_2_3_2_g1/product_update/", "s0");
-
-    const auto as_ = cc_task_.get_actions({"left_a_11", "sense_a_in_room_1_box_1_10", "left_b_11", "sense_b_in_room_1_box_1_11"});
-    daedalus::tester::printer::print_states(cc_task_.get_initial_state(), as_, OUT_PATH + "delphic/collaboration_communication/problem_2_3_2_g1/union_update/", "s0");
+//    const auto as = cc_task.get_actions({"left_a_11", "sense_a_in_room_1_box_1_10", "left_b_11", "sense_b_in_room_1_box_1_11"});
+//
+//    daedalus::tester::printer::print_state(*cc_task.get_initial_state(), OUT_PATH + "collaboration_communication/problem_2_3_2_g1/product_update/", "s0");
+//    daedalus::tester::printer::print_states(*cc_task.get_initial_state(), as, OUT_PATH + "collaboration_communication/problem_2_3_2_g1/product_update/", "s0");
+//
+//    const auto as_ = cc_task_.get_actions({"left_a_11", "sense_a_in_room_1_box_1_10", "left_b_11", "sense_b_in_room_1_box_1_11"});
+//    daedalus::tester::printer::print_states(cc_task_.get_initial_state(), as_, OUT_PATH + "delphic/collaboration_communication/problem_2_3_2_g1/union_update/", "s0");
 
 //    auto W1 = delphic::union_updater::update(cc_task_.get_initial_state(), as_[0]);
 //    auto W2 = delphic::union_updater::update(cc_task_.get_initial_state(), as_[0]);

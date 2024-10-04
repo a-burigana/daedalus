@@ -25,6 +25,7 @@
 #define DAEDALUS_SEARCH_TESTER_H
 
 #include "../include/search/planning_task.h"
+#include "../include/search/strategies.h"
 
 namespace daedalus::tester {
     class search_tester {
@@ -46,7 +47,7 @@ namespace daedalus::tester {
 
         static void run_search_tests(const std::vector<search::planning_task> &tasks);
         static void print_search_results(const std::vector<search::planning_task> &tasks);
-        static void print_time_results(const std::vector<search::planning_task> &tasks, const std::string &table_path);
+        static void print_time_results(const std::vector<search::planning_task> &tasks, search::strategy strategy, const std::string &table_path);
 
         static void print_coin_in_the_box_time_results();
         static void print_consecutive_numbers_time_results();

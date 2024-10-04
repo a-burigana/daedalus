@@ -194,7 +194,7 @@ void printer::print_delphic_results(const search::delphic_planning_task &task, s
     }
 }
 
-void printer::print_time_results(const search::planning_task &task, std::ofstream &table) {
+void printer::print_domain_info(const search::planning_task &task, std::ofstream &table) {
     unsigned long atoms_no = task.get_language()->get_atoms_number();
     unsigned long agents_no = task.get_language()->get_agents_number();
     unsigned long actions_no = task.get_actions().size();
@@ -205,37 +205,43 @@ void printer::print_time_results(const search::planning_task &task, std::ofstrea
         << task.get_problem_id() << ";"
         << atoms_no << ";" << agents_no << ";"
         << task.get_initial_state()->get_worlds_number() << ";" << actions_no << ";" << goal_depth << ";";
+}
 
-    std::chrono::seconds pause(5);
-
+void printer::print_time_results(const search::planning_task &task, search::strategy strategy, std::ofstream &table) {
     auto start = std::chrono::steady_clock::now();
-    search::node_deque path_IBDS = search::planner::search(task, search::strategy::iterative_bounded_search);
+    search::node_deque path = search::planner::search(task, strategy);
     auto end = std::chrono::steady_clock::now();
-    auto delta_IBDS = since(start).count();
+    auto delta = since(start).count();
 
-    unsigned long plan_length_IBDS = path_IBDS.size() - 1;
-    double time_IBDS = static_cast<double>(delta_IBDS) / 1000;
+    unsigned long plan_length = path.size() - 1;
+    double time = static_cast<double>(delta) / 1000;
 
-    table
-        << std::to_string(path_IBDS.back()->get_bound()) << ";"
-        << std::to_string(plan_length_IBDS) << ";"
-        << path_IBDS.back()->get_id() << ";"
-        << std::to_string(time_IBDS) << ";";
-
-    std::this_thread::sleep_for(pause);
-
-    start = std::chrono::steady_clock::now();
-    search::node_deque path_US = search::planner::search(task, search::strategy::unbounded_search);
-    end = std::chrono::steady_clock::now();
-    auto delta_US = since(start).count();
-
-    unsigned long plan_length_US = path_US.size() - 1;
-    double time_US = static_cast<double>(delta_US) / 1000;
-
-    std::this_thread::sleep_for(pause);
+    if (strategy == search::strategy::iterative_bounded_search)
+        table << std::to_string(path.back()->get_bound()) << ";";
 
     table
-        << std::to_string(plan_length_US) << ";"
-        << path_US.back()->get_id() << ";"
-        << std::to_string(time_US) << std::endl;
+        << std::to_string(plan_length) << ";"
+        << path.back()->get_id() << ";"
+        << std::to_string(time) << std::endl;
+
+    std::chrono::seconds pause(10);
+    std::this_thread::sleep_for(pause);
+}
+
+void printer::print_delphic_time_results(const search::delphic_planning_task &task, search::strategy strategy, std::ofstream &table) {
+    auto start = std::chrono::steady_clock::now();
+    search::delphic_node_deque path = search::delphic_planner::search(task, strategy);
+    auto end = std::chrono::steady_clock::now();
+    auto delta = since(start).count();
+
+    unsigned long plan_length = path.size() - 1;
+    double time = static_cast<double>(delta) / 1000;
+
+    table
+        << std::to_string(plan_length) << ";"
+        << path.back()->get_id() << ";"
+        << std::to_string(time) << std::endl;
+
+    std::chrono::seconds pause(10);
+    std::this_thread::sleep_for(pause);
 }

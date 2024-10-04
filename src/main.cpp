@@ -43,14 +43,97 @@
 #include "../include/del/semantics/delphic/update/union_updater.h"
 #include "../include/search/delphic/delphic_planner.h"
 #include "../tests/builder/domains/selective_communication.h"
+#include <memory>
 #include <string>
 
 #define OUT_PATH std::string{"../tests/out/"}
 
 using namespace daedalus::tester;
+using namespace clipp;
 
 #include <iostream>
 
+int main(int argc, char *argv[]) {
+    std::string semantics = "kripke", strategy = "unbounded";
+    std::string domain;
+    std::vector<std::string> parameters;
+    bool print_results = false;
+
+    auto cli = (
+        required("-d", "--domain") & value("domain", domain),
+        required("-p", "--parameters") & values("parameters", parameters),
+        option("-s", "--semantics") & values("semantics", semantics).doc("Selects the preferred DEL semantics ('kripke' or 'delphic')"),
+        option("-t", "--strategy" ) & values("strategy", strategy).doc("Selects the search strategy ('unbounded' or 'bounded')"),
+        option("--print").set(print_results).doc("Print time results")
+    );
+
+    if (not parse(argc, argv, cli)) {
+        std::cout << make_man_page(cli, argv[0]);
+        return 0;
+    }
+
+    search::planning_task_ptr task;
+
+    if (domain == "active_muddy_children" or domain == "amc")
+        task = std::make_unique<search::planning_task>(active_muddy_children::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2])));
+    else if (domain == "coin_in_the_box" or domain == "cb")
+        task = std::make_unique<search::planning_task>(coin_in_the_box::build_task(std::stoul(parameters[0])));
+    else if (domain == "collaboration_communication" or domain == "cc")
+        task = std::make_unique<search::planning_task>(collaboration_communication::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), std::stoul(parameters[3])));
+    else if (domain == "consecutive_numbers" or domain == "cn")
+        task = std::make_unique<search::planning_task>(consecutive_numbers::build_task(std::stoul(parameters[0])));
+    else if (domain == "gossip" or domain == "gos")
+        task = std::make_unique<search::planning_task>(gossip::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2])));
+    else if (domain == "grapevine" or domain == "gra")
+        task = std::make_unique<search::planning_task>(grapevine::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2])));
+    else if (domain == "selective_communication" or domain == "sc")
+        task = std::make_unique<search::planning_task>(selective_communication::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2])));
+    else if (domain == "tiger" or domain == "tig")
+        task = std::make_unique<search::planning_task>(tiger::build_task(std::stoul(parameters[0]), std::stoul(parameters[1])));
+
+    search::strategy t = strategy == "unbounded" ? search::strategy::unbounded_search : search::strategy::iterative_bounded_search;
+    std::string out_file_path = OUT_PATH + "thesis/time_results/" + task->get_domain_name() + "/";
+
+    if (not std::filesystem::exists(out_file_path))
+        std::filesystem::create_directories(out_file_path);
+
+    std::string out_file_name = "results_" + semantics + "_" + strategy + ".csv";
+    std::ifstream read_out_file = std::ifstream{out_file_path + out_file_name};
+    bool empty_file = read_out_file.peek() == std::ifstream::traits_type::eof();
+    read_out_file.close();
+
+    std::ofstream out_file = std::ofstream{out_file_path + out_file_name, std::ios_base::app};
+
+    if (empty_file) {
+        switch (t) {
+            case search::strategy::unbounded_search:
+                out_file << "Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Plan length;#Nodes;Time" << std::endl;
+                break;
+            case search::strategy::iterative_bounded_search:
+                out_file << "Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Bound;Plan length;#Nodes;Time" << std::endl;
+                break;
+        }
+    }
+
+    if (print_results)
+        daedalus::tester::printer::print_domain_info(*task, out_file);
+
+    if (semantics == "kripke") {
+        if (print_results) daedalus::tester::printer::print_time_results(*task, t, out_file);
+        else search::planner::search(*task, t);
+    } else if (semantics == "delphic") {
+        search::delphic_planning_task task_ = delphic_utils::convert(*task);
+
+        if (print_results) daedalus::tester::printer::print_delphic_time_results(task_, t, out_file);
+        else search::delphic_planner::search(task_, t);
+    }
+
+    out_file.close();
+
+    return 0;
+}
+
+/*
 void storage_test() {
     storage<int> int_storage;
     int x = 5, y = 5;
@@ -75,170 +158,4 @@ void storage_test() {
     assert(sign_w3_0->get_label() == sign_w5_0->get_label());
     assert(sign_w3_0->get_information_state(0) == sign_w5_0->get_information_state(0));
     assert(*sign_w3_0 == *sign_w5_0);
-}
-
-int main() {
-    const auto sc_task = selective_communication::build_task(3, 4, 4);
-    const auto sc_task_ = delphic::delphic_utils::convert(sc_task);
-//
-    daedalus::tester::printer::print_results(sc_task, search::strategy::iterative_bounded_search, OUT_PATH);
-    daedalus::tester::printer::print_results(sc_task, search::strategy::unbounded_search, OUT_PATH);
-    daedalus::tester::printer::print_delphic_results(sc_task_, search::strategy::unbounded_search, OUT_PATH);
-
-//    const auto as = cc_task.get_actions({"left_a_11", "sense_a_in_room_1_box_1_10", "left_b_11", "sense_b_in_room_1_box_1_11"});
-//
-//    daedalus::tester::printer::print_state(*cc_task.get_initial_state(), OUT_PATH + "collaboration_communication/problem_2_3_2_g1/product_update/", "s0");
-//    daedalus::tester::printer::print_states(*cc_task.get_initial_state(), as, OUT_PATH + "collaboration_communication/problem_2_3_2_g1/product_update/", "s0");
-//
-//    const auto as_ = cc_task_.get_actions({"left_a_11", "sense_a_in_room_1_box_1_10", "left_b_11", "sense_b_in_room_1_box_1_11"});
-//    daedalus::tester::printer::print_states(cc_task_.get_initial_state(), as_, OUT_PATH + "delphic/collaboration_communication/problem_2_3_2_g1/union_update/", "s0");
-
-//    auto W1 = delphic::union_updater::update(cc_task_.get_initial_state(), as_[0]);
-//    auto W2 = delphic::union_updater::update(cc_task_.get_initial_state(), as_[0]);
-
-//    search::planner::search(cb_task, search::strategy::iterative_bounded_search);
-//    search::planner::search(cb_task, search::strategy::unbounded_search);
-
-//    for (const auto &task : coin_in_the_box::build_tasks()) {
-//        const auto &task_ = delphic_utils::convert(task);
-//
-//        daedalus::tester::printer::print_results(task, search::strategy::iterative_bounded_search, OUT_PATH);
-//        daedalus::tester::printer::print_results(task, search::strategy::unbounded_search, OUT_PATH);
-//        search::delphic_planner::search(task_, search::strategy::unbounded_search);
-//    }
-
-//    daedalus::tester::printer::print_delphic_results(cb_task_, search::strategy::unbounded_search, OUT_PATH);
-
-//    daedalus::tester::printer::print_task(cb_task, OUT_PATH);
-
-//    search_tester::print_coin_in_the_box_time_results();
-
-//    search::planning_task sc_task = selective_communication::build_task(3, 5, 2);
-//    search::delphic_planning_task sc_task_ = delphic::delphic_utils::convert(sc_task);
-
-//    search::planner::search(sc_task, search::strategy::iterative_bounded_search);
-//    search::delphic_planner::search(sc_task_, search::strategy::unbounded_search);
-
-//    search::planning_task g_task = gossip::build_task(5, 2, 9);
-//    search::delphic_planning_task g_task_ = delphic::delphic_utils::convert(g_task);
-
-//    search::planner::search(g_task, search::strategy::iterative_bounded_search);
-//    search::delphic_planner::search(g_task_, search::strategy::unbounded_search);
-
-//    auto s0 = g_task.get_initial_state();
-//    auto a0 = g_task.get_action("tell_0_1");
-//    auto s1 = kripke::updater::product_update(*s0, *a0);
-//
-//    daedalus::tester::printer::print_state(*s0, OUT_PATH + "gossip/2_1_1/states/", "s0");
-//    daedalus::tester::printer::print_state( s1, OUT_PATH + "gossip/2_1_1/states/", "s0_tell_0_1");
-//
-//    auto W0 = g_task_.get_initial_state();
-//    auto E0 = g_task_.get_action("tell_0_1");
-//    auto W1 = delphic::union_updater::update(W0, E0);
-//
-//    auto s0_ = delphic::delphic_utils::convert(*W0);
-//    auto s1_ = delphic::delphic_utils::convert(*W1);
-//
-//    daedalus::tester::printer::print_state(s0_, OUT_PATH + "delphic/gossip/2_1_1/states/", "s0");
-//    daedalus::tester::printer::print_state(s1_, OUT_PATH + "delphic/gossip/2_1_1/states/", "s0_tell_0_1");
-
-//    daedalus::tester::printer::print_results(amc_task, search::strategy::iterative_bounded_search, OUT_PATH);
-//    daedalus::tester::printer::print_results(amc_task, search::strategy::unbounded_search, OUT_PATH);
-//    daedalus::tester::printer::print_task(amc_task, OUT_PATH);
-
-
-
-
-//    search::planning_task gr_task = grapevine::build_task(6, 3, 3);
-//    daedalus::tester::printer::print_task(gr_task, OUT_PATH);
-
-//    search::planner::search(gr_task, search::strategy::iterative_bounded_search);
-//    daedalus::tester::printer::print_results(gr_task, search::strategy::iterative_bounded_search, OUT_PATH);
-
-//    search::planner::search(gr_task, search::strategy::unbounded_search);
-
-
-//
-//    auto actions = gossip::build_actions(3);
-//
-//    for (const action_ptr &a : actions)
-//        printer::print_action(*a, OUT_PATH + "gossip/3/actions/");
-
-//    search::planning_task tiger_task = tiger::build_task(5, 3);
-//    printer::print_task(tiger_task, OUT_PATH);
-
-//    printer::print_results(tiger_task, search::strategy::unbounded_search, OUT_PATH);
-//    printer::print_results(tiger_task, search::strategy::iterative_bounded_search, OUT_PATH);
-
-
-
-//    action_deque as = {tiger_task.get_action("listen_1"), tiger_task.get_action("right"), tiger_task.get_action("open_2"), tiger_task.get_action("look_2"), tiger_task.get_action("save_princess_2")};
-//    printer::print_states(tiger_task, as, OUT_PATH, true, bisimulation_type::full);
-
-//    printer::print_results(tiger_task, search::strategy::iterative_bounded_search, OUT_PATH);
-
-//    state s = tiger::build_initial_state(4, 2);
-//    printer::print_state(s, OUT_PATH + "states/tiger/4_2/", "s0");
-//
-//    for (const action_ptr &a : tiger_task.get_actions())
-//        printer::print_action(*a, OUT_PATH + tiger_task.get_domain_name() + "/" + tiger_task.get_problem_id() + "/");
-
-
-//    int n = 6;
-//    auto cn_task = consecutive_numbers::build_task(n);
-
-//    state_ptr s = cn_task.get_initial_state();
-//    auto actions = cn_task.get_actions();
-//
-//    for (const auto &a : actions)
-//        printer::print_action(*a, OUT_PATH + "actions/consecutive_numbers/" + std::to_string(n) + "/");
-
-//    for (int n = 2; n <= 4; ++n) {
-//        auto cn_task = consecutive_numbers::build_task(n);
-//
-//        printer::print_results(cn_task, search::strategy::unbounded_search, OUT_PATH);
-//        printer::print_results(cn_task, search::strategy::iterative_bounded_search, OUT_PATH);
-//    }
-
-//    unsigned long b = 4;
-//    const auto &[is_bisim, s_contr] = bisimulator::contract(bisimulation_type::rooted, *s, b);
-//    assert(not is_bisim);
-//
-//    auto a = cn_task.get_actions({"a_not_knows_b_0"}); // "a_not_knows_b_3", "b_not_knows_a_4"
-//    printer::print_state( s_contr,    OUT_PATH + "product_update/consecutive_numbers/" + std::to_string(n) + "/", "s0");
-//    printer::print_states(s_contr, a, OUT_PATH + "product_update/consecutive_numbers/" + std::to_string(n) + "/", "s0" , true, bisimulation_type::rooted, b);
-
-
-
-//    auto a = cn_task.get_actions({"b_not_knows_a_1", "a_not_knows_b_2", "b_not_knows_a_3"});
-//    printer::print_state( *s,    OUT_PATH + "product_update/consecutive_numbers/" + std::to_string(n) + "/", "s0");
-//    printer::print_states(*s, a, OUT_PATH + "product_update/consecutive_numbers/" + std::to_string(n) + "/", "s0", true, bisimulation_type::full);
-
-//    bisimulation_tester::test_bisim_1(OUT_PATH, k, &storage);
-
-
-
-
-
-
-
-
-    /*auto tasks = coin_in_the_box::build_tasks();
-//    std::map<std::string, unsigned long> b_map;
-
-    for (const auto &task : tasks) {
-        search::planner::search(task, search::strategy::iterative_bounded_search);
-        search::planner::search(task, search::strategy::unbounded_search);
-//        b_map[task.get_problem_id()] = path.back()->get_bound();
-    }*/
-
-
-//
-////    for (const auto &[id, b] : b_map)
-////        std::cout << id << " & " << b << std::endl;
-
-//    action_tester::test_switches_actions(5, OUT_PATH);
-
-//
-    return 0;
-}
+}*/

@@ -74,7 +74,9 @@ namespace daedalus::tester {
         static void print_results(const search::planning_task &task, search::strategy strategy, const std::string &out_path);
         static void print_delphic_results(const search::delphic_planning_task &task, search::strategy strategy, const std::string &out_path);
 
-        static void print_time_results(const search::planning_task &task, std::ofstream &table);
+        static void print_domain_info(const search::planning_task &task, std::ofstream &table);
+        static void print_time_results(const search::planning_task &task, search::strategy strategy, std::ofstream &table);
+        static void print_delphic_time_results(const search::delphic_planning_task &task, search::strategy strategy, std::ofstream &table);
 
     private:
         std::ofstream m_output_stream;

@@ -27,6 +27,7 @@
 #include <memory>
 #include <deque>
 #include <unordered_set>
+#include <unordered_map>
 
 namespace delphic {
     class possibility;

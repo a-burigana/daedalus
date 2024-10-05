@@ -33,7 +33,9 @@ eventuality_spectrum::eventuality_spectrum(language_ptr language, action_type ty
         m_language{std::move(language)},
         m_type{type},
         m_name{std::move(name)},
-        m_designated_eventualities{std::move(designated_eventualities)} {}
+        m_designated_eventualities{std::move(designated_eventualities)} {
+    m_maximum_depth = 0;
+}
 
 language_ptr eventuality_spectrum::get_language() const {
     return m_language;

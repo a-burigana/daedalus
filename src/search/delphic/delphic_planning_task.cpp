@@ -57,7 +57,7 @@ const delphic::eventuality_spectrum_ptr &delphic_planning_task::get_action(const
     return m_actions_map.at(name);
 }
 
-delphic::action_deque delphic_planning_task::get_actions(const std::deque<std::string> &names) const {
+delphic::action_deque delphic_planning_task::get_actions(const std::vector<std::string> &names) const {
     delphic::action_deque as;
 
     for (const std::string &name : names)

@@ -56,7 +56,7 @@ const kripke::action_ptr &planning_task::get_action(const std::string &name) con
     return m_actions_map.at(name);
 }
 
-kripke::action_deque planning_task::get_actions(const std::deque<std::string> &names) const {
+kripke::action_deque planning_task::get_actions(const std::vector<std::string> &names) const {
     kripke::action_deque as;
 
     for (const std::string &name : names)

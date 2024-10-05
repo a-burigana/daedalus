@@ -56,6 +56,8 @@ namespace daedalus::tester {
         void set_out_to_file(bool out_to_file);
 
         static void print_state(const state &s, const std::string &path, const std::string &name);
+        static void print_state(const delphic::possibility_spectrum &W, const std::string &path, const std::string &name);
+
         static void print_action(const action &a, const std::string &path);
 
         static void print_states(const state &s, const kripke::action_deque &as, const std::string &path,
@@ -68,6 +70,8 @@ namespace daedalus::tester {
         static void print_states(const search::planning_task &task, const kripke::action_deque &as, const std::string &path,
                                  bool apply_contraction = false, bisimulation_type type = bisimulation_type::full,
                                  unsigned long k = 0);
+
+        static void print_states(const search::delphic_planning_task &task, const delphic::action_deque &as, const std::string &path);
 
         static void print_task(const search::planning_task &task, const std::string &path);
 

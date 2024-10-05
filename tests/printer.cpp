@@ -83,6 +83,11 @@ void printer::print_state(const kripke::state &s, const std::string &path, const
     dot_file.close();
 }
 
+void printer::print_state(const delphic::possibility_spectrum &W, const std::string &path, const std::string &name) {
+    const state s = delphic_utils::convert(W);
+    print_state(s, path, name);
+}
+
 void printer::print_action(const kripke::action &a, const std::string &path) {
     if (not std::filesystem::exists(path))
         std::filesystem::create_directories(path);
@@ -143,6 +148,11 @@ void printer::print_states(const search::planning_task &task, const kripke::acti
                  "s0", apply_contraction, type, k);
 }
 
+void printer::print_states(const search::delphic_planning_task &task, const delphic::action_deque &as,
+                           const std::string &path) {
+    print_states(task.get_initial_state(), as, path, "W0");
+}
+
 void printer::print_task(const search::planning_task &task, const std::string &path) {
     std::string task_path = path + task.get_domain_name() + "/" + task.get_problem_id() + "/";
 
@@ -201,6 +211,7 @@ void printer::print_domain_info(const search::planning_task &task, std::ofstream
     unsigned long goal_depth = task.get_goal()->get_modal_depth();
 
     table
+        << std::endl
         << task.get_domain_name() << ";"
         << task.get_problem_id() << ";"
         << atoms_no << ";" << agents_no << ";"
@@ -222,7 +233,7 @@ void printer::print_time_results(const search::planning_task &task, search::stra
     table
         << std::to_string(plan_length) << ";"
         << path.back()->get_id() << ";"
-        << std::to_string(time) << std::endl;
+        << std::to_string(time);
 
     std::chrono::seconds pause(10);
     std::this_thread::sleep_for(pause);
@@ -240,7 +251,7 @@ void printer::print_delphic_time_results(const search::delphic_planning_task &ta
     table
         << std::to_string(plan_length) << ";"
         << path.back()->get_id() << ";"
-        << std::to_string(time) << std::endl;
+        << std::to_string(time);
 
     std::chrono::seconds pause(10);
     std::this_thread::sleep_for(pause);

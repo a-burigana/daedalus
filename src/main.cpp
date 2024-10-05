@@ -54,17 +54,22 @@ using namespace clipp;
 #include <iostream>
 
 int main(int argc, char *argv[]) {
+    // todo: DEBUG GOSSIP, GRAPEVINE AND TIGER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     std::string semantics = "kripke", strategy = "unbounded";
     std::string domain;
-    std::vector<std::string> parameters;
-    bool print_results = false;
+    std::vector<std::string> parameters, actions;
+    bool print_results = false, print_info = false, debug = false;
 
     auto cli = (
         required("-d", "--domain") & value("domain", domain),
         required("-p", "--parameters") & values("parameters", parameters),
-        option("-s", "--semantics") & values("semantics", semantics).doc("Selects the preferred DEL semantics ('kripke' or 'delphic')"),
-        option("-t", "--strategy" ) & values("strategy", strategy).doc("Selects the search strategy ('unbounded' or 'bounded')"),
-        option("--print").set(print_results).doc("Print time results")
+        option("-s", "--semantics") & value("semantics", semantics).doc("Selects the preferred DEL semantics ('kripke' or 'delphic')"),
+        option("-t", "--strategy" ) & value("strategy", strategy).doc("Selects the search strategy ('unbounded' or 'bounded')"),
+        option("-a", "--actions" ) & values("actions", actions).doc("Actions to execute"),
+        option("--print").set(print_results).doc("Print time results"),
+        option("--info").set(print_info),
+        option("--debug").set(debug)
     );
 
     if (not parse(argc, argv, cli)) {
@@ -91,44 +96,71 @@ int main(int argc, char *argv[]) {
     else if (domain == "tiger" or domain == "tig")
         task = std::make_unique<search::planning_task>(tiger::build_task(std::stoul(parameters[0]), std::stoul(parameters[1])));
 
+    search::delphic_planning_task task_ = delphic_utils::convert(*task);
+
     search::strategy t = strategy == "unbounded" ? search::strategy::unbounded_search : search::strategy::iterative_bounded_search;
-    std::string out_file_path = OUT_PATH + "thesis/time_results/" + task->get_domain_name() + "/";
+    bisimulation_type type = t == search::strategy::unbounded_search ? bisimulation_type::full : bisimulation_type::rooted;
 
-    if (not std::filesystem::exists(out_file_path))
-        std::filesystem::create_directories(out_file_path);
+    if (debug) {
+        if (actions.empty()) {
+            if (semantics == "kripke")
+                daedalus::tester::printer::print_results(*task, t, OUT_PATH);
+            else if (semantics == "delphic")
+                daedalus::tester::printer::print_delphic_results(task_, t, OUT_PATH);
+        } else {
+            std::string path = task->get_domain_name() + "/" + task->get_problem_id() + "/updates/" + semantics + "/" + strategy + "/";
 
-    std::string out_file_name = "results_" + semantics + "_" + strategy + ".csv";
-    std::ifstream read_out_file = std::ifstream{out_file_path + out_file_name};
-    bool empty_file = read_out_file.peek() == std::ifstream::traits_type::eof();
-    read_out_file.close();
-
-    std::ofstream out_file = std::ofstream{out_file_path + out_file_name, std::ios_base::app};
-
-    if (empty_file) {
-        switch (t) {
-            case search::strategy::unbounded_search:
-                out_file << "Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Plan length;#Nodes;Time" << std::endl;
-                break;
-            case search::strategy::iterative_bounded_search:
-                out_file << "Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Bound;Plan length;#Nodes;Time" << std::endl;
-                break;
+            if (semantics == "kripke") {
+                kripke::action_deque as = task->get_actions(actions);
+                daedalus::tester::printer::print_state(*task->get_initial_state(), OUT_PATH + path, "s0");
+                daedalus::tester::printer::print_states(*task->get_initial_state(), as, OUT_PATH + path, "s0", true, type, task->get_goal()->get_modal_depth());
+            } else if (semantics == "delphic") {
+                delphic::action_deque as = task_.get_actions(actions);
+                daedalus::tester::printer::print_state(*task_.get_initial_state(), OUT_PATH + path, "W0");
+                daedalus::tester::printer::print_states(task_.get_initial_state(), as, OUT_PATH + path, "W0");
+            }
         }
+    } else {
+        std::string out_file_path = "thesis/time_results/" + task->get_domain_name() + "/";
+
+        if (not std::filesystem::exists(out_file_path))
+            std::filesystem::create_directories(out_file_path);
+
+        std::string out_file_name = "results_" + semantics + "_" + strategy + ".csv";
+        std::ifstream read_out_file = std::ifstream{out_file_path + out_file_name};
+        bool empty_file = read_out_file.peek() == std::ifstream::traits_type::eof();
+        read_out_file.close();
+
+        std::ofstream out_file = std::ofstream{out_file_path + out_file_name, std::ios_base::app};
+
+        if (empty_file) {
+            switch (t) {
+                case search::strategy::unbounded_search:
+                    out_file << "Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Plan length;#Nodes;Time"
+                             << std::endl;
+                    break;
+                case search::strategy::iterative_bounded_search:
+                    out_file << "Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Bound;Plan length;#Nodes;Time"
+                             << std::endl;
+                    break;
+            }
+        }
+
+        if (print_info)
+            daedalus::tester::printer::print_domain_info(*task, out_file);
+
+        if (not print_info) {
+            if (semantics == "kripke") {
+                if (print_results) daedalus::tester::printer::print_time_results(*task, t, out_file);
+                else search::planner::search(*task, t);
+            } else if (semantics == "delphic") {
+                if (print_results) daedalus::tester::printer::print_delphic_time_results(task_, t, out_file);
+                else search::delphic_planner::search(task_, t);
+            }
+        }
+
+        out_file.close();
     }
-
-    if (print_results)
-        daedalus::tester::printer::print_domain_info(*task, out_file);
-
-    if (semantics == "kripke") {
-        if (print_results) daedalus::tester::printer::print_time_results(*task, t, out_file);
-        else search::planner::search(*task, t);
-    } else if (semantics == "delphic") {
-        search::delphic_planning_task task_ = delphic_utils::convert(*task);
-
-        if (print_results) daedalus::tester::printer::print_delphic_time_results(task_, t, out_file);
-        else search::delphic_planner::search(task_, t);
-    }
-
-    out_file.close();
 
     return 0;
 }

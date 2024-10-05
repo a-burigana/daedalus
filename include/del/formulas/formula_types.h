@@ -24,7 +24,7 @@
 #ifndef DAEDALUS_FORMULA_TYPES_H
 #define DAEDALUS_FORMULA_TYPES_H
 
-#include <_types/_uint8_t.h>
+#include <cstdint>
 
 namespace del {
     enum class formula_type : uint8_t {

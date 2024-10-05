@@ -25,7 +25,7 @@
 #ifndef DAEDALUS_EVENTUALITY_TYPES_H
 #define DAEDALUS_EVENTUALITY_TYPES_H
 
-#include <_types/_uint8_t.h>
+#include <cstdint>
 #include <memory>
 #include <unordered_set>
 #include <unordered_map>

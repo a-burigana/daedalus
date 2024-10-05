@@ -57,7 +57,7 @@ namespace search {
         [[nodiscard]] del::formula_ptr get_goal() const;
 
         [[nodiscard]] const delphic::eventuality_spectrum_ptr &get_action(const std::string &name) const;
-        [[nodiscard]] delphic::action_deque get_actions(const std::deque<std::string> &names) const;
+        [[nodiscard]] delphic::action_deque get_actions(const std::vector<std::string> &names) const;
 
     private:
         std::string m_domain_name, m_problem_id;

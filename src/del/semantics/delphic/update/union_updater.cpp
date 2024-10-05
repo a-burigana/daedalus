@@ -235,7 +235,7 @@ void union_updater::update_information_states(const delphic::possibility_spectru
                     agents_is_map[ag][new_w] = old_w->get_information_state(ag);
                 } else {
                     for (const possibility_ptr &old_v: old_w->get_information_state(ag))
-                        if (auto new_v = update_map[old_v]; new_v) {
+                        if (auto new_v = update_map[old_v]; new_v and new_v != old_v) {
                             if (agents_is_map[ag].find(new_w) == agents_is_map[ag].end())
                                 agents_is_map[ag][new_w] = information_state{new_v};
                             else

@@ -45,6 +45,7 @@
 #include "../tests/builder/domains/selective_communication.h"
 #include <memory>
 #include <string>
+#include <filesystem>
 
 #define OUT_PATH std::string{"../tests/out/"}
 
@@ -111,11 +112,11 @@ int main(int argc, char *argv[]) {
             if (semantics == "kripke") {
                 kripke::action_deque as = task->get_actions(actions);
                 daedalus::tester::printer::print_state(*task->get_initial_state(), OUT_PATH + path, "s0");
-                daedalus::tester::printer::print_states(*task->get_initial_state(), as, OUT_PATH + path, "s0", true, type, task->get_goal()->get_modal_depth());
+                daedalus::tester::printer::print_states(*task->get_initial_state(), as, task->get_goal(), OUT_PATH + path, "s0", true, type);
             } else if (semantics == "delphic") {
                 delphic::action_deque as = task_.get_actions(actions);
                 daedalus::tester::printer::print_state(*task_.get_initial_state(), OUT_PATH + path, "W0");
-                daedalus::tester::printer::print_states(task_.get_initial_state(), as, OUT_PATH + path, "W0");
+                daedalus::tester::printer::print_states(task_.get_initial_state(), as, task_.get_goal(), OUT_PATH + path, "W0");
             }
         }
     } else {

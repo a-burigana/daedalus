@@ -60,12 +60,12 @@ namespace daedalus::tester {
 
         static void print_action(const action &a, const std::string &path);
 
-        static void print_states(const state &s, const kripke::action_deque &as, const std::string &path,
-                                 const std::string &name, bool apply_contraction = false,
-                                 bisimulation_type type = bisimulation_type::full, unsigned long k = 0);
+        static void print_states(const state &s, const kripke::action_deque &as, const del::formula_ptr &goal,
+                                 const std::string &path, const std::string &name, bool apply_contraction = false,
+                                 bisimulation_type type = bisimulation_type::full);
 
-        static void print_states(const possibility_spectrum_ptr &W, const delphic::action_deque &as, const std::string &path,
-                                 const std::string &name);
+        static void print_states(const possibility_spectrum_ptr &W, const delphic::action_deque &as,
+                                 const del::formula_ptr &goal, const std::string &path, const std::string &name);
 
         static void print_states(const search::planning_task &task, const kripke::action_deque &as, const std::string &path,
                                  bool apply_contraction = false, bisimulation_type type = bisimulation_type::full,

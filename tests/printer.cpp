@@ -107,28 +107,40 @@ void printer::print_action(const kripke::action &a, const std::string &path) {
     dot_file.close();
 }
 
-void printer::print_states(const kripke::state &s, const kripke::action_deque &as, const std::string &path,
-                           const std::string &name, bool apply_contraction, kripke::bisimulation_type type,
-                           const unsigned long k) {
+void printer::print_states(const kripke::state &s, const kripke::action_deque &as, const del::formula_ptr &goal,
+                           const std::string &path, const std::string &name, bool apply_contraction, kripke::bisimulation_type type) {
+    if (not kripke::updater::is_applicable(s, *as.front())) {
+        std::cout << "Action '" << as.front()->get_name() << "' is not applicable" << std::endl;
+        return;
+    }
+
     kripke::state s_ = kripke::updater::product_update(s, *as.front());
     std::string new_name = name + "_" + as.front()->get_name();
 
     if (apply_contraction)
-        s_ = kripke::bisimulator::contract(type, s_, k).second;
+        s_ = kripke::bisimulator::contract(type, s_, goal->get_modal_depth()).second;
 
     print_state(s_, path, new_name);
     kripke::action_deque as_ = as;
     as_.pop_front();
 
+    if (s_.satisfies(goal))
+        std::cout << "Goal found after applying '" << as.front()->get_name() << "'" << std::endl;
+
     if (as_.empty())
         return;
 
-    print_states(s_, as_, path, new_name, apply_contraction, type, k);
+    print_states(s_, as_, goal, path, new_name, apply_contraction, type);
 }
 
 void
-printer::print_states(const delphic::possibility_spectrum_ptr &W, const delphic::action_deque &as, const std::string &path,
-                      const std::string &name) {
+printer::print_states(const delphic::possibility_spectrum_ptr &W, const delphic::action_deque &as, const del::formula_ptr &goal,
+                      const std::string &path, const std::string &name) {
+    if (not delphic::union_updater::is_applicable(W, as.front())) {
+        std::cout << "Action '" << as.front()->get_name() << "' is not applicable" << std::endl;
+        return;
+    }
+
     auto W_ = delphic::union_updater::update(W, as.front());
     std::string new_name = name + "_" + as.front()->get_name();
 
@@ -136,21 +148,24 @@ printer::print_states(const delphic::possibility_spectrum_ptr &W, const delphic:
     delphic::action_deque as_ = as;
     as_.pop_front();
 
+    if (W_->satisfies(goal))
+        std::cout << "Goal found after applying '" << as.front()->get_name() << "'" << std::endl;
+
     if (as_.empty())
         return;
 
-    print_states(W_, as_, path, new_name);
+    print_states(W_, as_, goal, path, new_name);
 }
 
 void printer::print_states(const search::planning_task &task, const kripke::action_deque &as, const std::string &path,
                            bool apply_contraction, kripke::bisimulation_type type, unsigned long k) {
-    print_states(*task.get_initial_state(), as, path + task.get_domain_name() +  "/" + task.get_problem_id() + "/product_update/",
-                 "s0", apply_contraction, type, k);
+//    print_states(*task.get_initial_state(), as, path + task.get_domain_name() +  "/" + task.get_problem_id() + "/product_update/",
+//                 "s0", apply_contraction, type, k);
 }
 
 void printer::print_states(const search::delphic_planning_task &task, const delphic::action_deque &as,
                            const std::string &path) {
-    print_states(task.get_initial_state(), as, path, "W0");
+//    print_states(task.get_initial_state(), as, path, "W0");
 }
 
 void printer::print_task(const search::planning_task &task, const std::string &path) {

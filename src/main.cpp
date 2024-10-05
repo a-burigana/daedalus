@@ -54,8 +54,6 @@ using namespace clipp;
 #include <iostream>
 
 int main(int argc, char *argv[]) {
-    // todo: DEBUG GOSSIP, GRAPEVINE AND TIGER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
     std::string semantics = "kripke", strategy = "unbounded";
     std::string domain;
     std::vector<std::string> parameters, actions;

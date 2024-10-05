@@ -15,6 +15,12 @@ print_results() {
     timeout 10m $DAEDALUS --domain $DOMAIN --parameters "$1" "$2" --semantics "$3"  --strategy "$4" --print
 }
 
+echo "####################################################################################################"
+echo
+echo "                                         ${DOMAIN}"
+echo
+echo "####################################################################################################"
+
 for (( doors_no = N_MIN_DOORS; doors_no <= N_MAX_DOORS; doors_no++ )); do
     for (( tigers_no = N_MIN_TIGERS; tigers_no < doors_no; tigers_no++ )); do
         count=$((count+1))

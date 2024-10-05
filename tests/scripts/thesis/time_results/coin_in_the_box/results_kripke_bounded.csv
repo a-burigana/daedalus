@@ -1,0 +1,12 @@
+Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Bound;Plan length;#Nodes;Time
+
+coin_in_the_box;cb_1;5;3;2;31;1;2;2;6;0.002000
+coin_in_the_box;cb_2;5;3;2;31;1;2;3;56;0.019000
+coin_in_the_box;cb_3;5;3;2;31;1;2;5;1958;0.469000
+coin_in_the_box;cb_4;5;3;2;31;2;2;6;10497;2.439000
+coin_in_the_box;cb_5;5;3;2;31;2;2;7;58748;13.289000
+coin_in_the_box;cb_1;5;3;2;31;1;2;2;6;0.001000
+coin_in_the_box;cb_2;5;3;2;31;1;2;3;56;0.014000
+coin_in_the_box;cb_3;5;3;2;31;1;2;5;1958;0.568000
+coin_in_the_box;cb_4;5;3;2;31;2;2;6;10497;2.652000
+coin_in_the_box;cb_5;5;3;2;31;2;2;7;58748;14.237000

@@ -1,0 +1,4 @@
+Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Plan length;#Nodes;Time
+
+coin_in_the_box;cb_4;5;3;2;31;2;6;10617;0.638000
+coin_in_the_box;cb_5;5;3;2;31;2;7;60013;3.492000

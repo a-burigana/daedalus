@@ -1,0 +1,18 @@
+Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Bound;Plan length;#Nodes;Time
+
+collaboration_through_communication;2_3_2_g1;18;2;4;28;2;2;4;244;0.112000
+collaboration_through_communication;2_3_2_g2;18;2;4;28;1;1;4;146;0.031000
+collaboration_through_communication;2_3_2_g3;18;2;4;28;1;1;2;5;0.001000
+collaboration_through_communication;2_3_2_g4;18;2;4;28;1;1;3;26;0.006000
+collaboration_through_communication;2_4_3_g1;32;2;27;58;2;2;4;434;8.037000
+collaboration_through_communication;2_4_3_g2;32;2;27;58;1;1;4;235;0.243000
+collaboration_through_communication;2_4_3_g3;32;2;27;58;1;1;2;5;0.013000
+collaboration_through_communication;2_4_3_g4;32;2;27;58;1;1;6;27758;22.550000
+collaboration_through_communication;2_5_4_g1;50;2;256;100;2;
+collaboration_through_communication;2_5_4_g2;50;2;256;100;1;1;4;312;6.104000
+collaboration_through_communication;2_5_4_g3;50;2;256;100;1;1;2;5;2.337000
+collaboration_through_communication;2_5_4_g4;50;2;256;100;1;
+collaboration_through_communication;3_4_3_g1;48;3;27;195;2;2;4;954;32.958000
+collaboration_through_communication;3_4_3_g2;48;3;27;195;1;1;6;60418;83.900000
+collaboration_through_communication;3_4_3_g3;48;3;27;195;1;1;4;580;0.867000
+collaboration_through_communication;3_4_3_g4;48;3;27;195;1;1;6;137966;188.535000

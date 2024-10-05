@@ -1,0 +1,7 @@
+Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Plan length;#Nodes;Time
+
+consecutive_numbers;5;12;2;5;12;2;3;547;0.261000
+consecutive_numbers;6;14;2;6;14;2;4;7706;4.477000
+consecutive_numbers;7;16;2;7;16;2;5;221322;149.439000
+consecutive_numbers;5;12;2;5;12;2;3;547;0.288000
+consecutive_numbers;6;14;2;6;14;2;4;7706;4.682000

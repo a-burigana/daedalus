@@ -17,6 +17,12 @@ print_results() {
     timeout 10m $DAEDALUS --domain $DOMAIN --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --print
 }
 
+echo "####################################################################################################"
+echo
+echo "                                         ${DOMAIN}"
+echo
+echo "####################################################################################################"
+
 for (( agents_no = N_MIN_AGS; agents_no <= N_MAX_AGS; agents_no++ )); do
     for (( rooms_no = agents_no+1; rooms_no <= N_MAX_ROOMS; rooms_no++ )); do
         for (( goal_id = MIN_GOAL_ID; goal_id <= MAX_GOAL_ID; goal_id++ )); do

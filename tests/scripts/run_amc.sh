@@ -15,6 +15,12 @@ print_results() {
     timeout 10m $DAEDALUS --domain $DOMAIN --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --print
 }
 
+echo "####################################################################################################"
+echo
+echo "                                         ${DOMAIN}"
+echo
+echo "####################################################################################################"
+
 for (( children_no = N_MIN_CHILDREN; children_no <= N_MAX_CHILDREN; children_no++ )); do
     for (( muddy_no = N_MIN_MUDDY; muddy_no <= children_no; muddy_no++ )); do
         for (( is_muddy_0 = 0; is_muddy_0 <= 1; is_muddy_0++ )); do

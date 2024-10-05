@@ -14,6 +14,12 @@ print_results() {
     timeout 10m $DAEDALUS --domain $DOMAIN --parameters "$1" --semantics "$2"  --strategy "$3" --print
 }
 
+echo "####################################################################################################"
+echo
+echo "                                         ${DOMAIN}"
+echo
+echo "####################################################################################################"
+
 for (( n = MIN_N; n <= MAX_N; n++ )); do
     count=$((count+1))
     echo $'\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ' "${count}/${N_INSTANCES}" $'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n\n'

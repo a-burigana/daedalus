@@ -24,6 +24,7 @@
 #include "search_tester.h"
 #include <iostream>
 #include <string>
+#include <filesystem>
 #include "../include/del/language/language.h"
 #include "../include/del/semantics/kripke/states/state.h"
 #include "../include/del/semantics/kripke/update/updater.h"

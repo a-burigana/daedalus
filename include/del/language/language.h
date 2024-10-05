@@ -25,6 +25,7 @@
 #define DAEDALUS_LANGUAGE_H
 
 #include "language_types.h"
+#include <memory>
 
 namespace del {
     class language;

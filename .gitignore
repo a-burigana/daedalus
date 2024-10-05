@@ -1,6 +1,5 @@
 .idea/
 cmake-build-debug/
-sanitizers-cmake/
 tests/
 
 # Prerequisites

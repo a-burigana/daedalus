@@ -26,6 +26,7 @@
 
 
 #include "../formula.h"
+#include <algorithm>
 
 namespace del {
     class and_formula : public formula {

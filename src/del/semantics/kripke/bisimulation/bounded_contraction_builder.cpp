@@ -35,7 +35,7 @@ std::pair<bool, state> bounded_contraction_builder::calculate_rooted_contraction
     auto worlds_max_reprs = calculate_max_representatives(s, k, worlds_blocks);
 
     // We now create the set 'max_reprs_set' of maximal representatives out of the vector 'worlds_max_reprs'.
-    auto max_reprs_set = std::set<const world_id>{worlds_max_reprs.begin(), worlds_max_reprs.end()};
+    auto max_reprs_set = std::unordered_set<world_id>{worlds_max_reprs.begin(), worlds_max_reprs.end()};
     world_id bounded_worlds_number = max_reprs_set.size();
 
     std::vector<world_id> contracted_worlds_map = std::vector<world_id>(s.get_worlds_number());
@@ -89,7 +89,7 @@ std::pair<bool, state> bounded_contraction_builder::calculate_canonical_contract
     const auto &[worlds_signatures, worlds_max_signs, sign_map, worlds_max_reprs] = calculate_max_signatures(s, k, signatures_storage);
 
     // We now create the set 'max_signs_set' of maximal representative signatures out of the vector 'worlds_max_signs'.
-    auto max_signs_set = std::set<const signature_ptr>{worlds_max_signs.begin(), worlds_max_signs.end()};
+    auto max_signs_set = std::unordered_set<signature_ptr>{worlds_max_signs.begin(), worlds_max_signs.end()};
     world_id bounded_worlds_number = max_signs_set.size();
 
     std::vector<world_id> contracted_worlds_map = std::vector<world_id>(s.get_worlds_number());

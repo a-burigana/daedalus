@@ -66,12 +66,12 @@ eventuality_spectrum delphic_utils::convert(const kripke::action &a) {
     dynamic_information_state designated;
 
     for (event_id e = 0; e < a.get_events_number(); ++e) {
-        postconditions post;
+        delphic::postconditions post;
 
         if (a.is_ontic(e))
-            post = postconditions(a.get_postconditions(e));
+            post = a.get_postconditions(e);
 
-        eventualities[e] = std::make_shared<eventuality>(a.get_precondition(e), post, agents_dynamic_information_state(a.get_language()->get_agents_number()));
+        eventualities[e] = std::make_shared<eventuality>(a.get_precondition(e), std::move(post), agents_dynamic_information_state(a.get_language()->get_agents_number()));
         information_states[e] = std::vector<dynamic_information_state>(a.get_language()->get_agents_number());
 
         if (a.is_designated(e))

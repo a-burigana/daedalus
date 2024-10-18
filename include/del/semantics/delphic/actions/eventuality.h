@@ -34,7 +34,7 @@
 namespace delphic {
     class eventuality {
     public:
-        eventuality(del::formula_ptr pre, postconditions &post, agents_dynamic_information_state state);
+        eventuality(del::formula_ptr pre, postconditions post, agents_dynamic_information_state state);
 
         eventuality(const eventuality&) = default;
         eventuality& operator=(const eventuality&) = default;

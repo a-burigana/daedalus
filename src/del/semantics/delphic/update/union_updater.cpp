@@ -194,16 +194,13 @@ void union_updater::update_possibilities(const delphic::possibility_spectrum_ptr
     while (not to_visit.empty()) {
         auto first = to_visit.begin();
         const possibility_ptr &current = *first;
-        possibility_ptr updated = nullptr;
 
         if (current->satisfies(e->get_pre()) != negated) {
             agents_information_state is = agents_information_state(W->get_language()->get_agents_number());
             kripke::label l = e->is_ontic() ? update_label(current, e) : kripke::label{current->get_label()};
-            updated = std::make_shared<possibility>(W->get_language(), std::move(l), std::move(is));
+//            possibility_ptr updated = std::make_shared<possibility>(W->get_language(), std::move(l), std::move(is));
+            update_map[current] = std::make_shared<possibility>(W->get_language(), std::move(l), std::move(is));
         }
-
-        if (updated)
-            update_map[current] = updated;
 
         visited.emplace(current);
 
@@ -236,7 +233,7 @@ void union_updater::update_information_states(const delphic::possibility_spectru
                     for (const possibility_ptr &old_v: old_w->get_information_state(ag)) {
                         auto new_v = update_map.find(old_v);
 
-                        if (new_v != update_map.end()) {
+                        if (new_v != update_map.end() and new_v->second != old_v) {
 //                        if (auto new_v = update_map[old_v]; new_v and new_v != old_v) {
                             if (agents_is_map[ag].find(new_w) == agents_is_map[ag].end())
                                 agents_is_map[ag][new_w] = information_state{new_v->second};

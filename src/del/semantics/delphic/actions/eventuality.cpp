@@ -27,7 +27,7 @@
 
 using namespace delphic;
 
-eventuality::eventuality(del::formula_ptr pre, postconditions &post, agents_dynamic_information_state state) :
+eventuality::eventuality(del::formula_ptr pre, postconditions post, agents_dynamic_information_state state) :
     m_pre{std::move(pre)},
     m_post{std::move(post)},
     m_information_state{std::move(state)} {

@@ -46,34 +46,71 @@
 #include <memory>
 #include <string>
 #include <filesystem>
+#include <iostream>
 
 #define OUT_PATH std::string{"../tests/out/"}
 
 using namespace daedalus::tester;
 using namespace clipp;
 
-#include <iostream>
+void storage_test();
+void run(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
+//    run(argc, argv);
+    storage_test();
+
+    return 0;
+}
+
+void storage_test() {
+    storage<int> int_storage;
+    int x = 5, y = 5;
+
+    auto x_id = int_storage.emplace(std::move(x));
+    auto y_id = int_storage.emplace(std::move(y));
+
+    assert(x_id == y_id);
+
+//    state s1 = state_builder::build_test_state1();
+//    unsigned long k = 3;
+//    storage<delphic::possibility> storage;
+//    auto worlds_signatures = signature_matrix(1);
+//
+//    for (auto &h_signatures: worlds_signatures)
+//        h_signatures = signature_vector(s1.get_worlds_number());
+//
+//    bounded_identification::calculate_world_signature(s1, 3, 3, 0, storage, worlds_signatures);
+//    bounded_identification::calculate_world_signature(s1, 3, 5, 0, storage, worlds_signatures);
+//
+//    signature_ptr sign_w3_0 = worlds_signatures[0][3];
+//    signature_ptr sign_w5_0 = worlds_signatures[0][5];
+//
+//    assert(sign_w3_0->get_label() == sign_w5_0->get_label());
+//    assert(sign_w3_0->get_information_state(0) == sign_w5_0->get_information_state(0));
+//    assert(*sign_w3_0 == *sign_w5_0);
+}
+
+void run(int argc, char *argv[]) {
     std::string semantics = "kripke", strategy = "unbounded";
     std::string domain;
     std::vector<std::string> parameters, actions;
     bool print_results = false, print_info = false, debug = false;
 
     auto cli = (
-        required("-d", "--domain") & value("domain", domain),
-        required("-p", "--parameters") & values("parameters", parameters),
-        option("-s", "--semantics") & value("semantics", semantics).doc("Selects the preferred DEL semantics ('kripke' or 'delphic')"),
-        option("-t", "--strategy" ) & value("strategy", strategy).doc("Selects the search strategy ('unbounded' or 'bounded')"),
-        option("-a", "--actions" ) & values("actions", actions).doc("Actions to execute"),
-        option("--print").set(print_results).doc("Print time results"),
-        option("--info").set(print_info),
-        option("--debug").set(debug)
+            required("-d", "--domain") & value("domain", domain),
+            required("-p", "--parameters") & values("parameters", parameters),
+            option("-s", "--semantics") & value("semantics", semantics).doc("Selects the preferred DEL semantics ('kripke' or 'delphic')"),
+            option("-t", "--strategy" ) & value("strategy", strategy).doc("Selects the search strategy ('unbounded' or 'bounded')"),
+            option("-a", "--actions" ) & values("actions", actions).doc("Actions to execute"),
+            option("--print").set(print_results).doc("Print time results"),
+            option("--info").set(print_info),
+            option("--debug").set(debug)
     );
 
     if (not parse(argc, argv, cli)) {
         std::cout << make_man_page(cli, argv[0]);
-        return 0;
+        return;
     }
 
     search::planning_task_ptr task;
@@ -160,33 +197,4 @@ int main(int argc, char *argv[]) {
 
         out_file.close();
     }
-
-    return 0;
 }
-
-/*
-void storage_test() {
-    storage<int> int_storage;
-    int x = 5, y = 5;
-
-    int_storage.emplace(std::move(x));
-    int_storage.emplace(std::move(y));
-
-    state s1 = state_builder::build_test_state1();
-    unsigned long k = 3;
-    storage<delphic::possibility> storage;
-    auto worlds_signatures = signature_matrix(1);
-
-    for (auto &h_signatures: worlds_signatures)
-        h_signatures = signature_vector(s1.get_worlds_number());
-
-    bounded_identification::calculate_world_signature(s1, 3, 3, 0, storage, worlds_signatures);
-    bounded_identification::calculate_world_signature(s1, 3, 5, 0, storage, worlds_signatures);
-
-    signature_ptr sign_w3_0 = worlds_signatures[0][3];
-    signature_ptr sign_w5_0 = worlds_signatures[0][5];
-
-    assert(sign_w3_0->get_label() == sign_w5_0->get_label());
-    assert(sign_w3_0->get_information_state(0) == sign_w5_0->get_information_state(0));
-    assert(*sign_w3_0 == *sign_w5_0);
-}*/

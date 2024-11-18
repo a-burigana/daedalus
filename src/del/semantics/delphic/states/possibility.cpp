@@ -23,6 +23,7 @@
 
 #include "../../../../../include/del/semantics/delphic/states/possibility.h"
 #include "../../../../../include/del/semantics/delphic/model_checker.h"
+#include "../../../../utils/storage.cpp"
 
 using namespace delphic;
 
@@ -47,11 +48,12 @@ unsigned long possibility::get_bound() const {
 }
 
 const information_state &possibility::get_information_state(del::agent ag) const {
-    return m_information_state[ag];
+    return *m_information_states->get(m_information_state[ag]);
 }
 
 void possibility::set_information_state(del::agent ag, delphic::information_state &is) {
-    m_information_state[ag] = std::move(is);
+    // TODO: UNCOMMENT AND FIX
+//    m_information_state[ag] = std::move(is);
 }
 
 bool possibility::satisfies(const del::formula_ptr f) {

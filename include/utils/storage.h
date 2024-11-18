@@ -25,11 +25,13 @@
 #define DAEDALUS_STORAGE_H
 
 #include <memory>
-#include <unordered_set>
+#include <unordered_map>
+#include <deque>
 
 template<typename Elem>
 class storage {
-    using elem_ptr = std::shared_ptr<Elem>;
+    using Elem_ptr = std::shared_ptr<Elem>;
+    using Elem_id = unsigned long;
 
 public:
     storage() = default;
@@ -42,10 +44,12 @@ public:
 
     ~storage() = default;
 
-    elem_ptr emplace(Elem &&elem);
+    Elem_id emplace(Elem &&elem);
+    Elem_ptr get(Elem_id id) const;
 
 private:
-    std::unordered_set<elem_ptr> m_storage;
+    std::unordered_map<Elem, Elem_id> m_elements_ids;
+    std::deque<Elem_ptr> m_elements;
 };
 
 #endif //DAEDALUS_STORAGE_H

@@ -22,9 +22,18 @@
 // SOFTWARE.
 
 #include "../../include/utils/storage.h"
-#include <memory>
 
 template<typename Elem>
-typename storage<Elem>::elem_ptr storage<Elem>::emplace(Elem &&elem) {
-    return *m_storage.emplace(std::make_shared<Elem>(std::move(elem))).first;
+typename storage<Elem>::Elem_id storage<Elem>::emplace(Elem &&elem) {
+    if (m_elements_ids.find(elem) != m_elements_ids.end())          // If the element is already stored, then we simply
+        return m_elements_ids.at(elem);                             // return its id
+
+    const auto &[it, _] = m_elements_ids.emplace(std::move(elem), m_elements_ids.size());
+    m_elements.emplace_back(std::make_shared<Elem>(it->first));     // Otherwise, we assign the new element a fresh id,
+    return m_elements_ids.size() - 1;                               // we add it to the deque to ensure constant time
+}                                                                   // retrieval from id and we return its id
+
+template<typename Elem>
+typename storage<Elem>::Elem_ptr storage<Elem>::get(Elem_id id) const {
+    return m_elements[id];
 }

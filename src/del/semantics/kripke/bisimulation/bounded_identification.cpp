@@ -51,12 +51,13 @@ void bounded_identification::calculate_world_signature(const state &s, const uns
             for (const world_id y : s.get_agent_possible_worlds(ag, x)) {
                 if (not worlds_signatures[h-1][y])              // We check that we did not already calculate y's (h-1)-signature
                     calculate_world_signature(s, k, y, h-1, signatures_storage, worlds_signatures, sign_map);
-
-                xs[ag].emplace(worlds_signatures[h-1][y]);      // xs[ag] is the set of (h-1)-signatures of the worlds y such that x R_ag y
+                // TODO: UNCOMMENT AND FIX
+//                xs[ag].emplace(worlds_signatures[h-1][y]);      // xs[ag] is the set of (h-1)-signatures of the worlds y such that x R_ag y
             }
 
     auto sign_x_h = signature{s.get_language(), s.get_label(x), std::move(xs), h, x};  // We create the h-signature of x (h being x's bound),
-    worlds_signatures[h][x] = signatures_storage.emplace(std::move(sign_x_h));                                  // we add it to the storage, and we put it into worlds_signatures[h][x]
+    // TODO: UNCOMMENT AND FIX
+//    worlds_signatures[h][x] = signatures_storage.emplace(std::move(sign_x_h));                                  // we add it to the storage, and we put it into worlds_signatures[h][x]
 
     if (auto worlds_it = sign_map.find(worlds_signatures[h][x]); worlds_it == sign_map.end()) {
         sign_map[worlds_signatures[h][x]] = {std::make_unique<world_set>(world_set{s.get_worlds_number()}), x};
@@ -78,10 +79,11 @@ void bounded_identification::calculate_world_signature(const state &s, const uns
             for (const world_id y : s.get_agent_possible_worlds(ag, x)) {
                 if (not worlds_signatures[h-1][y])              // We check that we did not already calculate y's (h-1)-signature
                     calculate_world_signature(s, k, y, h-1, signatures_storage, worlds_signatures);
-
-                xs[ag].emplace(worlds_signatures[h-1][y]);      // xs[ag] is the set of (h-1)-signatures of the worlds y such that x R_ag y
+                // TODO: UNCOMMENT AND FIX
+//                xs[ag].emplace(worlds_signatures[h-1][y]);      // xs[ag] is the set of (h-1)-signatures of the worlds y such that x R_ag y
             }
 
     auto sign_x_h = signature{s.get_language(), s.get_label(x), std::move(xs), h};     // We create the h-signature of x (h being x's bound),
-    worlds_signatures[h][x] = signatures_storage.emplace(std::move(sign_x_h));                                  // we add it to the storage, and we put it into worlds_signatures[h][x]
+    // TODO: UNCOMMENT AND FIX
+//    worlds_signatures[h][x] = signatures_storage.emplace(std::move(sign_x_h));                                  // we add it to the storage, and we put it into worlds_signatures[h][x]
 }

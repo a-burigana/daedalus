@@ -32,8 +32,6 @@
 #include "../../kripke/states/label.h"
 #include "../../../formulas/formula.h"
 #include "../../../language/language.h"
-#include "../../../../utils/storage.h"
-//#include "../../../../../src/utils/storage.cpp"
 
 namespace delphic {
 
@@ -70,8 +68,8 @@ namespace delphic {
 
     private:
         del::language_ptr m_language;
-        std::shared_ptr<storage<possibility>> m_possibilities;
-        std::shared_ptr<storage<information_state>> m_information_states;
+        possibility_storage_ptr m_possibilities;
+        information_state_storage_ptr m_information_states;
 
         kripke::label m_label;      // todo: move label outside kripke
         agents_information_state m_information_state;

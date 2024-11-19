@@ -56,14 +56,35 @@ void possibility::set_information_state(del::agent ag, delphic::information_stat
 //    m_information_state[ag] = std::move(is);
 }
 
-bool possibility::satisfies(const del::formula_ptr f) {
+bool possibility::satisfies(const del::formula_ptr &f) const {
     return model_checker::holds_in(*this, *f);
+}
+
+bool possibility::operator<(const possibility &rhs) const {
+    if (m_bound != rhs.m_bound) return m_bound < rhs.m_bound;
+    if (m_label != rhs.m_label) return m_label < rhs.m_label;
+    return m_information_state < rhs.m_information_state;
+}
+
+bool possibility::operator>(const possibility &rhs) const {
+    if (m_bound != rhs.m_bound) return m_bound > rhs.m_bound;
+    if (m_label != rhs.m_label) return m_label > rhs.m_label;
+    return m_information_state > rhs.m_information_state;
+}
+
+bool possibility::operator<=(const possibility &rhs) const {
+    return *this < rhs or *this == rhs;
+}
+
+bool possibility::operator>=(const possibility &rhs) const {
+    return *this > rhs or *this == rhs;
 }
 
 bool possibility::operator==(const possibility &rhs) const {
     return m_bound == rhs.m_bound and
-           m_label == rhs.m_label and
-           m_information_state == rhs.m_information_state;
+           (m_bound == 0 ?
+            m_label == rhs.m_label :
+            m_label == rhs.m_label and m_information_state == rhs.m_information_state);
 }
 
 bool possibility::operator!=(const possibility &rhs) const {

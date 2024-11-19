@@ -59,7 +59,7 @@ namespace delphic {
 
         void set_information_state(del::agent ag, information_state &is);
 
-        bool satisfies(del::formula_ptr f);
+        bool satisfies(const del::formula_ptr &f) const;
 
         bool operator< (const possibility &rhs) const;
         bool operator> (const possibility &rhs) const;

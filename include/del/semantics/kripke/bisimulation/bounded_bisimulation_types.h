@@ -31,6 +31,7 @@
 #include <set>
 #include <unordered_map>
 #include "../../../../utils/bit_deque.h"
+#include "../../../../utils/storage.h"
 #include "../states/states_types.h"
 #include "../../delphic/states/possibility.h"
 
@@ -55,11 +56,15 @@ namespace kripke {
     // CANONICAL BOUNDED CONTRACTIONS
     using signature = delphic::possibility;
     using signature_ptr = std::shared_ptr<signature>;
-    using signature_vector = std::vector<signature_ptr>;
+    using signature_id = delphic::possibility_id;
+    using signature_vector = std::vector<signature_id>;
     using signature_matrix = std::vector<signature_vector>;
-    using signature_map = std::unordered_map<signature_ptr, std::pair<std::unique_ptr<world_set>, world_id>>;
+    using signature_map = std::unordered_map<signature_id, std::pair<std::unique_ptr<world_set>, world_id>>;
     using information_state = delphic::information_state;
     using agents_information_state = delphic::agents_information_state;
+
+    using signature_storage_ptr = std::shared_ptr<storage<signature>>;
+    using information_state_storage_ptr = delphic::information_state_storage_ptr;
 
 //    struct bi_structures {
 //        signature_matrix worlds_signatures;

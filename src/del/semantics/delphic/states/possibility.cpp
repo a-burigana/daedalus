@@ -27,9 +27,11 @@
 
 using namespace delphic;
 
-possibility::possibility(del::language_ptr language, kripke::label label, agents_information_state state,
-                         unsigned long bound, std::optional<unsigned long> world) :
+possibility::possibility(del::language_ptr language, possibility_storage_ptr p_storage, information_state_storage_ptr is_storage,
+                         kripke::label label, agents_information_state state, unsigned long bound, std::optional<unsigned long> world) :
     m_language{std::move(language)},
+    m_p_storage{std::move(p_storage)},
+    m_is_storage{std::move(is_storage)},
     m_label{std::move(label)},
     m_information_state{std::move(state)},
     m_bound{bound},
@@ -37,6 +39,18 @@ possibility::possibility(del::language_ptr language, kripke::label label, agents
 
 del::language_ptr possibility::get_language() const {
     return m_language;
+}
+
+//possibility_storage_ptr possibility::get_possibility_storage() const {
+//    return m_p_storage;
+//}
+//
+//information_state_storage_ptr possibility::get_information_state_storage() const {
+//    return m_is_storage;
+//}
+
+possibility_ptr possibility::get(delphic::possibility_id w) const {
+    return m_p_storage->get(w);
 }
 
 const kripke::label &possibility::get_label() const {
@@ -48,12 +62,15 @@ unsigned long possibility::get_bound() const {
 }
 
 const information_state &possibility::get_information_state(del::agent ag) const {
-    return *m_information_states->get(m_information_state[ag]);
+    return *m_is_storage->get(m_information_state[ag]);
 }
 
-void possibility::set_information_state(del::agent ag, delphic::information_state &is) {
-    // TODO: UNCOMMENT AND FIX
-//    m_information_state[ag] = std::move(is);
+const information_state_id possibility::get_information_state_id(del::agent ag) const {
+    return m_information_state[ag];
+}
+
+void possibility::set_information_state(del::agent ag, delphic::information_state_id &is) {
+    m_information_state[ag] = is;
 }
 
 bool possibility::satisfies(const del::formula_ptr &f) const {

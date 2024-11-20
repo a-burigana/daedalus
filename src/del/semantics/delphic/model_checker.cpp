@@ -74,11 +74,11 @@ bool model_checker::holds_in(const possibility &w, const del::imply_formula &f) 
 bool model_checker::holds_in(const possibility &w, const del::box_formula &f) {
     const auto &w_ag = w.get_information_state(f.get_ag());
     return std::all_of(w_ag.begin(), w_ag.end(),
-        [&](const possibility_ptr &v) { return model_checker::holds_in(*v, *f.get_f()); });
+        [&](const possibility_id &v) { return model_checker::holds_in(*w.get(v), *f.get_f()); });
 }
 
 bool model_checker::holds_in(const possibility &w, const del::diamond_formula &f) {
     const auto &w_ag = w.get_information_state(f.get_ag());
     return std::any_of(w_ag.begin(), w_ag.end(),
-        [&](const possibility_ptr &v) { return model_checker::holds_in(*v, *f.get_f()); });
+        [&](const possibility_id &v) { return model_checker::holds_in(*w.get(v), *f.get_f()); });
 }

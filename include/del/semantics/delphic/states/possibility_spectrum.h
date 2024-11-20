@@ -31,7 +31,8 @@
 namespace delphic {
     class possibility_spectrum {
     public:
-        possibility_spectrum(del::language_ptr language, information_state designated_possibilities); // , unsigned long possibilities_number);
+        possibility_spectrum(del::language_ptr language, possibility_storage_ptr p_storage,
+                             information_state_storage_ptr is_storage, information_state_id designated_possibilities); // , unsigned long possibilities_number);
 
         possibility_spectrum(const possibility_spectrum&) = delete;
         possibility_spectrum& operator=(const possibility_spectrum&) = delete;
@@ -44,8 +45,15 @@ namespace delphic {
         [[nodiscard]] const information_state &get_designated_possibilities() const;
 
         [[nodiscard]] del::language_ptr get_language() const;
+        [[nodiscard]] possibility_storage_ptr get_possibility_storage() const;
+        [[nodiscard]] information_state_storage_ptr get_information_state_storage() const;
 //        [[nodiscard]] unsigned long get_possibilities_number() const;
-        [[nodiscard]] bool is_designated(const possibility_ptr &w) const;
+
+        [[nodiscard]] possibility_ptr get(possibility_id w) const;
+        [[nodiscard]] possibility_id emplace_possibility(possibility &&w);
+        [[nodiscard]] information_state_id emplace_information_state(information_state &&is);
+
+        [[nodiscard]] bool is_designated(possibility_id w) const;
         [[nodiscard]] unsigned long long get_max_depth() const;
         [[nodiscard]] bool satisfies(const del::formula_ptr &f) const;
 
@@ -53,6 +61,8 @@ namespace delphic {
 
     private:
         del::language_ptr m_language;
+        possibility_storage_ptr m_p_storage;
+        information_state_storage_ptr m_is_storage;
         information_state m_designated_possibilities;
 //        unsigned long m_possibilities_number;
         unsigned long long m_max_depth;

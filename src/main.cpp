@@ -72,9 +72,12 @@ void storage_test() {
 
     assert(x_id == y_id);
 
-//    state s1 = state_builder::build_test_state1();
-//    unsigned long k = 3;
-//    storage<delphic::possibility> storage;
+    state s1 = state_builder::build_test_state1();
+    unsigned long k = 3;
+    possibility_storage_ptr p_storage;
+    information_state_storage_ptr is_storage;
+
+
 //    auto worlds_signatures = signature_matrix(1);
 //
 //    for (auto &h_signatures: worlds_signatures)

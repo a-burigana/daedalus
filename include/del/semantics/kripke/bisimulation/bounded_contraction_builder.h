@@ -35,7 +35,7 @@ namespace kripke {
     class bounded_contraction_builder {
     public:
         static std::pair<bool, state> calculate_rooted_contraction(const state &s, unsigned long k);
-        static std::pair<bool, state> calculate_canonical_contraction(const state &s, unsigned long k, storage<signature> &signatures_storage);
+        static std::pair<bool, state> calculate_canonical_contraction(const state &s, unsigned long k, const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage);
 
     private:
 
@@ -43,7 +43,7 @@ namespace kripke {
                                                                    const block_matrix &worlds_blocks);
 
         static std::tuple<signature_matrix, signature_vector, signature_map, std::vector<world_id>>
-            calculate_max_signatures(const state &s, unsigned long k, storage<signature> &signatures_storage);
+            calculate_max_signatures(const state &s, unsigned long k, const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage);
 
         static world_id get_block_max_representative(const state &s, const block_ptr &block);
 

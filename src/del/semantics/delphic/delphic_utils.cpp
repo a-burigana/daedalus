@@ -34,12 +34,13 @@ using namespace delphic;
 using namespace kripke;
 
 possibility_spectrum delphic::delphic_utils::convert(const state &s) {
-    std::vector<possibility_ptr> possibilities(s.get_worlds_number());
+    std::vector<possibility_id> possibilities(s.get_worlds_number());
     std::vector<std::vector<information_state>> information_states(s.get_worlds_number());
     information_state designated;
 
     for (world_id w = 0; w < s.get_worlds_number(); ++w) {
-        possibilities[w] = std::make_shared<possibility>(s.get_language(), s.get_label(w), agents_information_state(s.get_language()->get_agents_number()));
+        // TODO: UNCOMMENT AND FIX
+//        possibilities[w] = std::make_shared<possibility>(s.get_language(), s.get_label(w), agents_information_state(s.get_language()->get_agents_number()));
         information_states[w] = std::vector<information_state>(s.get_language()->get_agents_number());
 
         if (s.is_designated(w))
@@ -53,11 +54,13 @@ possibility_spectrum delphic::delphic_utils::convert(const state &s) {
             for (const world_id v : s.get_agent_possible_worlds(ag, w))
                 information_states[w][ag].emplace(possibilities[v]);
 
-    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
-        for (world_id w = 0; w < s.get_worlds_number(); ++w)
-            possibilities[w]->set_information_state(ag, information_states[w][ag]);
+    // TODO: UNCOMMENT AND FIX
+//    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
+//        for (world_id w = 0; w < s.get_worlds_number(); ++w)
+//            possibilities[w]->set_information_state(ag, information_states[w][ag]);
 
-    return possibility_spectrum{s.get_language(), std::move(designated)};       // , s.get_worlds_number()
+    // TODO: FIX
+    return possibility_spectrum{s.get_language(), nullptr, nullptr, 0};       // , s.get_worlds_number()
 }
 
 eventuality_spectrum delphic_utils::convert(const kripke::action &a) {
@@ -93,9 +96,9 @@ eventuality_spectrum delphic_utils::convert(const kripke::action &a) {
 }
 
 kripke::state delphic_utils::convert(const delphic::possibility_spectrum &W) {
-    std::unordered_map<possibility_ptr, kripke::world_id> world_map;
-    std::unordered_set<possibility_ptr> to_visit;
-    std::unordered_set<possibility_ptr> visited;
+    std::unordered_map<possibility_id, kripke::world_id> world_map;
+    std::unordered_set<possibility_id> to_visit;
+    std::unordered_set<possibility_id> visited;
     kripke::world_id worlds_number = 0;
 
     for (const auto &w : W.get_designated_possibilities())
@@ -103,10 +106,11 @@ kripke::state delphic_utils::convert(const delphic::possibility_spectrum &W) {
 
     while (not to_visit.empty()) {
         auto first = to_visit.begin();
-        const possibility_ptr &current = *first;
+        const possibility_id current_id = *first;
+        const possibility_ptr &current = W.get(current_id);
 
-        world_map[current] = worlds_number++;
-        visited.emplace(current);
+        world_map[current_id] = worlds_number++;
+        visited.emplace(current_id);
 
         for (del::agent ag = 0; ag < W.get_language()->get_agents_number(); ++ag)
             for (auto &w : current->get_information_state(ag))
@@ -125,14 +129,14 @@ kripke::state delphic_utils::convert(const delphic::possibility_spectrum &W) {
             r[ag][w] = kripke::world_set(worlds_number);
 
         for (const auto &[w, w_id] : world_map)
-            for (auto &v : w->get_information_state(ag))
+            for (auto &v : W.get(w)->get_information_state(ag))
                 r[ag][w_id].push_back(world_map[v]);
     }
 
     kripke::label_vector ls(worlds_number);
 
     for (const auto &[w, w_id] : world_map)
-        ls[w_id] = w->get_label();
+        ls[w_id] = W.get(w)->get_label();
 
     kripke::world_set designated_worlds(worlds_number);
 

@@ -84,12 +84,14 @@ std::pair<bool, state> bounded_contraction_builder::calculate_rooted_contraction
     return {is_bisim, state{s.get_language(), bounded_worlds_number, std::move(quotient_r), std::move(quotient_v), std::move(designated_worlds)}};
 }
 
-std::pair<bool, state> bounded_contraction_builder::calculate_canonical_contraction(const state &s, unsigned long k, storage<signature> &signatures_storage) {
+std::pair<bool, state>
+bounded_contraction_builder::calculate_canonical_contraction(const state &s, unsigned long k, const signature_storage_ptr &s_storage,
+                                                             const information_state_storage_ptr &is_storage) {
     // We first calculate the maximal representative signatures: worlds_max_reprs[x] is the maximal representative of x
-    const auto &[worlds_signatures, worlds_max_signs, sign_map, worlds_max_reprs] = calculate_max_signatures(s, k, signatures_storage);
+    const auto &[worlds_signatures, worlds_max_signs, sign_map, worlds_max_reprs] = calculate_max_signatures(s, k, s_storage, is_storage);
 
     // We now create the set 'max_signs_set' of maximal representative signatures out of the vector 'worlds_max_signs'.
-    auto max_signs_set = std::unordered_set<signature_ptr>{worlds_max_signs.begin(), worlds_max_signs.end()};
+    auto max_signs_set = std::unordered_set<signature_id>{worlds_max_signs.begin(), worlds_max_signs.end()};
     world_id bounded_worlds_number = max_signs_set.size();
 
     std::vector<world_id> contracted_worlds_map = std::vector<world_id>(s.get_worlds_number());
@@ -100,7 +102,7 @@ std::pair<bool, state> bounded_contraction_builder::calculate_canonical_contract
 
     world_id count = 0;
 
-    for (const signature_ptr &sign : max_signs_set) {
+    for (const signature_id &sign : max_signs_set) {
         const world_id x = sign_map.at(sign).second;        // We keep track in max_reprs_bitset of all maximal representatives x
         max_reprs_bitset[x].flip();                         // of our model (namely, all worlds x s.t. max_reprs_bitset[x] = 1)
         contracted_worlds_map[x] = count;
@@ -114,7 +116,7 @@ std::pair<bool, state> bounded_contraction_builder::calculate_canonical_contract
             quotient_r[ag][w] = world_set(bounded_worlds_number);
     }
 
-    for (const signature_ptr &sign : max_signs_set) {
+    for (const signature_id &sign : max_signs_set) {
         const auto &[worlds_blocks, x] = sign_map.at(sign);
 //        const world_id x = .second;
 
@@ -124,7 +126,7 @@ std::pair<bool, state> bounded_contraction_builder::calculate_canonical_contract
             for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
                 for (const world_id y : s.get_agent_possible_worlds(ag, x))
                     if (s.get_depth(y) <= k) {
-                        signature_ptr sign_y = worlds_signatures[b_x-1][y];
+                        signature_id sign_y = worlds_signatures[b_x-1][y];
 
                         auto y_reprs = bit_deque{max_reprs_bitset & sign_map.at(sign_y).first->get_bitset()};   // We compute the maximal representatives of y in its (b(x)-1)-block
                         world_id f_y = y_reprs.get_bitset().find_first();
@@ -174,13 +176,14 @@ std::vector<world_id> bounded_contraction_builder::calculate_max_representatives
 }
 
 std::tuple<signature_matrix, signature_vector, signature_map, std::vector<world_id>>
-bounded_contraction_builder::calculate_max_signatures(const state &s, unsigned long k, storage<signature> &signatures_storage) {
+bounded_contraction_builder::calculate_max_signatures(const state &s, unsigned long k, const signature_storage_ptr &s_storage,
+                                                      const information_state_storage_ptr &is_storage) {
     auto worlds_max_signs = signature_vector(s.get_worlds_number());
     auto worlds_max_reprs = std::vector<world_id>(s.get_worlds_number());
     std::queue<world_id> to_visit;
     boost::dynamic_bitset<> represented(s.get_worlds_number());
 
-    auto [worlds_signatures, sign_map] = bounded_identification::calculate_signatures(s, k, signatures_storage);
+    auto [worlds_signatures, sign_map] = bounded_identification::calculate_signatures(s, k, s_storage, is_storage);
 
     // We build 'worlds_max_signs' with a BFS visit.
     // Queue 'to_visit' contains world_ids of the state that still have not been visited.
@@ -192,7 +195,7 @@ bounded_contraction_builder::calculate_max_signatures(const state &s, unsigned l
         world_id current = to_visit.front();
         to_visit.pop();
 
-        const signature_ptr &sign = worlds_signatures[k - s.get_depth(current)][current];       // We take the representative signature of 'current'
+        const signature_id &sign = (worlds_signatures[k - s.get_depth(current)][current]);      // We take the representative signature of 'current'
         const auto &[worlds, max_representative] = sign_map.at(sign);                           // max_representative is a world in 'worlds' with higher bound
 
         update_max_representative_sign(s, k, *worlds, max_representative, represented, worlds_signatures, worlds_max_signs, worlds_max_reprs);   // We update the maximal representative signature of the worlds in 'worlds'

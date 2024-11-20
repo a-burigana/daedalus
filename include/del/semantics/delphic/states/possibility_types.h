@@ -26,6 +26,7 @@
 
 #include <memory>
 #include <deque>
+#include <set>
 #include <unordered_set>
 #include <unordered_map>
 #include "../../../../utils/storage.h"
@@ -35,15 +36,17 @@ namespace delphic {
     class possibility_spectrum;
 //    template<typename Elem> class storage;
 
+    using possibility_id = unsigned long;
     using possibility_ptr = std::shared_ptr<possibility>;
     using possibility_spectrum_ptr = std::shared_ptr<possibility_spectrum>;
 
-    using information_state = std::unordered_set<possibility_ptr>;
+    using information_state = std::set<possibility_id>;
     using information_state_id = unsigned long;
     using agents_information_state = std::vector<information_state_id>;
 
-    using possibility_map = std::unordered_map<possibility_ptr, possibility_ptr>;
-    using information_state_map = std::unordered_map<possibility_ptr, information_state>;
+    using possibility_map = std::unordered_map<possibility_id, possibility_id>;
+    using information_state_map    = std::unordered_map<possibility_id, information_state>;
+    using information_state_id_map = std::unordered_map<possibility_id, information_state_id>;
     using possibility_deque = std::deque<possibility_ptr>;
 
 //    template<> class storage<possibility>;

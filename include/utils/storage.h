@@ -25,8 +25,8 @@
 #define DAEDALUS_STORAGE_H
 
 #include <memory>
-#include <unordered_map>
 #include <deque>
+#include <map>
 
 template<typename Elem>
 class storage {
@@ -48,7 +48,7 @@ public:
     Elem_ptr get(Elem_id id) const;
 
 private:
-    std::unordered_map<Elem, Elem_id> m_elements_ids;
+    std::map<Elem, Elem_id> m_elements_ids;
     std::deque<Elem_ptr> m_elements;
 };
 

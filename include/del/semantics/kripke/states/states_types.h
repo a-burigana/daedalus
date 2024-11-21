@@ -39,6 +39,7 @@ namespace kripke {
     class state;
     using state_ptr = std::shared_ptr<state>;
 
+    using state_id       = unsigned long long;
     using world_id       = unsigned long long;
     using world_list     = std::list<world_id>;       // TODO: REVERT BACK TO DEQUE!!!!!!!!!!!!!!
     using world_deque    = std::deque<world_id>;

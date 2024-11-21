@@ -108,7 +108,7 @@ void printer::print_action(const kripke::action &a, const std::string &path) {
 }
 
 void printer::print_states(const kripke::state &s, const kripke::action_deque &as, const del::formula_ptr &goal,
-                           const std::string &path, const std::string &name, bool apply_contraction, kripke::bisimulation_type type) {
+                           const std::string &path, const std::string &name, bool apply_contraction, kripke::contraction_type type) {
     if (not kripke::updater::is_applicable(s, *as.front())) {
         std::cout << "Action '" << as.front()->get_name() << "' is not applicable" << std::endl;
         return;
@@ -158,7 +158,7 @@ printer::print_states(const delphic::possibility_spectrum_ptr &W, const delphic:
 }
 
 void printer::print_states(const search::planning_task &task, const kripke::action_deque &as, const std::string &path,
-                           bool apply_contraction, kripke::bisimulation_type type, unsigned long k) {
+                           bool apply_contraction, kripke::contraction_type type, unsigned long k) {
 //    print_states(*task.get_initial_state(), as, path + task.get_domain_name() +  "/" + task.get_problem_id() + "/product_update/",
 //                 "s0", apply_contraction, type, k);
 }
@@ -177,7 +177,7 @@ void printer::print_task(const search::planning_task &task, const std::string &p
         printer::print_action(*a,task_path + "actions/");
 }
 
-void printer::print_results(const search::planning_task &task, search::strategy strategy, const std::string &out_path) {
+void printer::print_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, const std::string &out_path) {
     std::string out_task_path =
             out_path + "search/" + task.get_domain_name() + "/problem_" + task.get_problem_id() + "/";
     std::string strategy_str = strategy == search::strategy::unbounded_search
@@ -185,7 +185,7 @@ void printer::print_results(const search::planning_task &task, search::strategy 
                                : "iter_bounded/";
 
     printer search_printer(true, out_task_path + strategy_str, "search_tree.txt");
-    search::node_deque path = search::planner::search(task, strategy,
+    search::node_deque path = search::planner::search(task, strategy, contraction_type,
                                                       std::make_unique<printer>(std::move(search_printer)));
     std::string state_name = "s0";
 
@@ -233,9 +233,9 @@ void printer::print_domain_info(const search::planning_task &task, std::ofstream
         << task.get_initial_state()->get_worlds_number() << ";" << actions_no << ";" << goal_depth << ";";
 }
 
-void printer::print_time_results(const search::planning_task &task, search::strategy strategy, std::ofstream &table) {
+void printer::print_time_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, std::ofstream &table) {
     auto start = std::chrono::steady_clock::now();
-    search::node_deque path = search::planner::search(task, strategy);
+    search::node_deque path = search::planner::search(task, strategy, contraction_type);
     auto end = std::chrono::steady_clock::now();
     auto delta = since(start).count();
 

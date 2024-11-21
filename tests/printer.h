@@ -62,24 +62,24 @@ namespace daedalus::tester {
 
         static void print_states(const state &s, const kripke::action_deque &as, const del::formula_ptr &goal,
                                  const std::string &path, const std::string &name, bool apply_contraction = false,
-                                 bisimulation_type type = bisimulation_type::full);
+                                 contraction_type type = contraction_type::full);
 
         static void print_states(const possibility_spectrum_ptr &W, const delphic::action_deque &as,
                                  const del::formula_ptr &goal, const std::string &path, const std::string &name);
 
         static void print_states(const search::planning_task &task, const kripke::action_deque &as, const std::string &path,
-                                 bool apply_contraction = false, bisimulation_type type = bisimulation_type::full,
+                                 bool apply_contraction = false, contraction_type type = contraction_type::full,
                                  unsigned long k = 0);
 
         static void print_states(const search::delphic_planning_task &task, const delphic::action_deque &as, const std::string &path);
 
         static void print_task(const search::planning_task &task, const std::string &path);
 
-        static void print_results(const search::planning_task &task, search::strategy strategy, const std::string &out_path);
+        static void print_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, const std::string &out_path);
         static void print_delphic_results(const search::delphic_planning_task &task, search::strategy strategy, const std::string &out_path);
 
         static void print_domain_info(const search::planning_task &task, std::ofstream &table);
-        static void print_time_results(const search::planning_task &task, search::strategy strategy, std::ofstream &table);
+        static void print_time_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, std::ofstream &table);
         static void print_delphic_time_results(const search::delphic_planning_task &task, search::strategy strategy, std::ofstream &table);
 
     private:

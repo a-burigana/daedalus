@@ -26,6 +26,7 @@
 
 #include "../include/search/planning_task.h"
 #include "../include/search/strategies.h"
+#include "../include/del/semantics/kripke/bisimulation/bisimulation_types.h"
 
 namespace daedalus::tester {
     class search_tester {
@@ -47,13 +48,14 @@ namespace daedalus::tester {
 
         static void run_search_tests(const std::vector<search::planning_task> &tasks);
         static void print_search_results(const std::vector<search::planning_task> &tasks);
-        static void print_time_results(const std::vector<search::planning_task> &tasks, search::strategy strategy, const std::string &table_path);
+        static void print_time_results(const std::vector<search::planning_task> &tasks, search::strategy strategy,
+                                       kripke::contraction_type contraction_type, const std::string &table_path);
 
-        static void print_coin_in_the_box_time_results();
-        static void print_consecutive_numbers_time_results();
-        static void print_switches_time_results();
-        static void print_selective_communication_time_results();
-        static void print_collaboration_communication_time_results();
+//        static void print_coin_in_the_box_time_results();
+//        static void print_consecutive_numbers_time_results();
+//        static void print_switches_time_results();
+//        static void print_selective_communication_time_results();
+//        static void print_collaboration_communication_time_results();
     };
 }
 

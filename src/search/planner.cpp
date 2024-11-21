@@ -30,7 +30,8 @@
 
 using namespace search;
 
-node_deque planner::search(const planning_task &task, const strategy strategy, const daedalus::tester::printer_ptr &printer) {
+node_deque planner::search(const planning_task &task, const strategy strategy, contraction_type contraction_type,
+                           const daedalus::tester::printer_ptr &printer) {
     std::cout << "==================================================" << std::endl;
     std::cout << "                     DAEDALUS                     " << std::endl;
     std::cout << "==================================================" << std::endl << std::endl;
@@ -49,8 +50,16 @@ node_deque planner::search(const planning_task &task, const strategy strategy, c
             std::cout << " - STRATEGY: Unbounded Search" << std::endl;
             break;
         case strategy::iterative_bounded_search:
-            std::cout << " - STRATEGY: Iterative Bounded Search" << std::endl;
-            break;
+            switch (contraction_type) {
+                case contraction_type::full:
+                    break;
+                case contraction_type::rooted:
+                    std::cout << " - STRATEGY: Iterative Bounded Tree Search" << std::endl;
+                    break;
+                case contraction_type::canonical:
+                    std::cout << " - STRATEGY: Iterative Bounded Graph Search" << std::endl;
+                    break;
+            }
     }
 
     std::cout << " - SEMANTICS: Kripke" << std::endl;
@@ -58,11 +67,19 @@ node_deque planner::search(const planning_task &task, const strategy strategy, c
     std::cout << "-------------------- SOLVING ---------------------" << std::endl;
 
     node_deque path;
+    signature_storage_ptr s_storage;
+    information_state_storage_ptr is_storage;
+
+    if (contraction_type == contraction_type::canonical) {
+        s_storage = std::make_shared<storage<signature>>();
+        is_storage = std::make_shared<storage<information_state>>(information_state{});
+    }
+
     auto start = std::chrono::steady_clock::now();
 
     // If the initial state satisfies the goal, we immediately terminate
     if (task.get_initial_state()->satisfies(task.get_goal())) {
-        node_ptr n0 = init_node(strategy, task.get_initial_state(), nullptr, true, nullptr, 0, task.get_goal()->get_modal_depth());
+        node_ptr n0 = init_node(strategy, contraction_type, task.get_initial_state(), nullptr, true, nullptr, 0, s_storage, is_storage, task.get_goal()->get_modal_depth());
         if (printer) print_goal_found(printer, n0);
         return extract_path(n0);
     }
@@ -72,7 +89,7 @@ node_deque planner::search(const planning_task &task, const strategy strategy, c
             path = unbounded_search(task, printer);
             break;
         case strategy::iterative_bounded_search:
-            path = iterative_bounded_search(task, printer);
+            path = iterative_bounded_search(task, contraction_type, s_storage, is_storage, printer);
             break;
     }
 
@@ -88,10 +105,12 @@ node_deque planner::unbounded_search(const planning_task &task, const daedalus::
     node_deque previous_iter_frontier = {};
     unsigned long long id = 0;
 
-    return bfs(task, strategy::unbounded_search, previous_iter_frontier, 0, id, printer);
+    return bfs(task, strategy::unbounded_search, contraction_type::full, previous_iter_frontier, 0, id, nullptr, nullptr, printer);
 }
 
-node_deque planner::iterative_bounded_search(const planning_task &task, const daedalus::tester::printer_ptr &printer) {
+node_deque planner::iterative_bounded_search(const planning_task &task, contraction_type contraction_type,
+                                             const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage,
+                                             const daedalus::tester::printer_ptr &printer) {
     unsigned long b = task.get_goal()->get_modal_depth();
     node_deque previous_iter_frontier;
     unsigned long long id = 0;
@@ -99,21 +118,24 @@ node_deque planner::iterative_bounded_search(const planning_task &task, const da
     while (true) {
         std::cout << "Entering Bounded Search iteration: " << b << std::endl;
         // If iteration 'b' produces a valid result, we return it. Otherwise, we move to the next iteration
-        if (node_deque result = bounded_search(task, previous_iter_frontier, b++, id, printer); not result.empty())
+        if (node_deque result = bounded_search(task, contraction_type, previous_iter_frontier, b++, id, s_storage, is_storage, printer); not result.empty())
             return result;
         std::cout << "No plan was found with bound " << b << ". Going to next iteration." << std::endl << std::endl;
     }
 }
 
-node_deque planner::bounded_search(const planning_task &task, node_deque &previous_iter_frontier, const unsigned long b,
-                                   unsigned long long &id, const daedalus::tester::printer_ptr &printer) {
-    return bfs(task, strategy::iterative_bounded_search, previous_iter_frontier, b, id, printer);
+node_deque planner::bounded_search(const planning_task &task, contraction_type contraction_type,
+                                   node_deque &previous_iter_frontier, const unsigned long b,
+                                   unsigned long long &id, const signature_storage_ptr &s_storage,
+                                   const information_state_storage_ptr &is_storage, const daedalus::tester::printer_ptr &printer) {
+    return bfs(task, strategy::iterative_bounded_search, contraction_type, previous_iter_frontier, b, id, s_storage, is_storage, printer);
 }
 
-node_deque planner::bfs(const planning_task &task, const strategy strategy, node_deque &previous_iter_frontier,
-                        const unsigned long b, unsigned long long &id, const daedalus::tester::printer_ptr &printer) {
+node_deque planner::bfs(const planning_task &task, const strategy strategy, contraction_type contraction_type, node_deque &previous_iter_frontier,
+                        const unsigned long b, unsigned long long &id, const signature_storage_ptr &s_storage,
+                        const information_state_storage_ptr &is_storage, const daedalus::tester::printer_ptr &printer) {
     kripke::state_ptr s0 = task.get_initial_state();
-    node_deque frontier = init_frontier(s0, strategy, b, previous_iter_frontier);
+    node_deque frontier = init_frontier(s0, strategy, contraction_type, b, previous_iter_frontier, s_storage, is_storage);
     unsigned long goal_depth = task.get_goal()->get_modal_depth();
     unsigned long long max_tree_depth = 0, is_bisim_tree_depth = 0;     // is_bisim_tree_depth: deepest level of the search tree such that all nodes in the previous levels have is_bisim = true
 
@@ -142,7 +164,7 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, node
         //      attribute 'm_to_apply_actions' of the class 'node'.
         //   2. Otherwise, we reached n for the first time. We then expand it wrt the entire set of actions of our task.
         const kripke::action_deque &actions = n->get_to_apply_actions().empty() ? task.get_actions() : n->get_to_apply_actions();
-        node_deque path = expand_node(task, strategy, n, actions, frontier, goal_depth, id, printer);
+        node_deque path = expand_node(task, strategy, contraction_type, n, actions, frontier, goal_depth, id, s_storage, is_storage, printer);
 
         if (not path.empty()) return path;
 
@@ -155,12 +177,13 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, node
     return {};
 }
 
-node_deque planner::init_frontier(kripke::state_ptr &s0, const strategy strategy, const unsigned long b,
-                                  node_deque &previous_iter_frontier) {
+node_deque planner::init_frontier(kripke::state_ptr &s0, const strategy strategy, contraction_type contraction_type, const unsigned long b,
+                                  node_deque &previous_iter_frontier, const signature_storage_ptr &s_storage,
+                                  const information_state_storage_ptr &is_storage) {
     node_deque frontier;
 
     if (previous_iter_frontier.empty()) {   // If this is the first iteration
-        node_ptr n0 = init_node(strategy, s0, nullptr, true, nullptr, 0, b);
+        node_ptr n0 = init_node(strategy, contraction_type, s0, nullptr, true, nullptr, 0, s_storage, is_storage, b);
         if (n0)
             frontier.push_back(std::move(n0));
     } else {
@@ -173,15 +196,16 @@ node_deque planner::init_frontier(kripke::state_ptr &s0, const strategy strategy
     return frontier;
 }
 
-node_deque planner::expand_node(const planning_task &task, const strategy strategy, node_ptr &n,
+node_deque planner::expand_node(const planning_task &task, const strategy strategy, contraction_type contraction_type, node_ptr &n,
                                 const kripke::action_deque &actions, node_deque &frontier, const unsigned long goal_depth,
-                                unsigned long long &id, const daedalus::tester::printer_ptr &printer) {
+                                unsigned long long &id, const signature_storage_ptr &s_storage,
+                                const information_state_storage_ptr &is_storage, const daedalus::tester::printer_ptr &printer) {
     kripke::action_deque to_reapply_actions;
     bool is_dead_node = true;
 
     for (const kripke::action_ptr &a : actions)
-        if (kripke::updater::is_applicable(*n->get_state(), *a)) {      // For all applicable actions. Let n_ be the
-            node_ptr n_ = update_node(strategy, n, a, id, goal_depth);  // result of updating node n with 'a'
+        if (kripke::updater::is_applicable(*n->get_state(), *a)) {                                                  // For all applicable actions. Let n_ be the
+            node_ptr n_ = update_node(strategy, contraction_type, n, a, id, s_storage, is_storage, goal_depth);     // result of updating node n with 'a'
             if (printer) print_applying_action(printer, a, n_, strategy);
 
             if (n_) {                                                   // If the update is successful
@@ -233,20 +257,21 @@ void planner::print_plan(const node_deque &path) {
     std::cout << std::endl;
 }
 
-node_ptr planner::update_node(const strategy strategy, const node_ptr &n, const kripke::action_ptr &a,
-                              unsigned long long &id, unsigned long goal_depth) {
+node_ptr planner::update_node(const strategy strategy, contraction_type contraction_type, const node_ptr &n, const kripke::action_ptr &a,
+                              unsigned long long &id, const signature_storage_ptr &s_storage,
+                              const information_state_storage_ptr &is_storage, unsigned long goal_depth) {
     switch (strategy) {
         case strategy::unbounded_search: {
             kripke::state_ptr s_ = std::make_shared<kripke::state>(kripke::updater::product_update(*n->get_state(), *a));
-            return init_node(strategy, s_, a, true, n, ++id);
+            return init_node(strategy, contraction_type, s_, a, true, n, ++id, s_storage, is_storage);
         } case strategy::iterative_bounded_search:
             if (n->is_bisim() or n->get_bound() - a->get_maximum_depth() >= goal_depth) {
                 kripke::state_ptr s_ = std::make_shared<kripke::state>(kripke::updater::product_update(*n->get_state(), *a));
 
                 if (n->is_bisim())
-                    return init_node(strategy, s_, a, true, n, ++id, n->get_bound());
+                    return init_node(strategy, contraction_type, s_, a, true, n, ++id, s_storage, is_storage, n->get_bound());
                 if (n->get_bound() - a->get_maximum_depth() >= goal_depth)
-                    return init_node(strategy, s_, a, false, n, ++id, n->get_bound() - a->get_maximum_depth());
+                    return init_node(strategy, contraction_type, s_, a, false, n, ++id, s_storage, is_storage, n->get_bound() - a->get_maximum_depth());
             }
             return nullptr;
     }
@@ -257,20 +282,20 @@ void planner::refresh_node(node_ptr &n) {
     n->clear_non_bisim_children();  // n'.is_bisim == false. We have to discard them before we move to the next iteration
 
     if (not n->is_bisim()) {                                        // If we can still do some refinement steps
-        auto [is_bisim, s_contr] = kripke::bisimulator::contract(kripke::bisimulation_type::rooted, *n->get_original_state(), n->get_bound());    // We do another refinement step
+        auto [is_bisim, s_contr] = kripke::bisimulator::contract(kripke::contraction_type::rooted, *n->get_original_state(), n->get_bound());    // We do another refinement step
         n->set_is_bisim(is_bisim);                                  // And we update the value of is_bisim
         n->set_state(std::make_shared<kripke::state>(std::move(s_contr)));
         if (is_bisim) n->set_original_state(nullptr);
     }
 }
 
-node_ptr planner::init_node(const strategy strategy, const kripke::state_ptr &s, const kripke::action_ptr &a, bool was_bisim,
-                            const node_ptr &parent, unsigned long long id, unsigned long b) {
-    kripke::bisimulation_type bisim_type = strategy == strategy::unbounded_search
-            ? kripke::bisimulation_type::full
-            : kripke::bisimulation_type::rooted;
-
-    auto [is_bisim, s_contr] = kripke::bisimulator::contract(bisim_type, *s, b);
+node_ptr planner::init_node(const strategy strategy, contraction_type contraction_type, const kripke::state_ptr &s, const kripke::action_ptr &a, bool was_bisim,
+                            const node_ptr &parent, unsigned long long id, const signature_storage_ptr &s_storage,
+                            const information_state_storage_ptr &is_storage, unsigned long b) {
+//    kripke::contraction_type bisim_type = strategy == strategy::unbounded_search
+//            ? kripke::contraction_type::full
+//            : kripke::contraction_type::rooted;
+    auto [is_bisim, s_contr] = kripke::bisimulator::contract(contraction_type, *s, b, s_storage, is_storage);
     node_ptr n = std::make_shared<node>(id, std::make_shared<kripke::state>(std::move(s_contr)), a, b, is_bisim and was_bisim, parent);
 
     if (not n->is_bisim()) n->set_original_state(s);

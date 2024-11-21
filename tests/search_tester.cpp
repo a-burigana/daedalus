@@ -112,8 +112,9 @@ void search_tester::run_contractions_tests() {
 
 void search_tester::run_search_tests(const std::vector<planning_task> &tasks) {
     for (const planning_task &task : tasks) {
-        planner::search(task, search::strategy::iterative_bounded_search);
-        planner::search(task, search::strategy::unbounded_search);
+        planner::search(task, search::strategy::iterative_bounded_search, contraction_type::canonical);
+        planner::search(task, search::strategy::iterative_bounded_search, contraction_type::rooted);
+        planner::search(task, search::strategy::unbounded_search, contraction_type::full);
     }
 }
 
@@ -139,8 +140,9 @@ void search_tester::run_collaboration_communication_search_tests() {
 
 void search_tester::print_search_results(const std::vector<planning_task> &tasks) {
     for (const planning_task &task : tasks) {
-        printer::print_results(task, search::strategy::iterative_bounded_search, OUT_PATH);
-        printer::print_results(task, search::strategy::unbounded_search, OUT_PATH);
+        printer::print_results(task, search::strategy::iterative_bounded_search, contraction_type::canonical, OUT_PATH);
+        printer::print_results(task, search::strategy::iterative_bounded_search, contraction_type::rooted, OUT_PATH);
+        printer::print_results(task, search::strategy::unbounded_search, contraction_type::full, OUT_PATH);
     }
 }
 
@@ -164,7 +166,8 @@ void search_tester::print_collaboration_communication_search_tests() {
     print_search_results(tasks);
 }
 
-void search_tester::print_time_results(const std::vector<planning_task> &tasks, search::strategy strategy, const std::string &table_path) {
+void search_tester::print_time_results(const std::vector<planning_task> &tasks, search::strategy strategy,
+                                       kripke::contraction_type contraction_type, const std::string &table_path) {
     if (not std::filesystem::exists(table_path))
         std::filesystem::create_directories(table_path);
 
@@ -174,43 +177,43 @@ void search_tester::print_time_results(const std::vector<planning_task> &tasks, 
     table << "Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Bound (IBDS);Plan length (IBDS);#Nodes (IBDS);Time (IBDS);Plan length (US);#Nodes (US);Time (US)" << std::endl;
 
     for (const planning_task &task : tasks)
-        printer::print_time_results(task, strategy, table);
+        printer::print_time_results(task, strategy, contraction_type, table);
 
     table.close();
 }
 
-void search_tester::print_coin_in_the_box_time_results() {
-    std::string table_path = OUT_PATH + "time_results/" + coin_in_the_box::get_name() + "/";
-    auto tasks = coin_in_the_box::build_tasks();
-    print_time_results(tasks, search::strategy::iterative_bounded_search, table_path);
-    print_time_results(tasks, search::strategy::unbounded_search, table_path);
-}
-
-void search_tester::print_consecutive_numbers_time_results() {
-    std::string table_path = OUT_PATH + "time_results/" + consecutive_numbers::get_name() + "/";
-    auto tasks = consecutive_numbers::build_tasks();
-    print_time_results(tasks, search::strategy::iterative_bounded_search, table_path);
-    print_time_results(tasks, search::strategy::unbounded_search, table_path);
-}
-
-void search_tester::print_switches_time_results() {
-    std::string table_path = OUT_PATH + "time_results/" + switches::get_name() + "/";
-    auto tasks = switches::build_tasks();
-    print_time_results(tasks, search::strategy::iterative_bounded_search, table_path);
-    print_time_results(tasks, search::strategy::unbounded_search, table_path);
-}
-
-void search_tester::print_selective_communication_time_results() {
-    std::string table_path = OUT_PATH + "time_results/" + selective_communication::get_name() + "/";
-    auto tasks = selective_communication::build_tasks();
-    print_time_results(tasks, search::strategy::iterative_bounded_search, table_path);
-    print_time_results(tasks, search::strategy::unbounded_search, table_path);
-}
-
-
-void search_tester::print_collaboration_communication_time_results() {
-    std::string table_path = OUT_PATH + "time_results/" + collaboration_communication::get_name() + "/";
-    auto tasks = collaboration_communication::build_tasks();
-    print_time_results(tasks, search::strategy::iterative_bounded_search, table_path);
-    print_time_results(tasks, search::strategy::unbounded_search, table_path);
-}
+//void search_tester::print_coin_in_the_box_time_results() {
+//    std::string table_path = OUT_PATH + "time_results/" + coin_in_the_box::get_name() + "/";
+//    auto tasks = coin_in_the_box::build_tasks();
+//    print_time_results(tasks, search::strategy::iterative_bounded_search, table_path);
+//    print_time_results(tasks, search::strategy::unbounded_search, table_path);
+//}
+//
+//void search_tester::print_consecutive_numbers_time_results() {
+//    std::string table_path = OUT_PATH + "time_results/" + consecutive_numbers::get_name() + "/";
+//    auto tasks = consecutive_numbers::build_tasks();
+//    print_time_results(tasks, search::strategy::iterative_bounded_search, table_path);
+//    print_time_results(tasks, search::strategy::unbounded_search, table_path);
+//}
+//
+//void search_tester::print_switches_time_results() {
+//    std::string table_path = OUT_PATH + "time_results/" + switches::get_name() + "/";
+//    auto tasks = switches::build_tasks();
+//    print_time_results(tasks, search::strategy::iterative_bounded_search, table_path);
+//    print_time_results(tasks, search::strategy::unbounded_search, table_path);
+//}
+//
+//void search_tester::print_selective_communication_time_results() {
+//    std::string table_path = OUT_PATH + "time_results/" + selective_communication::get_name() + "/";
+//    auto tasks = selective_communication::build_tasks();
+//    print_time_results(tasks, search::strategy::iterative_bounded_search, table_path);
+//    print_time_results(tasks, search::strategy::unbounded_search, table_path);
+//}
+//
+//
+//void search_tester::print_collaboration_communication_time_results() {
+//    std::string table_path = OUT_PATH + "time_results/" + collaboration_communication::get_name() + "/";
+//    auto tasks = collaboration_communication::build_tasks();
+//    print_time_results(tasks, search::strategy::iterative_bounded_search, table_path);
+//    print_time_results(tasks, search::strategy::unbounded_search, table_path);
+//}

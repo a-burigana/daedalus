@@ -33,7 +33,7 @@
 #include "../../../../utils/bit_deque.h"
 
 namespace kripke {
-    enum class bisimulation_type : uint8_t {
+    enum class contraction_type : uint8_t {
         full,
         rooted,
         canonical

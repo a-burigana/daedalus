@@ -35,7 +35,7 @@
 namespace kripke {
     class bisimulator {
     public:
-        static std::pair<bool, state> contract(bisimulation_type type, state &s, unsigned long k = 0,
+        static std::pair<bool, state> contract(contraction_type type, state &s, unsigned long k = 0,
                                                const signature_storage_ptr &s_storage = nullptr,
                                                const information_state_storage_ptr &is_storage = nullptr);
 //        static bool contract(bisimulation_type type, search::node_ptr &n);

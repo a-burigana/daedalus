@@ -43,7 +43,7 @@ bool updater::is_applicable_world(const state &s, const action &a, const world_i
 }
 
 state updater::product_update(const state &s, const action_deque &as, bool apply_contraction,
-                              bisimulation_type type, const unsigned long k) {
+                              contraction_type type, const unsigned long k) {
     state s_ = product_update(s, *as.front());
 
     if (apply_contraction)

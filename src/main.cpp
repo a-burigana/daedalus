@@ -81,7 +81,7 @@ void storage_test() {
     information_state_storage_ptr is_storage = std::make_shared<storage<information_state>>(information_state{});
 
     unsigned long k = 3, h = 3;
-    state s1 = state_builder::build_test_state1(), s1_contr = bisimulator::contract(bisimulation_type::rooted, s1, k).second;
+    state s1 = state_builder::build_test_state1(), s1_contr = bisimulator::contract(contraction_type::rooted, s1, k).second;
     auto worlds_signatures = signature_matrix(h+1), worlds_signatures_contr = signature_matrix(h+1);
 
     for (auto &h_signatures: worlds_signatures)
@@ -104,7 +104,7 @@ void storage_test() {
 }
 
 void run(int argc, char *argv[]) {
-    std::string semantics = "kripke", strategy = "unbounded";
+    std::string semantics = "kripke", strategy = "unbounded", contraction_type = "full";
     std::string domain;
     std::vector<std::string> parameters, actions;
     bool print_results = false, print_info = false, debug = false;
@@ -114,6 +114,7 @@ void run(int argc, char *argv[]) {
             required("-p", "--parameters") & values("parameters", parameters),
             option("-s", "--semantics") & value("semantics", semantics).doc("Selects the preferred DEL semantics ('kripke' or 'delphic')"),
             option("-t", "--strategy" ) & value("strategy", strategy).doc("Selects the search strategy ('unbounded' or 'bounded')"),
+            option("-c", "--contr" ) & value("contraction type", contraction_type).doc("Selects the type of bisimulation contraction to perform ('full', 'rooted' or 'canonical')"),
             option("-a", "--actions" ) & values("actions", actions).doc("Actions to execute"),
             option("--print").set(print_results).doc("Print time results"),
             option("--info").set(print_info),
@@ -147,12 +148,12 @@ void run(int argc, char *argv[]) {
     search::delphic_planning_task task_ = delphic_utils::convert(*task);
 
     search::strategy t = strategy == "unbounded" ? search::strategy::unbounded_search : search::strategy::iterative_bounded_search;
-    bisimulation_type type = t == search::strategy::unbounded_search ? bisimulation_type::full : bisimulation_type::rooted;
+    enum contraction_type type = contraction_type == "full" ? contraction_type::full : (contraction_type == "rooted" ? contraction_type::rooted : contraction_type::canonical);
 
     if (debug) {
         if (actions.empty()) {
             if (semantics == "kripke")
-                daedalus::tester::printer::print_results(*task, t, OUT_PATH);
+                daedalus::tester::printer::print_results(*task, t, type, OUT_PATH);
             else if (semantics == "delphic")
                 daedalus::tester::printer::print_delphic_results(task_, t, OUT_PATH);
         } else {
@@ -199,8 +200,8 @@ void run(int argc, char *argv[]) {
 
         if (not print_info) {
             if (semantics == "kripke") {
-                if (print_results) daedalus::tester::printer::print_time_results(*task, t, out_file);
-                else search::planner::search(*task, t);
+                if (print_results) daedalus::tester::printer::print_time_results(*task, t, type, out_file);
+                else search::planner::search(*task, t, type);
             } else if (semantics == "delphic") {
                 if (print_results) daedalus::tester::printer::print_delphic_time_results(task_, t, out_file);
                 else search::delphic_planner::search(task_, t);

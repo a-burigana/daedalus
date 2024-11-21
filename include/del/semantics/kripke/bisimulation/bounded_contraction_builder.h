@@ -34,7 +34,9 @@ namespace kripke {
 
     class bounded_contraction_builder {
     public:
-        static std::pair<bool, state> calculate_rooted_contraction(const state &s, unsigned long k);
+        static std::pair<bool, state> calculate_rooted_contraction(const state &s, unsigned long k, bool canonical = false,
+                                                                   const signature_storage_ptr &s_storage = nullptr,
+                                                                   const information_state_storage_ptr &is_storage = nullptr);
         static std::pair<bool, state> calculate_canonical_contraction(const state &s, unsigned long k, const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage);
 
     private:

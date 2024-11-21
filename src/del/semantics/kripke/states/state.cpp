@@ -33,12 +33,13 @@ using namespace del;
 using namespace kripke;
 
 state::state(language_ptr language, unsigned long long worlds_number, relations relations,
-             label_vector valuation, world_set designated_worlds) :
+             label_vector valuation, world_set designated_worlds, unsigned long long state_id) :
         m_language{std::move(language)},
         m_worlds_number{worlds_number},
         m_relations{std::move(relations)},
         m_labels{std::move(valuation)},
-        m_designated_worlds{std::move(designated_worlds)} {
+        m_designated_worlds{std::move(designated_worlds)},
+        m_state_id{state_id} {
     calculate_worlds_depth();
 }
 
@@ -61,6 +62,10 @@ const label &state::get_label(const world_id w) const {
 
 const world_set &state::get_designated_worlds() const {
     return m_designated_worlds;
+}
+
+unsigned long long state::get_state_id() const {
+    return m_state_id;
 }
 
 bool state::is_designated(const world_id w) const {
@@ -115,6 +120,30 @@ void state::calculate_worlds_depth() {
             }
         }
     }
+}
+
+bool state::operator<(const state &rhs) const {
+    return m_state_id < rhs.m_state_id;
+}
+
+bool state::operator>(const state &rhs) const {
+    return rhs < *this;
+}
+
+bool state::operator<=(const state &rhs) const {
+    return !(rhs < *this);
+}
+
+bool state::operator>=(const state &rhs) const {
+    return !(*this < rhs);
+}
+
+bool state::operator==(const state &rhs) const {
+    return m_state_id == rhs.m_state_id;
+}
+
+bool state::operator!=(const state &rhs) const {
+    return !(rhs == *this);
 }
 
 std::ostream &kripke::operator<<(std::ostream &os, const state &s) {

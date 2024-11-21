@@ -35,8 +35,8 @@
 namespace kripke {
     enum class bisimulation_type : uint8_t {
         full,
-        rooted
-//        canonical
+        rooted,
+        canonical
     };
 
     using agent_worlds_labels = std::vector<del::agent>;

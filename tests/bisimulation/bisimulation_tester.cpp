@@ -33,7 +33,8 @@
 using namespace daedalus::tester;
 using namespace del;
 
-void bisimulation_tester::test_bisim_1(const std::string &out_path, unsigned long k, storage<signature> *signatures_storage) {
+void bisimulation_tester::test_bisim_1(const std::string &out_path, unsigned long k, const signature_storage_ptr &s_storage,
+                                       const information_state_storage_ptr &is_storage) {
     std::string s1_dir = "s1/";
 
     state s1 = state_builder::build_test_state1();
@@ -46,11 +47,13 @@ void bisimulation_tester::test_bisim_1(const std::string &out_path, unsigned lon
 //    assert(is_s1_bisim);
     printer::print_state(s1_k_contr, out_path + BISIM_PATH + s1_dir, "s1_" + std::to_string(k) + "_contr");
 
-//    auto [is_s1_bisim_id, s1_k_contr_id] = bisimulator::contract(bisimulation_type::canonical, s1, k, signatures_storage);
-//    printer::print_state(s1_k_contr_id, out_path + BISIM_PATH + s1_dir, "s1_" + std::to_string(k) + "_can_contr");
+    auto [is_s1_bisim_id, s1_k_contr_id] = bisimulator::contract(bisimulation_type::canonical, s1, k, s_storage, is_storage);
+    printer::print_state(s1_k_contr_id, out_path + BISIM_PATH + s1_dir, "s1_" + std::to_string(k) + "_can_contr");
 }
 
-void bisimulation_tester::test_bisim_singleton(const std::string &out_path, unsigned long k) {
+void bisimulation_tester::test_bisim_singleton(const std::string &out_path, unsigned long k,
+                                               const signature_storage_ptr &s_storage,
+                                               const information_state_storage_ptr &is_storage) {
     std::string singleton_dir = "singleton/";
 
     state singleton = state_builder::build_singleton(true);
@@ -61,9 +64,14 @@ void bisimulation_tester::test_bisim_singleton(const std::string &out_path, unsi
 
     auto [is_singleton_bisim, singleton_k_contr] = bisimulation_tester::test_bounded_bisim_singleton(k, true);
     printer::print_state(singleton_k_contr, out_path + BISIM_PATH + singleton_dir, "singleton_" + std::to_string(k) + "_contr");
+
+    auto [is_singleton_bisim_id, singleton_k_contr_id] = bisimulator::contract(bisimulation_type::canonical, singleton, k, s_storage, is_storage);
+    printer::print_state(singleton_k_contr_id, out_path + BISIM_PATH + singleton_dir, "singleton_" + std::to_string(k) + "_can_contr");
 }
 
-void bisimulation_tester::test_bisim_singleton_no_loop(const std::string &out_path, unsigned long k) {
+void bisimulation_tester::test_bisim_singleton_no_loop(const std::string &out_path, unsigned long k,
+                                                       const signature_storage_ptr &s_storage,
+                                                       const information_state_storage_ptr &is_storage) {
     std::string singleton_no_loop_dir = "singleton_no_loop/";
 
     state singleton_no_loop = state_builder::build_singleton(false);
@@ -74,9 +82,14 @@ void bisimulation_tester::test_bisim_singleton_no_loop(const std::string &out_pa
 
     auto [is_singleton_no_loop_bisim, singleton_no_loop_k_contr] = bisimulation_tester::test_bounded_bisim_singleton(k, false);
     printer::print_state(singleton_no_loop_k_contr, out_path + BISIM_PATH + singleton_no_loop_dir, "singleton_no_loop_" + std::to_string(k) + "_contr");
+
+    auto [is_singleton_no_loop_bisim_id, singleton_no_loop_k_contr_id] = bisimulator::contract(bisimulation_type::canonical, singleton_no_loop, k, s_storage, is_storage);
+    printer::print_state(singleton_no_loop_k_contr_id, out_path + BISIM_PATH + singleton_no_loop_dir, "singleton_no_loop_" + std::to_string(k) + "_can_contr");
 }
 
-void bisimulation_tester::test_bisim_chain(const std::string &out_path, unsigned long k, unsigned long length, bool all_designated) {
+void bisimulation_tester::test_bisim_chain(const std::string &out_path, unsigned long k, unsigned long length,
+                                           const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage,
+                                           bool all_designated) {
     std::string chain_dir = all_designated ? "chain_des/" : "chain/";
 
     state chain = state_builder::build_chain(length, true, all_designated);
@@ -87,9 +100,14 @@ void bisimulation_tester::test_bisim_chain(const std::string &out_path, unsigned
 
     auto [is_chain_bisim, chain_k_contr] = bisimulation_tester::test_bounded_bisim_chain(k, length, true, all_designated);
     printer::print_state(chain_k_contr, out_path + BISIM_PATH + chain_dir, "chain_" + std::to_string(k) + "_contr");
+
+    auto [is_chain_bisim_id, chain_k_contr_id] = bisimulator::contract(bisimulation_type::canonical, chain, k, s_storage, is_storage);
+    printer::print_state(chain_k_contr_id, out_path + BISIM_PATH + chain_dir, "chain_" + std::to_string(k) + "_can_contr");
 }
 
-void bisimulation_tester::test_bisim_chain_no_loop(const std::string &out_path, unsigned long k, unsigned long length, bool all_designated) {
+void bisimulation_tester::test_bisim_chain_no_loop(const std::string &out_path, unsigned long k, unsigned long length,
+                                                   const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage,
+                                                   bool all_designated) {
     std::string chain_no_loop_dir = all_designated ? "chain_no_loop_des/" : "chain_no_loop/";
 
     state chain_no_loop = state_builder::build_chain(k, false, all_designated);
@@ -100,9 +118,13 @@ void bisimulation_tester::test_bisim_chain_no_loop(const std::string &out_path, 
 
     auto [is_chain_no_loop_bisim, chain_no_loop_k_contr] = bisimulation_tester::test_bounded_bisim_chain(k, length, false, all_designated);
     printer::print_state(chain_no_loop_k_contr, out_path + BISIM_PATH + chain_no_loop_dir, "chain_no_loop_" + std::to_string(k) + "_contr");
+
+    auto [is_chain_no_loop_bisim_id, chain_no_loop_k_contr_id] = bisimulator::contract(bisimulation_type::canonical, chain_no_loop, k, s_storage, is_storage);
+    printer::print_state(chain_no_loop_k_contr_id, out_path + BISIM_PATH + chain_no_loop_dir, "chain_no_loop_" + std::to_string(k) + "_can_contr");
 }
 
-void bisimulation_tester::test_bisim_k_tree(const std::string &out_path, unsigned long k) {
+void bisimulation_tester::test_bisim_k_tree(const std::string &out_path, unsigned long k,
+                                            const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage) {
     std::string tree_dir = "k_tree/" + std::to_string(k) + "/";
 
     state tree = state_builder::build_k_tree(k);
@@ -113,9 +135,13 @@ void bisimulation_tester::test_bisim_k_tree(const std::string &out_path, unsigne
 
     auto [is_tree_bisim, tree_k_contr] = bisimulation_tester::test_bounded_bisim_k_tree(k);
     printer::print_state(tree_k_contr, out_path + BISIM_PATH + tree_dir, "tree_" + std::to_string(k) + "_contr");
+
+    auto [is_tree_bisim_id, tree_k_contr_id] = bisimulator::contract(bisimulation_type::canonical, tree, k, s_storage, is_storage);
+    printer::print_state(tree_k_contr_id, out_path + BISIM_PATH + tree_dir, "tree_" + std::to_string(k) + "_can_contr");
 }
 
-void bisimulation_tester::test_bisim_cn(const std::string &out_path, unsigned long n, unsigned long k) {
+void bisimulation_tester::test_bisim_cn(const std::string &out_path, unsigned long n, unsigned long k,
+                                        const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage) {
     std::string cn_dir = "consecutive_numbers/" + std::to_string(n) + "/";
 
     state cn = consecutive_numbers::build_initial_state(n);
@@ -126,6 +152,9 @@ void bisimulation_tester::test_bisim_cn(const std::string &out_path, unsigned lo
 
     auto [is_cn_bisim, cn_k_contr] = bisimulation_tester::test_bounded_bisim_cn(n, k);
     printer::print_state(cn_k_contr, out_path + BISIM_PATH + cn_dir, "cn_" + std::to_string(k) + "_contr");
+
+    auto [is_cn_bisim_id, cn_k_contr_id] = bisimulator::contract(bisimulation_type::canonical, cn, k, s_storage, is_storage);
+    printer::print_state(cn_k_contr_id, out_path + BISIM_PATH + cn_dir, "cn_" + std::to_string(k) + "_can_contr");
 }
 
 
@@ -201,7 +230,8 @@ std::pair<bool, state> bisimulation_tester::test_bounded_bisim_cn(unsigned long 
 
 
 
-std::pair<bool, state> bisimulation_tester::test_bounded_bisim_1(const unsigned long k, storage<signature> *signatures_storage) {
+std::pair<bool, state> bisimulation_tester::test_bounded_bisim_1(const unsigned long k, const signature_storage_ptr &s_storage,
+                                                                 const information_state_storage_ptr &is_storage) {
     state s = state_builder::build_test_state1();
-    return bisimulator::contract(bisimulation_type::rooted, s, k, signatures_storage);
+    return bisimulator::contract(bisimulation_type::rooted, s, k, s_storage, is_storage);
 }

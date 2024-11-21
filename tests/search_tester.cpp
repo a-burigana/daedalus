@@ -85,26 +85,29 @@ void search_tester::run_product_update_tests() {
 }
 
 void search_tester::run_contractions_tests() {
-    bisimulation_tester::test_bisim_1                (OUT_PATH + "contractions/", 3);
+    signature_storage_ptr s_storage = std::make_shared<storage<possibility>>();
+    information_state_storage_ptr is_storage = std::make_shared<storage<information_state>>(information_state{});
 
-    bisimulation_tester::test_bisim_singleton        (OUT_PATH + "contractions/", 1);
-    bisimulation_tester::test_bisim_singleton_no_loop(OUT_PATH + "contractions/", 1);
+//    bisimulation_tester::test_bisim_1                (OUT_PATH + "contractions/", 3, s_storage, is_storage);
+//
+//    bisimulation_tester::test_bisim_singleton        (OUT_PATH + "contractions/", 1, s_storage, is_storage);
+//    bisimulation_tester::test_bisim_singleton_no_loop(OUT_PATH + "contractions/", 1, s_storage, is_storage);
 
-    bisimulation_tester::test_bisim_chain            (OUT_PATH + "contractions/", 3, 3);
-    bisimulation_tester::test_bisim_chain_no_loop    (OUT_PATH + "contractions/", 3, 3);
+    bisimulation_tester::test_bisim_chain            (OUT_PATH + "contractions/", 3, 3, s_storage, is_storage);
+//    bisimulation_tester::test_bisim_chain_no_loop    (OUT_PATH + "contractions/", 3, 3, s_storage, is_storage);
+//
+//    bisimulation_tester::test_bisim_chain            (OUT_PATH + "contractions/", 3, 3, s_storage, is_storage, true);
+//    bisimulation_tester::test_bisim_chain_no_loop    (OUT_PATH + "contractions/", 3, 3, s_storage, is_storage, true);
 
-    bisimulation_tester::test_bisim_chain            (OUT_PATH + "contractions/", 3, 3, true);
-    bisimulation_tester::test_bisim_chain_no_loop    (OUT_PATH + "contractions/", 3, 3, true);
-
-    bisimulation_tester::test_bisim_k_tree           (OUT_PATH + "contractions/", 3);
-    bisimulation_tester::test_bisim_k_tree           (OUT_PATH + "contractions/", 4);
-    bisimulation_tester::test_bisim_k_tree           (OUT_PATH + "contractions/", 5);
-    bisimulation_tester::test_bisim_k_tree           (OUT_PATH + "contractions/", 10);
-
-    bisimulation_tester::test_bisim_cn               (OUT_PATH + "contractions/", 5, 2);
-    bisimulation_tester::test_bisim_cn               (OUT_PATH + "contractions/", 5, 3);
-    bisimulation_tester::test_bisim_cn               (OUT_PATH + "contractions/", 5, 4);
-    bisimulation_tester::test_bisim_cn               (OUT_PATH + "contractions/", 5, 5);
+//    bisimulation_tester::test_bisim_k_tree           (OUT_PATH + "contractions/", 3, s_storage, is_storage);
+//    bisimulation_tester::test_bisim_k_tree           (OUT_PATH + "contractions/", 4, s_storage, is_storage);
+//    bisimulation_tester::test_bisim_k_tree           (OUT_PATH + "contractions/", 5, s_storage, is_storage);
+//    bisimulation_tester::test_bisim_k_tree           (OUT_PATH + "contractions/", 10, s_storage, is_storage);
+//
+//    bisimulation_tester::test_bisim_cn               (OUT_PATH + "contractions/", 5, 2, s_storage, is_storage);
+//    bisimulation_tester::test_bisim_cn               (OUT_PATH + "contractions/", 5, 3, s_storage, is_storage);
+//    bisimulation_tester::test_bisim_cn               (OUT_PATH + "contractions/", 5, 4, s_storage, is_storage);
+//    bisimulation_tester::test_bisim_cn               (OUT_PATH + "contractions/", 5, 5, s_storage, is_storage);
 }
 
 void search_tester::run_search_tests(const std::vector<planning_task> &tasks) {

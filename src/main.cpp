@@ -58,8 +58,13 @@ void run(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
 //    run(argc, argv);
-    storage_test();
+//    storage_test();
 
+//    unsigned long k = 3;
+//    signature_storage_ptr s_storage = std::make_shared<storage<possibility>>();
+//    information_state_storage_ptr is_storage = std::make_shared<storage<information_state>>();
+
+    search_tester::run_contractions_tests();
     return 0;
 }
 
@@ -72,8 +77,8 @@ void storage_test() {
 //
 //    assert(x_id == y_id);
 
-    possibility_storage_ptr p_storage = std::make_shared<storage<possibility>>();
-    information_state_storage_ptr is_storage = std::make_shared<storage<information_state>>();
+    signature_storage_ptr s_storage = std::make_shared<storage<possibility>>();
+    information_state_storage_ptr is_storage = std::make_shared<storage<information_state>>(information_state{});
 
     unsigned long k = 3, h = 3;
     state s1 = state_builder::build_test_state1(), s1_contr = bisimulator::contract(bisimulation_type::rooted, s1, k).second;
@@ -87,11 +92,11 @@ void storage_test() {
 
     world_id x = 0, y = 0;
 
-    bounded_identification::calculate_world_signature(s1,      k, x, h, p_storage, is_storage, worlds_signatures);
-    bounded_identification::calculate_world_signature(s1_contr, k, y, h, p_storage, is_storage, worlds_signatures);
+    bounded_identification::calculate_world_signature(s1,      k, x, h, s_storage, is_storage, worlds_signatures);
+    bounded_identification::calculate_world_signature(s1_contr, k, y, h, s_storage, is_storage, worlds_signatures);
 
-    signature_ptr sign_x_h = p_storage->get(worlds_signatures[h][x]);
-    signature_ptr sign_y_h = p_storage->get(worlds_signatures[h][y]);
+    signature_ptr sign_x_h = s_storage->get(worlds_signatures[h][x]);
+    signature_ptr sign_y_h = s_storage->get(worlds_signatures[h][y]);
 
     assert(sign_x_h->get_label() == sign_y_h->get_label());
     assert(sign_x_h->get_information_state(0) == sign_y_h->get_information_state(0));

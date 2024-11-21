@@ -31,10 +31,11 @@
 template<typename Elem>
 class storage {
     using Elem_ptr = std::shared_ptr<Elem>;
-    using Elem_id = unsigned long;
+    using Elem_id = unsigned long long;
 
 public:
-    storage() = default;
+    storage();
+    explicit storage(Elem &&null);
 
     storage(const storage&) = default;
     storage& operator=(const storage&) = default;
@@ -46,10 +47,12 @@ public:
 
     Elem_id emplace(Elem &&elem);
     Elem_ptr get(Elem_id id) const;
+    [[nodiscard]] bool is_null(Elem_id id) const;
 
 private:
     std::map<Elem, Elem_id> m_elements_ids;
     std::deque<Elem_ptr> m_elements;
+    unsigned long m_count;
 };
 
 #endif //DAEDALUS_STORAGE_H

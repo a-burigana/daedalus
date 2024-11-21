@@ -33,17 +33,27 @@ using namespace kripke;
 namespace daedalus::tester {
     class bisimulation_tester {
     public:
-        static void test_bisim_1(const std::string &out_path, unsigned long k, storage<delphic::possibility> *signatures_storage = nullptr);
+        static void test_bisim_1(const std::string &out_path, unsigned long k, const signature_storage_ptr &s_storage,
+                                 const information_state_storage_ptr &is_storage);
 
-        static void test_bisim_singleton(const std::string &out_path, unsigned long k);
-        static void test_bisim_singleton_no_loop(const std::string &out_path, unsigned long k);
+        static void test_bisim_singleton(const std::string &out_path, unsigned long k, const signature_storage_ptr &s_storage,
+                                 const information_state_storage_ptr &is_storage);
+        static void test_bisim_singleton_no_loop(const std::string &out_path, unsigned long k, const signature_storage_ptr &s_storage,
+                                 const information_state_storage_ptr &is_storage);
 
-        static void test_bisim_chain(const std::string &out_path, unsigned long k, unsigned long length, bool all_designated = false);
-        static void test_bisim_chain_no_loop(const std::string &out_path, unsigned long k, unsigned long length, bool all_designated = false);
+        static void test_bisim_chain(const std::string &out_path, unsigned long k, unsigned long length,
+                                     const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage,
+                                     bool all_designated = false);
 
-        static void test_bisim_k_tree(const std::string &out_path, unsigned long k);
+        static void test_bisim_chain_no_loop(const std::string &out_path, unsigned long k, unsigned long length,
+                                             const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage,
+                                             bool all_designated = false);
 
-        static void test_bisim_cn(const std::string &out_path, unsigned long n, unsigned long k);
+        static void test_bisim_k_tree(const std::string &out_path, unsigned long k, const signature_storage_ptr &s_storage,
+                                      const information_state_storage_ptr &is_storage);
+
+        static void test_bisim_cn(const std::string &out_path, unsigned long n, unsigned long k, const signature_storage_ptr &s_storage,
+                                      const information_state_storage_ptr &is_storage);
 
         static state test_full_bisim_1();
         static state test_full_bisim_singleton(bool has_loop);
@@ -57,7 +67,8 @@ namespace daedalus::tester {
         static std::pair<bool, state> test_bounded_bisim_k_tree(unsigned long k);
         static std::pair<bool, state> test_bounded_bisim_cn(unsigned long n, unsigned long k);
 
-        static std::pair<bool, state> test_bounded_bisim_1(unsigned long k, storage<delphic::possibility> *signatures_storage);
+        static std::pair<bool, state> test_bounded_bisim_1(unsigned long k, const signature_storage_ptr &s_storage,
+                                                           const information_state_storage_ptr &is_storage);
     };
 }
 

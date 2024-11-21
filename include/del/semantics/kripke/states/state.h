@@ -36,7 +36,7 @@ namespace kripke {
     class state {
     public:
         state(del::language_ptr language, unsigned long long worlds_number, relations relations,
-              label_vector valuation, world_set designated_worlds);
+              label_vector valuation, world_set designated_worlds, unsigned long long state_id = 0);
 
         state(const state&) = delete;
         state& operator=(const state&) = delete;
@@ -51,12 +51,24 @@ namespace kripke {
         [[nodiscard]] bool has_edge(del::agent ag, world_id w, world_id v) const;
         [[nodiscard]] const label &get_label(world_id w) const;
         [[nodiscard]] const world_set &get_designated_worlds() const;
+        [[nodiscard]] unsigned long long get_state_id() const;
         [[nodiscard]] bool is_designated(world_id w) const;
 
         [[nodiscard]] del::language_ptr get_language() const;
         [[nodiscard]] unsigned long long get_depth(world_id w) const;
         [[nodiscard]] unsigned long long get_max_depth() const;
         [[nodiscard]] bool satisfies(const del::formula_ptr &f) const;
+
+        bool operator<(const state &rhs) const;
+
+        bool operator>(const state &rhs) const;
+
+        bool operator<=(const state &rhs) const;
+
+        bool operator>=(const state &rhs) const;
+
+        bool operator==(const state &rhs) const;
+        bool operator!=(const state &rhs) const;
 
         friend std::ostream &operator<<(std::ostream &os, const state &s);
 
@@ -66,6 +78,7 @@ namespace kripke {
         relations m_relations;
         label_vector m_labels;
         world_set m_designated_worlds;
+        unsigned long long m_state_id;
         std::vector<unsigned long long> m_worlds_depth;
         unsigned long long m_max_depth;
 

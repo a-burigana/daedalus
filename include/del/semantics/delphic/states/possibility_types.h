@@ -36,12 +36,12 @@ namespace delphic {
     class possibility_spectrum;
 //    template<typename Elem> class storage;
 
-    using possibility_id = unsigned long;
+    using possibility_id = unsigned long long;
     using possibility_ptr = std::shared_ptr<possibility>;
     using possibility_spectrum_ptr = std::shared_ptr<possibility_spectrum>;
 
     using information_state = std::set<possibility_id>;
-    using information_state_id = unsigned long;
+    using information_state_id = unsigned long long;
     using agents_information_state = std::vector<information_state_id>;
 
     using possibility_map = std::unordered_map<possibility_id, possibility_id>;

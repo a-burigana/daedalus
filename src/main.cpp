@@ -64,34 +64,38 @@ int main(int argc, char *argv[]) {
 }
 
 void storage_test() {
-    storage<int> int_storage;
-    int x = 5, y = 5;
-
-    auto x_id = int_storage.emplace(std::move(x));
-    auto y_id = int_storage.emplace(std::move(y));
-
-    assert(x_id == y_id);
-
-    state s1 = state_builder::build_test_state1();
-    unsigned long k = 3;
-    possibility_storage_ptr p_storage;
-    information_state_storage_ptr is_storage;
-
-
-//    auto worlds_signatures = signature_matrix(1);
+//    storage<int> int_storage;
+//    int x = 5, y = 5;
 //
-//    for (auto &h_signatures: worlds_signatures)
-//        h_signatures = signature_vector(s1.get_worlds_number());
+//    auto x_id = int_storage.emplace(std::move(x));
+//    auto y_id = int_storage.emplace(std::move(y));
 //
-//    bounded_identification::calculate_world_signature(s1, 3, 3, 0, storage, worlds_signatures);
-//    bounded_identification::calculate_world_signature(s1, 3, 5, 0, storage, worlds_signatures);
-//
-//    signature_ptr sign_w3_0 = worlds_signatures[0][3];
-//    signature_ptr sign_w5_0 = worlds_signatures[0][5];
-//
-//    assert(sign_w3_0->get_label() == sign_w5_0->get_label());
-//    assert(sign_w3_0->get_information_state(0) == sign_w5_0->get_information_state(0));
-//    assert(*sign_w3_0 == *sign_w5_0);
+//    assert(x_id == y_id);
+
+    possibility_storage_ptr p_storage = std::make_shared<storage<possibility>>();
+    information_state_storage_ptr is_storage = std::make_shared<storage<information_state>>();
+
+    unsigned long k = 3, h = 3;
+    state s1 = state_builder::build_test_state1(), s1_contr = bisimulator::contract(bisimulation_type::rooted, s1, k).second;
+    auto worlds_signatures = signature_matrix(h+1), worlds_signatures_contr = signature_matrix(h+1);
+
+    for (auto &h_signatures: worlds_signatures)
+        h_signatures = signature_vector(s1.get_worlds_number());
+
+    for (auto &h_signatures: worlds_signatures_contr)
+        h_signatures = signature_vector(s1_contr.get_worlds_number());
+
+    world_id x = 0, y = 0;
+
+    bounded_identification::calculate_world_signature(s1,      k, x, h, p_storage, is_storage, worlds_signatures);
+    bounded_identification::calculate_world_signature(s1_contr, k, y, h, p_storage, is_storage, worlds_signatures);
+
+    signature_ptr sign_x_h = p_storage->get(worlds_signatures[h][x]);
+    signature_ptr sign_y_h = p_storage->get(worlds_signatures[h][y]);
+
+    assert(sign_x_h->get_label() == sign_y_h->get_label());
+    assert(sign_x_h->get_information_state(0) == sign_y_h->get_information_state(0));
+    assert(*sign_x_h == *sign_y_h);
 }
 
 void run(int argc, char *argv[]) {

@@ -47,6 +47,10 @@ void bounded_identification::calculate_world_signature(const state &s, const uns
                                                        const information_state_storage_ptr &is_storage,
                                                        signature_matrix &worlds_signatures, signature_map &sign_map) {
     agents_information_state xs = agents_information_state(s.get_language()->get_agents_number());
+    signature_id empty_is = is_storage->emplace(information_state{});
+
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
+        xs[ag] = empty_is;
 
     if (h > 0)
         for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
@@ -75,6 +79,10 @@ void bounded_identification::calculate_world_signature(const state &s, const uns
                                                        const unsigned long h, const signature_storage_ptr &s_storage,
                                                        const information_state_storage_ptr &is_storage, signature_matrix &worlds_signatures) {
     agents_information_state xs = agents_information_state(s.get_language()->get_agents_number());
+    signature_id empty_is = is_storage->emplace(information_state{});
+
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
+        xs[ag] = empty_is;
 
     if (h > 0)
         for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)

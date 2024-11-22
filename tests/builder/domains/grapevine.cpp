@@ -205,8 +205,8 @@ kripke::action grapevine::build_left(unsigned long agents_no, unsigned long secr
     std::string ag_name = language->get_agent_name(ag);
 
     formula_ptr in_room_1_ag = std::make_shared<atom_formula>(language->get_atom_id("in_room_1_" + ag_name));
-    formula_ptr not_in_room_1_ag = std::make_shared<not_formula>(in_room_1_ag);
-    formula_ptr f_pre = std::make_shared<box_formula>(ag, not_in_room_1_ag);
+    formula_ptr f_pre = std::make_shared<not_formula>(in_room_1_ag);
+//    formula_ptr f_pre = std::make_shared<box_formula>(ag, not_in_room_1_ag);
 
     event_post e_post;
     e_post[language->get_atom_id("in_room_1_" + ag_name)] = std::make_shared<true_formula>();
@@ -220,8 +220,8 @@ kripke::action grapevine::build_right(unsigned long agents_no, unsigned long sec
     language_ptr language = grapevine::build_language(agents_no, secrets_no);
     std::string ag_name = language->get_agent_name(ag);
 
-    formula_ptr in_room_1_ag = std::make_shared<atom_formula>(language->get_atom_id("in_room_1_" + ag_name));
-    formula_ptr f_pre = std::make_shared<box_formula>(ag, in_room_1_ag);
+    formula_ptr f_pre = std::make_shared<atom_formula>(language->get_atom_id("in_room_1_" + ag_name));
+//    formula_ptr f_pre = std::make_shared<box_formula>(ag, in_room_1_ag);
 
     event_post e_post;
     e_post[language->get_atom_id("in_room_1_" + ag_name)] = std::make_shared<false_formula>();

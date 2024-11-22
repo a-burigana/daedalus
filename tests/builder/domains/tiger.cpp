@@ -156,7 +156,8 @@ kripke::action tiger::build_left(const unsigned long doors_no, const unsigned lo
     language_ptr language = tiger::build_language(doors_no, tigers_no);
 
     formula_ptr knight_1 = std::make_shared<atom_formula>(language->get_atom_id("knight_1"));
-    formula_ptr f_pre = std::make_shared<box_formula>(0, std::make_shared<not_formula>(knight_1));
+    formula_ptr f_pre = std::make_shared<not_formula>(knight_1);
+//    formula_ptr f_pre = std::make_shared<box_formula>(0, std::make_shared<not_formula>(knight_1));
 
     event_post e_post;
 
@@ -177,7 +178,8 @@ kripke::action tiger::build_right(const unsigned long doors_no, const unsigned l
     language_ptr language = tiger::build_language(doors_no, tigers_no);
 
     formula_ptr knight_d = std::make_shared<atom_formula>(language->get_atom_id("knight_" + std::to_string(doors_no)));
-    formula_ptr f_pre = std::make_shared<box_formula>(0, std::make_shared<not_formula>(knight_d));
+    formula_ptr f_pre = std::make_shared<not_formula>(knight_d);
+//    formula_ptr f_pre = std::make_shared<box_formula>(0, std::make_shared<not_formula>(knight_d));
 
     event_post e_post;
 

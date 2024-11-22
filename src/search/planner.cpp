@@ -106,11 +106,12 @@ node_deque planner::search(const planning_task &task, const strategy strategy, c
 node_deque planner::unbounded_search(const planning_task &task, const daedalus::tester::printer_ptr &printer) {
     node_deque previous_iter_frontier = {};
     unsigned long long id = 0;
+    states_ids_set visited_states_ids;
 
-    return bfs(task, strategy::unbounded_search, contraction_type::full, previous_iter_frontier, 0, id, {}, nullptr, nullptr, printer);
+    return bfs(task, strategy::unbounded_search, contraction_type::full, previous_iter_frontier, 0, id, visited_states_ids, nullptr, nullptr, printer);
 }
 
-node_deque planner::iterative_bounded_search(const planning_task &task, contraction_type contraction_type, const states_ids_set &visited_states_ids,
+node_deque planner::iterative_bounded_search(const planning_task &task, contraction_type contraction_type, states_ids_set &visited_states_ids,
                                              const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage,
                                              const daedalus::tester::printer_ptr &printer) {
     unsigned long b = task.get_goal()->get_modal_depth();
@@ -128,13 +129,13 @@ node_deque planner::iterative_bounded_search(const planning_task &task, contract
 
 node_deque planner::bounded_search(const planning_task &task, contraction_type contraction_type,
                                    node_deque &previous_iter_frontier, const unsigned long b,
-                                   unsigned long long &id, const states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
+                                   unsigned long long &id, states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
                                    const information_state_storage_ptr &is_storage, const daedalus::tester::printer_ptr &printer) {
     return bfs(task, strategy::iterative_bounded_search, contraction_type, previous_iter_frontier, b, id, visited_states_ids, s_storage, is_storage, printer);
 }
 
 node_deque planner::bfs(const planning_task &task, const strategy strategy, contraction_type contraction_type, node_deque &previous_iter_frontier,
-                        const unsigned long b, unsigned long long &id, const states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
+                        const unsigned long b, unsigned long long &id, states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
                         const information_state_storage_ptr &is_storage, const daedalus::tester::printer_ptr &printer) {
     kripke::state_ptr s0 = task.get_initial_state();
     node_deque frontier = init_frontier(s0, strategy, contraction_type, b, previous_iter_frontier, visited_states_ids, s_storage, is_storage);
@@ -193,14 +194,14 @@ node_deque planner::init_frontier(kripke::state_ptr &s0, const strategy strategy
         previous_iter_frontier.clear();
 
         for (node_ptr &n : frontier)    // The nodes in previous_iter_frontier have to be refreshed
-            refresh_node(n, contraction_type);
+            refresh_node(n, contraction_type, s_storage, is_storage);
     }
     return frontier;
 }
 
 node_deque planner::expand_node(const planning_task &task, const strategy strategy, contraction_type contraction_type, node_ptr &n,
                                 const kripke::action_deque &actions, node_deque &frontier, const unsigned long goal_depth,
-                                unsigned long long &id, const states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
+                                unsigned long long &id, states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
                                 const information_state_storage_ptr &is_storage, const daedalus::tester::printer_ptr &printer) {
     kripke::action_deque to_reapply_actions;
     bool is_dead_node = true;
@@ -223,6 +224,7 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
                 if (not n_->is_bisim())                                 // If n_.is_bisim is false, we need to
                     to_reapply_actions.push_back(a);                    // reapply 'a' to n in the next iteration
 
+                visited_states_ids.emplace(n_->get_state()->get_id());  // todo: what if I add this id, but n_'s parent will be re-expanded at the next iteration and so n_.state's id remains marked as visited despite the state now has disappeared together with n_?
                 frontier.push_back(std::move(n_));                      // We update the frontier
             } else if (strategy != strategy::unbounded_search)          // If the update is unsuccessful, we need to
                 to_reapply_actions.push_back(a);                        // reapply 'a' to n in the next iteration
@@ -263,12 +265,13 @@ node_ptr planner::update_node(const strategy strategy, contraction_type contract
     }
 }
 
-void planner::refresh_node(node_ptr &n, contraction_type contraction_type) {
+void planner::refresh_node(node_ptr &n, contraction_type contraction_type, const signature_storage_ptr &s_storage,
+                           const information_state_storage_ptr &is_storage) {
     n->increment_bound();           // We increment the bound value. Moreover,  node n might have children n' such that
     n->clear_non_bisim_children();  // n'.is_bisim == false. We have to discard them before we move to the next iteration
 
     if (not n->is_bisim()) {                                        // If we can still do some refinement steps
-        auto [is_bisim, s_contr] = kripke::bisimulator::contract(contraction_type, *n->get_original_state(), n->get_bound());    // We do another refinement step
+        auto [is_bisim, s_contr] = kripke::bisimulator::contract(contraction_type, *n->get_original_state(), n->get_bound(), s_storage, is_storage);    // We do another refinement step
         n->set_is_bisim(is_bisim);                                  // And we update the value of is_bisim
         n->set_state(std::make_shared<kripke::state>(std::move(s_contr)));
         if (is_bisim) n->set_original_state(nullptr);

@@ -49,17 +49,17 @@ namespace search {
     private:
         static node_deque unbounded_search(const planning_task &task, const daedalus::tester::printer_ptr &printer);
         static node_deque iterative_bounded_search(const planning_task &task, contraction_type contraction_type,
-                                                   const states_ids_set &visited_states_ids,
+                                                   states_ids_set &visited_states_ids,
                                                    const signature_storage_ptr &s_storage,
                                                    const information_state_storage_ptr &is_storage,
                                                    const daedalus::tester::printer_ptr &printer);
 
         static node_deque bounded_search(const planning_task &task, contraction_type contraction_type, node_deque &previous_iter_frontier, unsigned long b,
-                                         unsigned long long &id, const states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
+                                         unsigned long long &id, states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
                                          const information_state_storage_ptr &is_storage, const daedalus::tester::printer_ptr &printer);
 
         static node_deque bfs(const planning_task &task, strategy strategy, contraction_type contraction_type, node_deque &previous_iter_frontier,
-                              unsigned long b, unsigned long long &id, const states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
+                              unsigned long b, unsigned long long &id, states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
                               const information_state_storage_ptr &is_storage, const daedalus::tester::printer_ptr &printer);
 
         static node_deque init_frontier(kripke::state_ptr &s0, strategy strategy, contraction_type contraction_type, unsigned long b,
@@ -68,7 +68,7 @@ namespace search {
 
         static node_deque expand_node(const planning_task &task, strategy strategy, contraction_type contraction_type, node_ptr &n,
                                       const kripke::action_deque &actions, node_deque &frontier, unsigned long goal_depth,
-                                      unsigned long long &id, const states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
+                                      unsigned long long &id, states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
                                       const information_state_storage_ptr &is_storage, const daedalus::tester::printer_ptr &printer);
         
         static node_deque extract_path(node_ptr n);
@@ -77,7 +77,8 @@ namespace search {
                                             unsigned long long &id, const states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
                                             const information_state_storage_ptr &is_storage, unsigned long goal_depth = 0);
 
-        static void refresh_node(node_ptr &n, contraction_type contraction_type);
+        static void refresh_node(node_ptr &n, contraction_type contraction_type, const signature_storage_ptr &s_storage,
+                                 const information_state_storage_ptr &is_storage);
 
         static search::node_ptr init_node(strategy strategy, contraction_type contraction_type, const kripke::state_ptr &s, const kripke::action_ptr &a,
                                           bool was_bisim, const node_ptr &parent, unsigned long long id,

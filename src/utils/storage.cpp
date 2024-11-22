@@ -22,7 +22,6 @@
 // SOFTWARE.
 
 #include "../../include/utils/storage.h"
-#include <cassert>
 
 template<typename Elem>
 storage<Elem>::storage() {

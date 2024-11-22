@@ -64,7 +64,7 @@ const world_set &state::get_designated_worlds() const {
     return m_designated_worlds;
 }
 
-unsigned long long state::get_state_id() const {
+unsigned long long state::get_id() const {
     return m_state_id;
 }
 

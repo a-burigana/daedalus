@@ -35,7 +35,7 @@ namespace search {
     class node {
     public:
         node(unsigned long long id, kripke::state_ptr state, kripke::action_ptr action, unsigned long bound,
-             bool is_bisim, node_ptr parent = nullptr);
+             bool is_bisim, bool already_visited = false, node_ptr parent = nullptr);
 
         node(const node&) = delete;
         node& operator=(const node&) = delete;
@@ -53,6 +53,7 @@ namespace search {
         [[nodiscard]] kripke::action_ptr get_action() const;
         [[nodiscard]] unsigned long get_bound() const;
         [[nodiscard]] bool is_bisim() const;
+        [[nodiscard]] bool is_already_visited() const;
 
         [[nodiscard]] node_ptr get_parent() const;
         [[nodiscard]] const node_deque &get_children() const;
@@ -76,7 +77,7 @@ namespace search {
         kripke::state_ptr m_state, m_original_state;
         kripke::action_ptr m_action;
         unsigned long m_bound;
-        bool m_is_bisim;
+        bool m_is_bisim, m_already_visited;
 
         node_ptr m_parent;
         node_deque m_children, m_non_bisim_children;

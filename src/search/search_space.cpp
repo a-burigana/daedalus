@@ -29,12 +29,13 @@
 using namespace search;
 
 node::node(unsigned long long id, kripke::state_ptr state, kripke::action_ptr action, unsigned long bound, bool is_bisim,
-           node_ptr parent) :
+           bool already_visited, node_ptr parent) :
         m_id{id},
         m_state{std::move(state)},
         m_action{std::move(action)},
         m_bound{bound},
         m_is_bisim{is_bisim},
+        m_already_visited{already_visited},
         m_parent{std::move(parent)} {
     m_tree_depth = m_parent ? m_parent->get_tree_depth() + 1 : 0;
 }
@@ -65,6 +66,10 @@ unsigned long node::get_bound() const {
 
 bool node::is_bisim() const {
     return m_is_bisim;
+}
+
+bool node::is_already_visited() const {
+    return m_already_visited;
 }
 
 node_ptr node::get_parent() const {

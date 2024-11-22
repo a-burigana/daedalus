@@ -110,7 +110,7 @@ node_deque planner::unbounded_search(const planning_task &task, const daedalus::
     return bfs(task, strategy::unbounded_search, contraction_type::full, previous_iter_frontier, 0, id, {}, nullptr, nullptr, printer);
 }
 
-node_deque planner::iterative_bounded_search(const planning_task &task, contraction_type contraction_type, states_ids_set visited_states_ids,
+node_deque planner::iterative_bounded_search(const planning_task &task, contraction_type contraction_type, const states_ids_set &visited_states_ids,
                                              const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage,
                                              const daedalus::tester::printer_ptr &printer) {
     unsigned long b = task.get_goal()->get_modal_depth();
@@ -128,13 +128,13 @@ node_deque planner::iterative_bounded_search(const planning_task &task, contract
 
 node_deque planner::bounded_search(const planning_task &task, contraction_type contraction_type,
                                    node_deque &previous_iter_frontier, const unsigned long b,
-                                   unsigned long long &id, states_ids_set visited_states_ids, const signature_storage_ptr &s_storage,
+                                   unsigned long long &id, const states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
                                    const information_state_storage_ptr &is_storage, const daedalus::tester::printer_ptr &printer) {
     return bfs(task, strategy::iterative_bounded_search, contraction_type, previous_iter_frontier, b, id, visited_states_ids, s_storage, is_storage, printer);
 }
 
 node_deque planner::bfs(const planning_task &task, const strategy strategy, contraction_type contraction_type, node_deque &previous_iter_frontier,
-                        const unsigned long b, unsigned long long &id, states_ids_set visited_states_ids, const signature_storage_ptr &s_storage,
+                        const unsigned long b, unsigned long long &id, const states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
                         const information_state_storage_ptr &is_storage, const daedalus::tester::printer_ptr &printer) {
     kripke::state_ptr s0 = task.get_initial_state();
     node_deque frontier = init_frontier(s0, strategy, contraction_type, b, previous_iter_frontier, visited_states_ids, s_storage, is_storage);
@@ -180,7 +180,7 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, cont
 }
 
 node_deque planner::init_frontier(kripke::state_ptr &s0, const strategy strategy, contraction_type contraction_type, const unsigned long b,
-                                  node_deque &previous_iter_frontier, states_ids_set visited_states_ids,
+                                  node_deque &previous_iter_frontier, const states_ids_set &visited_states_ids,
                                   const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage) {
     node_deque frontier;
 
@@ -193,14 +193,14 @@ node_deque planner::init_frontier(kripke::state_ptr &s0, const strategy strategy
         previous_iter_frontier.clear();
 
         for (node_ptr &n : frontier)    // The nodes in previous_iter_frontier have to be refreshed
-            refresh_node(n);
+            refresh_node(n, contraction_type);
     }
     return frontier;
 }
 
 node_deque planner::expand_node(const planning_task &task, const strategy strategy, contraction_type contraction_type, node_ptr &n,
                                 const kripke::action_deque &actions, node_deque &frontier, const unsigned long goal_depth,
-                                unsigned long long &id, states_ids_set visited_states_ids, const signature_storage_ptr &s_storage,
+                                unsigned long long &id, const states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
                                 const information_state_storage_ptr &is_storage, const daedalus::tester::printer_ptr &printer) {
     kripke::action_deque to_reapply_actions;
     bool is_dead_node = true;
@@ -210,9 +210,9 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
             node_ptr n_ = update_node(strategy, contraction_type, n, a, id, visited_states_ids, s_storage, is_storage, goal_depth);
             if (printer) print_applying_action(printer, a, n_, strategy);
 
-            if (n_) {                                                   // If the update is successful
-                is_dead_node = false;                                   // Then n is not a dead node
-                n->add_child(n_);                                       // We add n_ to the children of n
+            if (n_ and not n_->is_already_visited()) {                  // If the update is successful and n_'s state
+                is_dead_node = false;                                   // was not previously visited, then n is not a
+                n->add_child(n_);                                       // dead node and we add n_ to the children of n
 
                 // If n_'s state satisfies the goal, we return the path from the root of the search tree to n_
                 if (n_->get_state()->satisfies(task.get_goal())) {
@@ -243,24 +243,8 @@ node_deque planner::extract_path(node_ptr n) {
     return path;
 }
 
-void planner::print_plan(const node_deque &path) {
-    if (path.empty())
-        std::cout << "No plan was found" << std::endl;
-    else if (path.size() == 1)
-        std::cout << "Goal found in initial state!" << std::endl;
-    else {
-        std::cout << "Found plan of length " << (path.size() - 1) << ":" << std::endl;
-        unsigned long count = 0;
-
-        for (const auto &node : path)
-            if (node->get_action())
-                std::cout << "  " << ++count << ". " << node->get_action()->get_name() << std::endl;
-    }
-    std::cout << std::endl;
-}
-
 node_ptr planner::update_node(const strategy strategy, contraction_type contraction_type, const node_ptr &n, const kripke::action_ptr &a,
-                              unsigned long long &id, states_ids_set visited_states_ids, const signature_storage_ptr &s_storage,
+                              unsigned long long &id, const states_ids_set &visited_states_ids, const signature_storage_ptr &s_storage,
                               const information_state_storage_ptr &is_storage, unsigned long goal_depth) {
     switch (strategy) {
         case strategy::unbounded_search: {
@@ -279,12 +263,12 @@ node_ptr planner::update_node(const strategy strategy, contraction_type contract
     }
 }
 
-void planner::refresh_node(node_ptr &n) {
+void planner::refresh_node(node_ptr &n, contraction_type contraction_type) {
     n->increment_bound();           // We increment the bound value. Moreover,  node n might have children n' such that
     n->clear_non_bisim_children();  // n'.is_bisim == false. We have to discard them before we move to the next iteration
 
     if (not n->is_bisim()) {                                        // If we can still do some refinement steps
-        auto [is_bisim, s_contr] = kripke::bisimulator::contract(kripke::contraction_type::rooted, *n->get_original_state(), n->get_bound());    // We do another refinement step
+        auto [is_bisim, s_contr] = kripke::bisimulator::contract(contraction_type, *n->get_original_state(), n->get_bound());    // We do another refinement step
         n->set_is_bisim(is_bisim);                                  // And we update the value of is_bisim
         n->set_state(std::make_shared<kripke::state>(std::move(s_contr)));
         if (is_bisim) n->set_original_state(nullptr);
@@ -292,17 +276,12 @@ void planner::refresh_node(node_ptr &n) {
 }
 
 node_ptr planner::init_node(const strategy strategy, contraction_type contraction_type, const kripke::state_ptr &s, const kripke::action_ptr &a, bool was_bisim,
-                            const node_ptr &parent, unsigned long long id, states_ids_set visited_states_ids,
+                            const node_ptr &parent, unsigned long long id, const states_ids_set &visited_states_ids,
                             const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage, unsigned long b) {
-//    kripke::contraction_type bisim_type = strategy == strategy::unbounded_search
-//            ? kripke::contraction_type::full
-//            : kripke::contraction_type::rooted;
     auto [is_bisim, s_contr] = kripke::bisimulator::contract(contraction_type, *s, b, s_storage, is_storage);
+    bool already_visited = contraction_type == contraction_type::canonical and visited_states_ids.find(s_contr.get_id()) != visited_states_ids.end();
 
-    if (contraction_type == contraction_type::canonical and visited_states_ids.find(s_contr.get_state_id()) != visited_states_ids.end())
-        return nullptr;
-
-    node_ptr n = std::make_shared<node>(id, std::make_shared<kripke::state>(std::move(s_contr)), a, b, is_bisim and was_bisim, parent);
+    node_ptr n = std::make_shared<node>(id, std::make_shared<kripke::state>(std::move(s_contr)), a, b, is_bisim and was_bisim, already_visited, parent);
 
     if (not n->is_bisim()) n->set_original_state(s);
     return n;
@@ -310,6 +289,22 @@ node_ptr planner::init_node(const strategy strategy, contraction_type contractio
 
 
 // Print utilities
+void planner::print_plan(const node_deque &path) {
+    if (path.empty())
+        std::cout << "No plan was found" << std::endl;
+    else if (path.size() == 1)
+        std::cout << "Goal found in initial state!" << std::endl;
+    else {
+        std::cout << "Found plan of length " << (path.size() - 1) << ":" << std::endl;
+        unsigned long count = 0;
+
+        for (const auto &node : path)
+            if (node->get_action())
+                std::cout << "  " << ++count << ". " << node->get_action()->get_name() << std::endl;
+    }
+    std::cout << std::endl;
+}
+
 void planner::print_max_tree_depth(const daedalus::tester::printer_ptr &printer, unsigned long long max_tree_depth) {
     printer->out() << "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*" << std::endl;
     printer->out() << "                                      Search Tree Depth: " << max_tree_depth << "                                           " << std::endl;

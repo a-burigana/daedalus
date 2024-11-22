@@ -51,7 +51,7 @@ namespace kripke {
         [[nodiscard]] bool has_edge(del::agent ag, world_id w, world_id v) const;
         [[nodiscard]] const label &get_label(world_id w) const;
         [[nodiscard]] const world_set &get_designated_worlds() const;
-        [[nodiscard]] unsigned long long get_state_id() const;
+        [[nodiscard]] unsigned long long get_id() const;
         [[nodiscard]] bool is_designated(world_id w) const;
 
         [[nodiscard]] del::language_ptr get_language() const;

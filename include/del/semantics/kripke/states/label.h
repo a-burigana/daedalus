@@ -29,11 +29,10 @@
 
 namespace kripke {
     class label;
-    using label_ptr = std::shared_ptr<label>;
 
     class label {
     public:
-        label() = default;
+        label() : m_id{0} {}
 
         explicit label(boost::dynamic_bitset<> bitset);
 
@@ -46,10 +45,9 @@ namespace kripke {
         ~label() = default;
 
         [[nodiscard]] unsigned long get_id() const;
+        [[nodiscard]] boost::dynamic_bitset<> get_bitset() const;
 
-        boost::dynamic_bitset<> &operator*();
         bool operator[](const del::atom &p) const;
-        void update(del::atom p, bool value);
 
         bool operator==(const label &rhs) const;
         bool operator!=(const label &rhs) const;

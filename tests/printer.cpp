@@ -107,30 +107,34 @@ void printer::print_action(const kripke::action &a, const std::string &path) {
     dot_file.close();
 }
 
-void printer::print_states(const kripke::state &s, const kripke::action_deque &as, const del::formula_ptr &goal,
-                           const std::string &path, const std::string &name, bool apply_contraction, kripke::contraction_type type) {
+state_deque printer::print_states(kripke::state_deque &ss, kripke::action_deque &as, const del::formula_ptr &goal,
+                                  const std::string &path, const std::string &name, bool apply_contraction, kripke::contraction_type type,
+                                  const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage) {
+    kripke::state &s = *ss.back();
+
+    if (apply_contraction)
+        s = kripke::bisimulator::contract(type, s, goal->get_modal_depth(), s_storage, is_storage).second;
+
+    print_state(s, path, name);
+
+    if (as.empty())
+        return ss;
+
     if (not kripke::updater::is_applicable(s, *as.front())) {
         std::cout << "Action '" << as.front()->get_name() << "' is not applicable" << std::endl;
-        return;
+        return ss;
     }
 
     kripke::state s_ = kripke::updater::product_update(s, *as.front());
-    std::string new_name = name + "_" + as.front()->get_name();
-
-    if (apply_contraction)
-        s_ = kripke::bisimulator::contract(type, s_, goal->get_modal_depth()).second;
-
-    print_state(s_, path, new_name);
-    kripke::action_deque as_ = as;
-    as_.pop_front();
 
     if (s_.satisfies(goal))
         std::cout << "Goal found after applying '" << as.front()->get_name() << "'" << std::endl;
 
-    if (as_.empty())
-        return;
+    std::string new_name = name + "_" + as.front()->get_name();
+    ss.emplace_back(std::make_shared<kripke::state>(std::move(s_)));
+    as.pop_front();
 
-    print_states(s_, as_, goal, path, new_name, apply_contraction, type);
+    return print_states(ss, as, goal, path, new_name, apply_contraction, type, s_storage, is_storage);
 }
 
 void

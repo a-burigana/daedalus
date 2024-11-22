@@ -57,7 +57,7 @@ namespace daedalus::tester {
 
         static del::formula_ptr build_goal(const del::language_ptr &language, unsigned long boxes_no, unsigned long goal_id);
 
-        static del::formula_deque in_room_agents(const del::language_ptr &language, unsigned long r, const del::agent_set &ags);
+        static del::formula_deque at_room_agents(const del::language_ptr &language, unsigned long r, const del::agent_set &ags);
     };
 }
 

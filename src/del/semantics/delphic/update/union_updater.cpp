@@ -310,12 +310,12 @@ void union_updater::update_designated(const delphic::possibility_spectrum_ptr &W
 }
 
 kripke::label union_updater::update_label(const delphic::possibility_ptr &w, const delphic::eventuality_ptr &e) {
-    auto l = kripke::label{w->get_label()};
+    auto bitset = w->get_label().get_bitset();
 
     for (const auto &[p, post] : e->get_postconditions())
-        l.update(p, model_checker::holds_in(*w, *post));
+        bitset[p] = model_checker::holds_in(*w, *post);
 
-    return std::move(l);
+    return kripke::label{std::move(bitset)};
 }
 
 /*void union_updater::bounded_update_helper(const possibility_ptr &w, const eventuality_ptr &e, unsigned long b,

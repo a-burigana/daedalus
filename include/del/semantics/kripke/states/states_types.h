@@ -49,6 +49,7 @@ namespace kripke {
 //    using agent_relation = std::vector<world_deque>;
     using relations      = std::vector<agent_relation>;
     using label_vector   = std::vector<label>;
+    using state_deque    = std::deque<state_ptr>;
 
 //    class world_set {
 //    public:

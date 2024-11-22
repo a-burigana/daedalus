@@ -59,12 +59,28 @@ void run(int argc, char *argv[]);
 int main(int argc, char *argv[]) {
 //    run(argc, argv);
 //    storage_test();
+    signature_storage_ptr s_storage = std::make_shared<storage<possibility>>();
+    information_state_storage_ptr is_storage = std::make_shared<storage<information_state>>(information_state{});
+
+    search::planning_task t = collaboration_communication::build_task(2, 3, 2, 1);
+    const unsigned long b = 1;
+
+//    state s0_contr = bisimulator::contract(contraction_type::canonical, *t.get_initial_state(), b, s_storage, is_storage).second;
+    state_deque ss = state_deque{t.get_initial_state()};
+    kripke::action_deque as = t.get_actions({"left_a_11", "right_a_11", "left_a_11", "right_a_11", "left_b_11", "right_b_11"});
+
+    daedalus::tester::printer::print_states(ss, as, t.get_goal(),
+                                            OUT_PATH + "product_update/" + t.get_domain_name() + "/" + t.get_problem_id() + "/",
+                                            "s0", true, contraction_type::canonical, s_storage, is_storage);
+
+//    state s2_contr = updater::product_update(s0_contr, as, true, contraction_type::canonical, b, s_storage, is_storage);
+    assert(*ss[0] == *ss[ss.size()-1]);
 
 //    unsigned long k = 3;
 //    signature_storage_ptr s_storage = std::make_shared<storage<possibility>>();
 //    information_state_storage_ptr is_storage = std::make_shared<storage<information_state>>();
 
-    search_tester::run_contractions_tests();
+//    search_tester::run_contractions_tests();
     return 0;
 }
 
@@ -161,8 +177,9 @@ void run(int argc, char *argv[]) {
 
             if (semantics == "kripke") {
                 kripke::action_deque as = task->get_actions(actions);
-                daedalus::tester::printer::print_state(*task->get_initial_state(), OUT_PATH + path, "s0");
-                daedalus::tester::printer::print_states(*task->get_initial_state(), as, task->get_goal(), OUT_PATH + path, "s0", true, type);
+//                daedalus::tester::printer::print_state(*task->get_initial_state(), OUT_PATH + path, "s0");
+                state_deque ss = {task->get_initial_state()};
+                daedalus::tester::printer::print_states(ss, as, task->get_goal(), OUT_PATH + path, "s0", true, type);
             } else if (semantics == "delphic") {
                 delphic::action_deque as = task_.get_actions(actions);
                 daedalus::tester::printer::print_state(*task_.get_initial_state(), OUT_PATH + path, "W0");

@@ -31,6 +31,7 @@
 #include "../include/search/planning_task.h"
 #include "../include/search/strategies.h"
 #include "../include/search/delphic/delphic_planning_task.h"
+#include "../include/del/semantics/kripke/bisimulation/bounded_bisimulation_types.h"
 //#include "../include/search/planner.h"
 
 using namespace kripke;
@@ -60,9 +61,11 @@ namespace daedalus::tester {
 
         static void print_action(const action &a, const std::string &path);
 
-        static void print_states(const state &s, const kripke::action_deque &as, const del::formula_ptr &goal,
-                                 const std::string &path, const std::string &name, bool apply_contraction = false,
-                                 contraction_type type = contraction_type::full);
+        static state_deque print_states(state_deque &ss, kripke::action_deque &as, const del::formula_ptr &goal,
+                                        const std::string &path, const std::string &name, bool apply_contraction = false,
+                                        contraction_type type = contraction_type::full,
+                                        const signature_storage_ptr &s_storage = nullptr,
+                                        const information_state_storage_ptr &is_storage = nullptr);
 
         static void print_states(const possibility_spectrum_ptr &W, const delphic::action_deque &as,
                                  const del::formula_ptr &goal, const std::string &path, const std::string &name);

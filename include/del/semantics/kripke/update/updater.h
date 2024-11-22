@@ -29,6 +29,7 @@
 #include "../../../language/language.h"
 #include "boost/dynamic_bitset.hpp"
 #include "../bisimulation/bisimulation_types.h"
+#include "../bisimulation/bounded_bisimulation_types.h"
 
 namespace kripke {
     class updater {
@@ -37,7 +38,9 @@ namespace kripke {
         static state product_update(const state &s, const action &a);
 
         static state product_update(const state &s, const action_deque &as, bool apply_contraction = false,
-                                    contraction_type type = contraction_type::full, unsigned long k = 0);
+                                    contraction_type type = contraction_type::full, unsigned long k = 0,
+                                    const signature_storage_ptr &s_storage = nullptr,
+                                    const information_state_storage_ptr &is_storage = nullptr);
 
     private:
         using updated_world            = std::pair<const world_id, const event_id>;

@@ -50,13 +50,13 @@ collaboration_communication::build_language(unsigned long agents_no, unsigned lo
         std::string ag_name{static_cast<char>('a' + ag)};
         agent_names[ag] = ag_name;
 
-        for (unsigned long r = 1; r <= rooms_no; ++r) {
-            atom_names.emplace_back("in_room_" + std::to_string(r) + "_" + ag_name);
-
-            for (unsigned long b = 1; b <= boxes_no; ++b)
-                atom_names.emplace_back("in_room_" + std::to_string(r) + "_box_" + std::to_string(b));
-        }
+        for (unsigned long r = 1; r <= rooms_no; ++r)
+            atom_names.emplace_back("at_room_" + std::to_string(r) + "_" + ag_name);
     }
+
+    for (unsigned long r = 1; r <= rooms_no; ++r)
+        for (unsigned long b = 1; b <= boxes_no; ++b)
+            atom_names.emplace_back("in_room_" + std::to_string(r) + "_box_" + std::to_string(b));
 
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
@@ -98,8 +98,8 @@ kripke::state collaboration_communication::build_initial_state(unsigned long age
 
         for (agent ag = 0; ag < language->get_agents_number(); ++ag) {
             std::string ag_name{static_cast<char>('a' + ag)};
-            atom in_room_2_ag = language->get_atom_id("in_room_2_" + ag_name);
-            bs.set(in_room_2_ag);
+            atom at_room_2_ag = language->get_atom_id("at_room_2_" + ag_name);
+            bs.set(at_room_2_ag);
         }
 
         bool is_sorted = true;
@@ -246,19 +246,19 @@ kripke::action collaboration_communication::build_left(unsigned long agents_no, 
     language_ptr language = collaboration_communication::build_language(agents_no, rooms_no, boxes_no);
     std::string ag_name = language->get_agent_name(ag);
 
-    formula_ptr in_room_1_ag = std::make_shared<atom_formula>(language->get_atom_id("in_room_1_" + ag_name));
-    formula_ptr f_pre = std::make_shared<not_formula>(in_room_1_ag);
+    formula_ptr at_room_1_ag = std::make_shared<atom_formula>(language->get_atom_id("at_room_1_" + ag_name));
+    formula_ptr f_pre = std::make_shared<not_formula>(at_room_1_ag);
 
     event_post e_post;
 
-    atom in_room_n_ag = language->get_atom_id("in_room_" + std::to_string(rooms_no) + "_" + ag_name);
-    e_post[in_room_n_ag] = std::make_shared<false_formula>();
+    atom at_room_n_ag = language->get_atom_id("at_room_" + std::to_string(rooms_no) + "_" + ag_name);
+    e_post[at_room_n_ag] = std::make_shared<false_formula>();
 
     for (unsigned long r = 1; r < rooms_no; ++r) {
-        atom in_room_r_ag_to   = language->get_atom_id("in_room_" + std::to_string(r)   + "_" + ag_name);
-        atom in_room_r_ag_from = language->get_atom_id("in_room_" + std::to_string(r+1) + "_" + ag_name);
-        formula_ptr f_post = std::make_shared<atom_formula>(in_room_r_ag_from);
-        e_post[in_room_r_ag_to] = std::move(f_post);
+        atom at_room_r_ag_to   = language->get_atom_id("at_room_" + std::to_string(r)   + "_" + ag_name);
+        atom at_room_r_ag_from = language->get_atom_id("at_room_" + std::to_string(r+1) + "_" + ag_name);
+        formula_ptr f_post = std::make_shared<atom_formula>(at_room_r_ag_from);
+        e_post[at_room_r_ag_to] = std::move(f_post);
     }
 
     std::string fo_str;
@@ -274,19 +274,19 @@ kripke::action collaboration_communication::build_right(unsigned long agents_no,
     language_ptr language = collaboration_communication::build_language(agents_no, rooms_no, boxes_no);
     std::string ag_name = language->get_agent_name(ag);
 
-    formula_ptr in_room_n_ag = std::make_shared<atom_formula>(language->get_atom_id("in_room_" + std::to_string(rooms_no) + "_" + ag_name));
-    formula_ptr f_pre = std::make_shared<not_formula>(in_room_n_ag);
+    formula_ptr at_room_n_ag = std::make_shared<atom_formula>(language->get_atom_id("at_room_" + std::to_string(rooms_no) + "_" + ag_name));
+    formula_ptr f_pre = std::make_shared<not_formula>(at_room_n_ag);
 
     event_post e_post;
 
-    atom in_room_1_ag = language->get_atom_id("in_room_1_" + ag_name);
-    e_post[in_room_1_ag] = std::make_shared<false_formula>();
+    atom at_room_1_ag = language->get_atom_id("at_room_1_" + ag_name);
+    e_post[at_room_1_ag] = std::make_shared<false_formula>();
 
     for (unsigned long r = 1; r < rooms_no; ++r) {
-        atom in_room_r_ag_to   = language->get_atom_id("in_room_" + std::to_string(r+1) + "_" + ag_name);
-        atom in_room_r_ag_from = language->get_atom_id("in_room_" + std::to_string(r)   + "_" + ag_name);
-        formula_ptr f_post = std::make_shared<atom_formula>(in_room_r_ag_from);
-        e_post[in_room_r_ag_to] = std::move(f_post);
+        atom at_room_r_ag_to   = language->get_atom_id("at_room_" + std::to_string(r+1) + "_" + ag_name);
+        atom at_room_r_ag_from = language->get_atom_id("at_room_" + std::to_string(r)   + "_" + ag_name);
+        formula_ptr f_post = std::make_shared<atom_formula>(at_room_r_ag_from);
+        e_post[at_room_r_ag_to] = std::move(f_post);
     }
 
     std::string fo_str;
@@ -311,7 +311,7 @@ kripke::action collaboration_communication::build_sense(unsigned long agents_no,
 
     formula_ptr sensed = std::make_shared<atom_formula>(language->get_atom_id("in_room_" + std::to_string(r) + "_box_" + std::to_string(b)));
 
-    formula_deque fs = in_room_agents(language, r, looking_ags);
+    formula_deque fs = at_room_agents(language, r, looking_ags);
 
     formula_ptr f_pre = std::make_shared<and_formula>(std::move(fs));
 
@@ -333,7 +333,7 @@ kripke::action collaboration_communication::build_tell(unsigned long agents_no, 
 
     formula_ptr D_a_in_room_box = std::make_shared<diamond_formula>(ag, in_room_box);
 
-    formula_deque fs = in_room_agents(language, r, fo_ags);
+    formula_deque fs = at_room_agents(language, r, fo_ags);
     fs.push_back(D_a_in_room_box);
 
     formula_ptr f_pre = std::make_shared<and_formula>(std::move(fs));
@@ -346,18 +346,18 @@ kripke::action collaboration_communication::build_tell(unsigned long agents_no, 
     return action_builder::build_private_announcement(std::move(name), language, f_pre, fo_ags);
 }
 
-del::formula_deque collaboration_communication::in_room_agents(const del::language_ptr &language, unsigned long r,
+del::formula_deque collaboration_communication::at_room_agents(const del::language_ptr &language, unsigned long r,
                                                                const del::agent_set &ags) {
     formula_deque fs;
 
     for (agent ag = 0; ag < language->get_agents_number(); ++ag) {
         std::string ag_name = language->get_agent_name(ag);
-        formula_ptr in_room_r_ag = std::make_shared<atom_formula>(language->get_atom_id("in_room_" + std::to_string(r) + "_" + language->get_agent_name(ag)));
+        formula_ptr at_room_r_ag = std::make_shared<atom_formula>(language->get_atom_id("at_room_" + std::to_string(r) + "_" + language->get_agent_name(ag)));
 
         if (ags[ag])
-            fs.push_back(std::move(in_room_r_ag));
+            fs.push_back(std::move(at_room_r_ag));
         else
-            fs.push_back(std::make_shared<not_formula>(std::move(in_room_r_ag)));
+            fs.push_back(std::make_shared<not_formula>(std::move(at_room_r_ag)));
     }
 
     return fs;

@@ -21,6 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <iostream>
 #include <queue>
 #include <utility>
 #include <list>
@@ -43,15 +44,16 @@ bool updater::is_applicable_world(const state &s, const action &a, const world_i
 }
 
 state updater::product_update(const state &s, const action_deque &as, bool apply_contraction,
-                              contraction_type type, const unsigned long k) {
+                              contraction_type type, const unsigned long k, const signature_storage_ptr &s_storage,
+                              const information_state_storage_ptr &is_storage) {
     state s_ = product_update(s, *as.front());
 
     if (apply_contraction)
-        s_ = bisimulator::contract(type, s_, k).second;
+        s_ = bisimulator::contract(type, s_, k, s_storage, is_storage).second;
 
     action_deque as_ = as;
     as_.pop_front();
-    return as_.empty() ? std::move(s_) : product_update(s_, as_, apply_contraction, type, k);
+    return as_.empty() ? std::move(s_) : product_update(s_, as_, apply_contraction, type, k, s_storage, is_storage);
 }
 
 state updater::product_update(const state &s, const action &a) {
@@ -148,11 +150,10 @@ label_vector updater::calculate_labels(const state &s, const action &a, const wo
 }
 
 label updater::update_world(const state &s, const world_id &w, const action &a, const event_id &e) {
-    label l = s.get_label(w);
+    auto bitset = s.get_label(w).get_bitset();
 
     for (const auto &[p, post] : a.get_postconditions(e))
-        l.update(p, model_checker::holds_in(s, w, *post));
-//        l.update(p, post->holds_in(s, w));
+        bitset[p] = model_checker::holds_in(s, w, *post);
 
-    return l;
+    return label{std::move(bitset)};
 }

@@ -22,6 +22,7 @@
 // SOFTWARE.
 
 #include "../../include/utils/storage.h"
+#include <cassert>
 
 template<typename Elem>
 storage<Elem>::storage() {
@@ -40,7 +41,7 @@ typename storage<Elem>::Elem_id storage<Elem>::emplace(Elem &&elem) {
     if (m_elements_ids.find(elem) != m_elements_ids.end())          // If the element is already stored, then we simply
         return m_elements_ids.at(elem);                             // return its id
 
-    const auto &[it, _] = m_elements_ids.emplace(std::move(elem), m_elements_ids.size());
+    const auto &[it, _] = m_elements_ids.emplace(std::move(elem), m_count);
     m_elements.emplace_back(std::make_shared<Elem>(it->first));     // Otherwise, we assign the new element a fresh id,
     return m_count++;                                               // we add it to the deque to ensure constant time
 }                                                                   // retrieval from id and we return its id

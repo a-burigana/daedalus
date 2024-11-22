@@ -33,18 +33,12 @@ unsigned long label::get_id() const {
     return m_id;
 }
 
-boost::dynamic_bitset<> &label::operator*() {
+boost::dynamic_bitset<> label::get_bitset() const {
     return m_bitset;
 }
 
 bool label::operator[](const del::atom &p) const {
     return m_bitset[p];
-}
-
-void label::update(const del::atom p, const bool value) {
-    m_bitset[p] = value;
-    auto offset = static_cast<unsigned long>(std::exp2(m_bitset.size() - p-1));
-    m_id = value ? m_id + offset : m_id - offset;
 }
 
 bool label::operator==(const label &rhs) const {

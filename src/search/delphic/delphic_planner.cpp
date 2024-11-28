@@ -181,7 +181,7 @@ void delphic_planner::print_plan(const delphic_node_deque &path) {
 
 delphic_node_ptr delphic_planner::update_node(const strategy strategy, const delphic_node_ptr &n, const delphic::eventuality_spectrum_ptr &a,
                               unsigned long long &id, unsigned long goal_depth) {
-    delphic::possibility_spectrum_ptr s_ = delphic::union_updater::update(n->get_state(), a); // todo: = std::make_shared<kripke::state>(delphic::union_updater::union_update(*n->get_state(), *a));
+    delphic::possibility_spectrum_ptr s_ = delphic::union_updater::update(n->get_state(), a);
     return init_node(strategy, s_, a, true, n, ++id);
 }
 

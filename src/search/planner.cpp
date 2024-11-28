@@ -72,7 +72,7 @@ node_deque planner::search(const planning_task &task, const strategy strategy, c
     information_state_storage_ptr is_storage;
     states_ids_set visited_states_ids;
 
-    if (contraction_type == contraction_type::canonical) {
+    if (contraction_type == contraction_type::canonical or contraction_type == contraction_type::full) {
         s_storage = std::make_shared<storage<signature>>();
         is_storage = std::make_shared<storage<information_state>>(information_state{});
     }
@@ -88,7 +88,7 @@ node_deque planner::search(const planning_task &task, const strategy strategy, c
 
     switch (strategy) {
         case strategy::unbounded_search:
-            path = unbounded_search(task, printer);
+            path = unbounded_search(task, visited_states_ids, s_storage, is_storage, printer);
             break;
         case strategy::iterative_bounded_search:
             path = iterative_bounded_search(task, contraction_type, visited_states_ids, s_storage, is_storage, printer);
@@ -103,12 +103,13 @@ node_deque planner::search(const planning_task &task, const strategy strategy, c
     return path;
 }
 
-node_deque planner::unbounded_search(const planning_task &task, const daedalus::tester::printer_ptr &printer) {
+node_deque planner::unbounded_search(const planning_task &task, states_ids_set &visited_states_ids,
+                                     const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage,
+                                     const daedalus::tester::printer_ptr &printer) {
     node_deque previous_iter_frontier = {};
     unsigned long long id = 0;
-    states_ids_set visited_states_ids;
 
-    return bfs(task, strategy::unbounded_search, contraction_type::full, previous_iter_frontier, 0, id, visited_states_ids, nullptr, nullptr, printer);
+    return bfs(task, strategy::unbounded_search, contraction_type::full, previous_iter_frontier, 0, id, visited_states_ids, s_storage, is_storage, printer);
 }
 
 node_deque planner::iterative_bounded_search(const planning_task &task, contraction_type contraction_type, states_ids_set &visited_states_ids,

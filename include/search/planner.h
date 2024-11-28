@@ -47,7 +47,11 @@ namespace search {
         static void print_plan(const node_deque &path);
 
     private:
-        static node_deque unbounded_search(const planning_task &task, const daedalus::tester::printer_ptr &printer);
+        static node_deque unbounded_search(const planning_task &task, states_ids_set &visited_states_ids,
+                                           const signature_storage_ptr &s_storage,
+                                           const information_state_storage_ptr &is_storage,
+                                           const daedalus::tester::printer_ptr &printer);
+
         static node_deque iterative_bounded_search(const planning_task &task, contraction_type contraction_type,
                                                    states_ids_set &visited_states_ids,
                                                    const signature_storage_ptr &s_storage,

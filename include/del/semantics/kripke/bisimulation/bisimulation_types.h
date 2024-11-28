@@ -48,7 +48,7 @@ namespace kripke {
     using q_block_ptr           = std::shared_ptr<q_block>;
     using x_block_ptr           = std::shared_ptr<x_block>;
     using q_partition           = std::vector<q_block_ptr>;
-    using x_partition           = std::list<x_block_ptr>;   // todo: use vector?
+    using x_partition           = std::list<x_block_ptr>;
     using compound_x_blocks_set = std::set<x_block_ptr>;
     using q_block_ptr_vector    = std::vector<q_block_ptr>;
     using q_block_ptr_list      = std::list<q_block_ptr>;
@@ -79,7 +79,7 @@ namespace kripke {
     /* - Each block of X points to a doubly linked list of the blocks of Q contained in it.
      * -*/
     struct x_block {
-        q_block_ptr_list sub_blocks;  // todo: use list?
+        q_block_ptr_list sub_blocks;
         counts_vector counts;
 
         x_block(q_block_ptr_list sub_blocks_, counts_vector counts_) :

@@ -39,7 +39,7 @@ namespace kripke {
         label(const label&) = default;
         label& operator=(const label&) = default;
 
-        label(label&&) = default;       // todo: make it delete?
+        label(label&&) = default;
         label& operator=(label&&) = default;
 
         ~label() = default;

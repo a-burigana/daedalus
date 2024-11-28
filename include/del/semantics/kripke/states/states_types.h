@@ -27,7 +27,7 @@
 #include <vector>
 #include <deque>
 #include <boost/dynamic_bitset.hpp>
-#include "label.h"
+#include "../../../language/label.h"
 #include "../../../language/language_types.h"
 #include "../../../../utils/bit_deque.h"
 
@@ -41,7 +41,7 @@ namespace kripke {
     using world_set      = bit_deque;
     using agent_relation = std::vector<world_set>;
     using relations      = std::vector<agent_relation>;
-    using label_vector   = std::vector<label>;
+    using label_vector   = std::vector<del::label>;
     using state_deque    = std::deque<state_ptr>;
 }
 

@@ -27,7 +27,7 @@
 #include "../../../../../include/del/semantics/delphic/states/possibility_spectrum.h"
 #include "../../../../../include/del/semantics/delphic/actions/eventuality_spectrum.h"
 #include "../../../../utils/storage.h"
-#include "../../kripke/states/label.h"
+#include "../../../language/label.h"
 #include "../../../del_types.h"
 
 namespace delphic {
@@ -58,7 +58,7 @@ namespace delphic {
 
         static void update_designated(const possibility_spectrum_ptr &W, information_state &designated, possibility_map &update_map);
 
-        static kripke::label update_label(const possibility_ptr &w, const eventuality_ptr &e);
+        static del::label update_label(const possibility_ptr &w, const eventuality_ptr &e);
     };
 }
 

@@ -21,9 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../../../../../include/del/semantics/kripke/states/label.h"
+#include "../../../include/del/language/label.h"
 
-using namespace kripke;
+using namespace del;
 
 label::label(boost::dynamic_bitset<> bitset) :
         m_bitset{std::move(bitset)},

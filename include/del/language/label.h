@@ -25,9 +25,9 @@
 #define DAEDALUS_LABEL_H
 
 #include "boost/dynamic_bitset.hpp"
-#include "../../../language/language_types.h"
+#include "language_types.h"
 
-namespace kripke {
+namespace del {
     class label;
 
     class label {

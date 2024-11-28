@@ -48,8 +48,8 @@ add_executable(DAEDALUS
         include/search/search_space.h
         src/del/semantics/kripke/bisimulation/bisimulator.cpp
         include/del/semantics/kripke/bisimulation/bisimulator.h
-        src/del/semantics/kripke/states/label.cpp
-        include/del/semantics/kripke/states/label.h
+        src/del/language/label.cpp
+        include/del/language/label.h
         src/del/semantics/kripke/bisimulation/partition_refinement.cpp
         include/del/semantics/kripke/bisimulation/partition_refinement.h
         include/del/semantics/kripke/states/states_types.h

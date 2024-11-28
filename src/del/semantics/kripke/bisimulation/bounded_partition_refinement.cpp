@@ -145,7 +145,7 @@ bpr_structures bounded_partition_refinement::init_structures(const state &s, uns
     block_matrix worlds_blocks;
     relations r_1 = init_preimage(s);
     block_id count = 0;
-    std::map<const label, block_ptr> initial_partition;
+    std::map<const del::label, block_ptr> initial_partition;
 
     Q = partition{k + 1};
     worlds_blocks = block_matrix(s.get_worlds_number());
@@ -172,7 +172,7 @@ bpr_structures bounded_partition_refinement::init_structures(const state &s, uns
     return bpr_structures{std::move(Q), std::move(worlds_blocks), std::move(r_1), count};
 }   // Complexity: O(|P|*|W|)
 
-void bounded_partition_refinement::init_partitions_helper(const state &s, std::map<const label, block_ptr> &partition,
+void bounded_partition_refinement::init_partitions_helper(const state &s, std::map<const del::label, block_ptr> &partition,
                                                           world_id w, block_matrix &worlds_blocks, block_id &count) {
     const auto it = partition.find(s.get_label(w));
 

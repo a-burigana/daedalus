@@ -149,11 +149,11 @@ label_vector updater::calculate_labels(const state &s, const action &a, const wo
     return labels;
 }
 
-label updater::update_world(const state &s, const world_id &w, const action &a, const event_id &e) {
+del::label updater::update_world(const state &s, const world_id &w, const action &a, const event_id &e) {
     auto bitset = s.get_label(w).get_bitset();
 
     for (const auto &[p, post] : a.get_postconditions(e))
         bitset[p] = model_checker::holds_in(s, w, *post);
 
-    return label{std::move(bitset)};
+    return del::label{std::move(bitset)};
 }

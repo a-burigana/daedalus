@@ -29,18 +29,15 @@
 #include <unordered_set>
 #include <vector>
 #include "possibility_types.h"
-#include "../../kripke/states/label.h"
+#include "../../../language/label.h"
 #include "../../../formulas/formula.h"
 #include "../../../language/language.h"
 
 namespace delphic {
-
-//    using possibility_id = unsigned long;
-
     class possibility {
     public:
         possibility(del::language_ptr language, possibility_storage_ptr p_storage, information_state_storage_ptr is_storage,
-                    kripke::label label, agents_information_state state, unsigned long bound = 0,
+                    del::label label, agents_information_state state, unsigned long bound = 0,
                     std::optional<unsigned long> world = std::nullopt);
 
         possibility(const possibility&) = default;
@@ -56,7 +53,7 @@ namespace delphic {
 //        [[nodiscard]] information_state_storage_ptr get_information_state_storage() const;
 
         [[nodiscard]] possibility_ptr get(possibility_id w) const;
-        [[nodiscard]] const kripke::label &get_label() const;
+        [[nodiscard]] const del::label &get_label() const;
         [[nodiscard]] unsigned long get_bound() const;
         [[nodiscard]] const information_state &get_information_state(del::agent ag) const;
         [[nodiscard]] const information_state_id get_information_state_id(del::agent ag) const;
@@ -77,7 +74,7 @@ namespace delphic {
         possibility_storage_ptr m_p_storage;
         information_state_storage_ptr m_is_storage;
 
-        kripke::label m_label;      // todo: move label outside kripke
+        del::label m_label;
         agents_information_state m_information_state;
         unsigned long m_bound;
         std::optional<unsigned long> m_world;

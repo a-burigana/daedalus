@@ -60,7 +60,7 @@ namespace kripke {
         static label_vector calculate_labels(const state &s, const action &a, world_id worlds_number,
                                              const updated_worlds_map &w_map);
 
-        static label update_world(const state &s, const world_id &w, const action &a, const event_id &e);
+        static del::label update_world(const state &s, const world_id &w, const action &a, const event_id &e);
     };
 }
 

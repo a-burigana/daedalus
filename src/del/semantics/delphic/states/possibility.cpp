@@ -28,7 +28,7 @@
 using namespace delphic;
 
 possibility::possibility(del::language_ptr language, possibility_storage_ptr p_storage, information_state_storage_ptr is_storage,
-                         kripke::label label, agents_information_state state, unsigned long bound, std::optional<unsigned long> world) :
+                         del::label label, agents_information_state state, unsigned long bound, std::optional<unsigned long> world) :
     m_language{std::move(language)},
     m_p_storage{std::move(p_storage)},
     m_is_storage{std::move(is_storage)},
@@ -53,7 +53,7 @@ possibility_ptr possibility::get(delphic::possibility_id w) const {
     return m_p_storage->get(w);
 }
 
-const kripke::label &possibility::get_label() const {
+const del::label &possibility::get_label() const {
     return m_label;
 }
 

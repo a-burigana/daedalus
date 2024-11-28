@@ -28,7 +28,7 @@
 #include <set>
 #include <vector>
 #include "eventuality_types.h"
-#include "../../kripke/states/label.h"
+#include "../../../language/label.h"
 #include "../../../formulas/formula.h"
 
 namespace delphic {

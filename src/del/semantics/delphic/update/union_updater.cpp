@@ -203,7 +203,7 @@ void union_updater::update_possibilities(const delphic::possibility_spectrum_ptr
 
         if (current->satisfies(e->get_pre()) != negated) {
             agents_information_state is = agents_information_state(W->get_language()->get_agents_number());
-            kripke::label l = e->is_ontic() ? update_label(current, e) : kripke::label{current->get_label()};
+            del::label l = e->is_ontic() ? update_label(current, e) : del::label{current->get_label()};
 //            possibility_ptr updated = std::make_shared<possibility>(W->get_language(), std::move(l), std::move(is));
             possibility_id updated_id = W->emplace_possibility(possibility{W->get_language(), W->get_possibility_storage(), W->get_information_state_storage(), std::move(l), std::move(is)});
             update_map[current_id] = updated_id;
@@ -309,13 +309,13 @@ void union_updater::update_designated(const delphic::possibility_spectrum_ptr &W
             designated.emplace(update_map[w]);
 }
 
-kripke::label union_updater::update_label(const delphic::possibility_ptr &w, const delphic::eventuality_ptr &e) {
+del::label union_updater::update_label(const delphic::possibility_ptr &w, const delphic::eventuality_ptr &e) {
     auto bitset = w->get_label().get_bitset();
 
     for (const auto &[p, post] : e->get_postconditions())
         bitset[p] = model_checker::holds_in(*w, *post);
 
-    return kripke::label{std::move(bitset)};
+    return del::label{std::move(bitset)};
 }
 
 /*void union_updater::bounded_update_helper(const possibility_ptr &w, const eventuality_ptr &e, unsigned long b,

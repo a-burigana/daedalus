@@ -56,7 +56,7 @@ bool state::has_edge(const agent ag, const world_id w, const world_id v) const {
     return (*m_relations[ag][w])[v];
 }
 
-const label &state::get_label(const world_id w) const {
+const del::label &state::get_label(const world_id w) const {
     return m_labels[w];
 }
 

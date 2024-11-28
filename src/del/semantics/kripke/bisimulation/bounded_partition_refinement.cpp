@@ -177,7 +177,7 @@ void bounded_partition_refinement::init_partitions_helper(const state &s, std::m
     const auto it = partition.find(s.get_label(w));
 
     if (it == partition.end()) {
-        block_ptr b = std::make_shared<block>(block{s.get_worlds_number(), world_list{w}, count++});
+        block_ptr b = std::make_shared<block>(block{s.get_worlds_number(), world_deque{w}, count++});
         worlds_blocks[w][0] = b;
         partition.emplace(s.get_label(w), std::move(b));
     } else {

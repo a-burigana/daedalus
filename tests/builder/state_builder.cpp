@@ -57,11 +57,11 @@ state state_builder::build_test_state1() {
     for (world_id w = 0; w < worlds_number; ++w)    // Initializing world sets
         r[0][w] = world_set(worlds_number);
 
-    r[a][w0] = world_set(worlds_number, world_list{w1, w2});
-    r[a][w1] = world_set(worlds_number, world_list{w1, w3});
-    r[a][w2] = world_set(worlds_number, world_list{w2, w4});
-    r[a][w3] = world_set(worlds_number, world_list{w5});
-    r[a][w4] = world_set(worlds_number, world_list{w6});
+    r[a][w0] = world_set(worlds_number, world_deque{w1, w2});
+    r[a][w1] = world_set(worlds_number, world_deque{w1, w3});
+    r[a][w2] = world_set(worlds_number, world_deque{w2, w4});
+    r[a][w3] = world_set(worlds_number, world_deque{w5});
+    r[a][w4] = world_set(worlds_number, world_deque{w6});
     r[a][w5] = world_set(worlds_number);
     r[a][w6] = world_set(worlds_number);
 
@@ -74,7 +74,7 @@ state state_builder::build_test_state1() {
     v[w5] = label{bs1};
     v[w6] = label{bs2};
 
-    return state{language, worlds_number, std::move(r), std::move(v), world_set{worlds_number, world_list{w0}}};
+    return state{language, worlds_number, std::move(r), std::move(v), world_set{worlds_number, world_deque{w0}}};
 }
 
 state state_builder::build_singleton(bool has_loop) {
@@ -97,12 +97,12 @@ state state_builder::build_singleton(bool has_loop) {
         r[a][w] = world_set(worlds_number);
 
     if (has_loop)
-        r[a][0] = world_set{worlds_number, world_list{0}};
+        r[a][0] = world_set{worlds_number, world_deque{0}};
 
     label_vector v = label_vector{worlds_number};
     v[0] = label{std::move(bs0)};
 
-    return state{language, worlds_number, std::move(r), std::move(v), world_set{worlds_number, world_list{0}}};
+    return state{language, worlds_number, std::move(r), std::move(v), world_set{worlds_number, world_deque{0}}};
 }
 
 state state_builder::build_chain(unsigned long length, bool has_final_loop, bool all_designated) {
@@ -137,7 +137,7 @@ state state_builder::build_chain(unsigned long length, bool has_final_loop, bool
         v[w] = label{bs0};
     }
 
-    world_list designated_worlds = {0};
+    world_deque designated_worlds = {0};
 
     if (all_designated)
         for (world_id w = 1; w < worlds_number; ++w)
@@ -193,7 +193,7 @@ state state_builder::build_k_tree(const unsigned long k) {
     };
 
     build_tree(k);
-    return state{language, worlds_number, std::move(r), std::move(v), world_set{worlds_number, world_list{0}}};
+    return state{language, worlds_number, std::move(r), std::move(v), world_set{worlds_number, world_deque{0}}};
 
 //    std::vector<world_id>
 //            pascal_triangle_row = std::vector<world_id>(k + 1),

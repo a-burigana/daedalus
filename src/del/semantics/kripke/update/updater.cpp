@@ -70,7 +70,7 @@ state updater::product_update(const state &s, const action &a) {
 std::pair<world_id, world_set> updater::calculate_worlds(const state &s, const action &a, updated_worlds_map &w_map,
                                                            updated_edges_vector &r_map) {
     world_id worlds_number = 0;
-    world_list designated_worlds;
+    world_deque designated_worlds;
 
     std::set<updated_world> to_expand;
     std::set<updated_world> visited;

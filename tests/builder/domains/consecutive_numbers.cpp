@@ -51,7 +51,7 @@ kripke::state consecutive_numbers::build_initial_state(unsigned long n) {
     language_ptr language = consecutive_numbers::build_language(n);
 
     world_id worlds_number = n;
-    world_set designated_worlds = world_set{worlds_number, world_list{0, 1}};           // We assume n >= 2
+    world_set designated_worlds = world_set{worlds_number, world_deque{0, 1}};           // We assume n >= 2
 
     relations r(language->get_agents_number());
 

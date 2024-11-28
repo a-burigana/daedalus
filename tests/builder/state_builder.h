@@ -24,6 +24,7 @@
 #ifndef DAEDALUS_STATE_BUILDER_H
 #define DAEDALUS_STATE_BUILDER_H
 
+#include <list>
 #include "../../include/del/semantics/kripke/states/state.h"
 
 namespace daedalus::tester {

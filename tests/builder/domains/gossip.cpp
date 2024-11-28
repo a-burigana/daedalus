@@ -86,7 +86,7 @@ kripke::state gossip::build_initial_state(unsigned long agents_no, unsigned long
     for (world_id w = 0; w < worlds_number; ++w)
         if (ls[w].get_bitset().all()) designated = w;
 
-    world_set designated_worlds = world_set{worlds_number, world_list{designated}};
+    world_set designated_worlds = world_set{worlds_number, world_deque{designated}};
 
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
 }

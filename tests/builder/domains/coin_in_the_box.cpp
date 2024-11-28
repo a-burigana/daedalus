@@ -54,7 +54,7 @@ kripke::state coin_in_the_box::build_initial_state() {
     language_ptr language = coin_in_the_box::build_language();
 
     const world_id worlds_number = 2;
-    world_set designated_worlds = world_set{worlds_number, world_list{0}};
+    world_set designated_worlds = world_set{worlds_number, world_deque{0}};
 
     relations r(language->get_agents_number());
 

@@ -27,7 +27,7 @@
 #include <memory>
 #include <vector>
 #include <set>
-#include <list>
+#include <deque>
 #include "../../../language/language_types.h"
 #include "../../../../utils/bit_deque.h"
 #include "../../../formulas/formula.h"
@@ -36,12 +36,10 @@ namespace kripke {
     class formula;
     class action;
     using action_ptr   = std::shared_ptr<action>;
-    using action_set   = std::set<kripke::action_ptr>;
     using action_deque = std::deque<kripke::action_ptr>;
 
     using event_id               = unsigned long long;
-    using event_deque            = std::list<event_id>;    // std::deque<event_id>; TODO: CHANGE BACK TO DEQUE!!!!!!!!!!!!!!!!!
-//    using event_set              = std::set<const event_id>;
+    using event_deque            = std::deque<event_id>;
     using event_set              = bit_deque;
     using action_agent_relations = std::vector<event_set>;
     using action_relations       = std::vector<action_agent_relations>;

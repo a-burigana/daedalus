@@ -62,7 +62,7 @@ kripke::state selective_communication::build_initial_state(unsigned long agents_
     language_ptr language = selective_communication::build_language(agents_no, rooms_no);
 
     const world_id worlds_number = 2;
-    world_set designated_worlds = world_set{worlds_number, world_list{0}};
+    world_set designated_worlds = world_set{worlds_number, world_deque{0}};
 
     relations r(language->get_agents_number());
 

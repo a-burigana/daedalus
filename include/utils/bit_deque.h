@@ -25,21 +25,21 @@
 #define DAEDALUS_BIT_DEQUE_H
 
 #include <boost/dynamic_bitset.hpp>
-#include <list>
+#include <deque>
 
 class bit_deque {
 public:
     using index = unsigned long long;
-    using index_list = std::list<index>;
-    using iterator = index_list::const_iterator;      // TODO: REVERT BACK TO DEQUE!!!!!!!!!!!!!!
+    using index_deque = std::deque<index>;          // todo: use unordered_set instead of deque?
+    using iterator = index_deque::const_iterator;
 
-    bit_deque() = default;
+    bit_deque() : m_id{0} {}
 
     explicit bit_deque(unsigned long long size, unsigned long id = 0) :
             m_bitset{boost::dynamic_bitset<>(size)},
             m_id{id} {}
 
-    bit_deque(unsigned long long size, index_list deque_, unsigned long id = 0) :       // TODO: REVERT BACK TO DEQUE!!!!!!!!!!!!!!
+    bit_deque(unsigned long long size, index_deque deque_, unsigned long id = 0) :
             m_bitset{boost::dynamic_bitset<>(size)},
             m_deque{std::move(deque_)},
             m_id{id} {
@@ -78,7 +78,7 @@ public:
     void remove(const index i) {
         if (m_bitset[i]) {
             m_bitset[i].flip();
-            m_deque.remove(i);      // todo: this takes O(n)... Can we do better?
+            m_deque.erase(std::find(m_deque.begin(), m_deque.end(), i));      // todo: this takes O(n)... Can we do better?
         }
     }
 
@@ -88,9 +88,9 @@ public:
     boost::dynamic_bitset<> operator&(const bit_deque &rhs) { return this->m_bitset & rhs.m_bitset; }
     boost::dynamic_bitset<> operator-(const bit_deque &rhs) { return this->m_bitset - rhs.m_bitset; }
 
-    bool operator< (const bit_deque &rhs) const { return m_bitset.to_ulong() < rhs.m_bitset.to_ulong(); }
+    bool operator< (const bit_deque &rhs) const { return m_bitset.to_ulong() <  rhs.m_bitset.to_ulong(); }
     bool operator<=(const bit_deque &rhs) const { return m_bitset.to_ulong() <= rhs.m_bitset.to_ulong(); }
-    bool operator> (const bit_deque &rhs) const { return m_bitset.to_ulong() > rhs.m_bitset.to_ulong(); }
+    bool operator> (const bit_deque &rhs) const { return m_bitset.to_ulong() >  rhs.m_bitset.to_ulong(); }
     bool operator>=(const bit_deque &rhs) const { return m_bitset.to_ulong() >= rhs.m_bitset.to_ulong(); }
     bool operator==(const bit_deque &rhs) const { return m_bitset.to_ulong() == rhs.m_bitset.to_ulong(); }
     bool operator!=(const bit_deque &rhs) const { return m_bitset.to_ulong() != rhs.m_bitset.to_ulong(); }
@@ -103,8 +103,8 @@ public:
 
 private:
     boost::dynamic_bitset<> m_bitset;
-    index_list m_deque;      // TODO: REVERT BACK TO DEQUE!!!!!!!!!!!!!!
-    unsigned long m_id;
+    index_deque m_deque;
+    unsigned long m_id{};
 };
 
 #endif //DAEDALUS_BIT_DEQUE_H

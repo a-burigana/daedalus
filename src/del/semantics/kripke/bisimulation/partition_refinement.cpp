@@ -372,7 +372,7 @@ void partition_refinement::init_partitions_helper(std::map<T, q_block> &partitio
     const auto it = partition.find(key);
 
     if (it == partition.end())
-        partition.emplace(key, q_block{block{preprocessed_worlds_no, world_list{w}}, std::shared_ptr<x_block>(nullptr)});
+        partition.emplace(key, q_block{block{preprocessed_worlds_no, world_deque{w}}, std::shared_ptr<x_block>(nullptr)});
     else {
         q_block &block = it->second;
         block.elements.push_back(w);

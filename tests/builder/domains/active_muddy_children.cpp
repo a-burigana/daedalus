@@ -100,7 +100,7 @@ active_muddy_children::build_initial_state(unsigned long children_no, unsigned l
                     r[ag][w].push_back(v);
             }
 
-    world_set designated_worlds = world_set{worlds_number, world_list{designated}};
+    world_set designated_worlds = world_set{worlds_number, world_deque{designated}};
 
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
 }

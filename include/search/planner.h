@@ -82,7 +82,7 @@ namespace search {
 
         static void refresh_node(node_ptr &n, contraction_type contraction_type, const del::storages_ptr &storages);
 
-        static search::node_ptr init_node(strategy strategy, contraction_type contraction_type, const kripke::state_ptr &s,
+        static search::node_ptr init_node(contraction_type contraction_type, const kripke::state_ptr &s,
                                           const kripke::action_ptr &a, bool was_bisim, const node_ptr &parent, unsigned long long id,
                                           const states_ids_set &visited_states_ids, const del::storages_ptr &storages, unsigned long b = 0);
 

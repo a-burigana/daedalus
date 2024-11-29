@@ -56,18 +56,3 @@ template<typename Elem>
 bool storage<Elem>::is_null(Elem_id id) const {
     return id == 0;
 }
-
-//template<typename Elem>
-//typename storage<Elem>::Elem_id storage<Elem>::emplace(const storage_ptr &storage, Elem &&elem) {
-//    return storage->emplace(elem);
-//}
-//
-//template<typename Elem>
-//typename storage<Elem>::Elem_ptr storage<Elem>::get(const storage_ptr &storage, Elem_id id) {
-//    return storage->get(id);
-//}
-//
-//template<typename Elem>
-//bool storage<Elem>::is_null(const storage_ptr &storage, Elem_id id) {
-//    return storage->is_null(id);
-//}

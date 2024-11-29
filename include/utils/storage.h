@@ -52,10 +52,6 @@ namespace del {
         Elem_ptr get(Elem_id id) const;
         [[nodiscard]] bool is_null(Elem_id id) const;
 
-//        static Elem_id emplace(const storage_ptr &storage, Elem &&elem);
-//        static Elem_ptr get(const storage_ptr &storage, Elem_id id);
-//        [[nodiscard]] static bool is_null(const storage_ptr &storage, Elem_id id);
-
     private:
         std::map<Elem, Elem_id> m_elements_ids;
         std::deque<Elem_ptr> m_elements;

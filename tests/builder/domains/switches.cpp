@@ -68,7 +68,7 @@ kripke::state switches::build_initial_state(unsigned long n, const label_storage
 
     label_vector ls = label_vector(worlds_number);
     boost::dynamic_bitset<> b0(language->get_atoms_number());
-    label l0 = label{std::move(l0)};
+    label l0 = label{std::move(b0)};
     ls[0] = l_storage->emplace(std::move(l0));
 
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};

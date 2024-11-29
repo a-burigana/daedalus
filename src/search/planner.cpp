@@ -26,7 +26,6 @@
 #include <utility>
 #include <iostream>
 #include "../../include/search/planner.h"
-#include "../../include/del/semantics/delphic/states/possibility_types.h"
 #include "../../include/utils/time_utils.h"
 #include "../../include/utils/printer/formula_printer.h"
 
@@ -42,7 +41,6 @@ node_deque planner::search(const planning_task &task, const strategy strategy, c
     std::cout << " - DOMAIN:  " << task.get_domain_name() << std::endl;
     std::cout << " - PROBLEM: " << task.get_problem_id() << std::endl;
     std::cout << " - GOAL:    " << printer::formula_printer::to_string(*task.get_goal(), task.get_language(), false) << std::endl;
-//    std::cout << " - GOAL:    " << task.get_goal()->to_string(task.get_language(), false) << std::endl;
     std::cout << "--------------------------------------------------" << std::endl << std::endl;
 
     std::cout << "----------------- CONFIGURATION ------------------" << std::endl;
@@ -74,7 +72,7 @@ node_deque planner::search(const planning_task &task, const strategy strategy, c
 
     // If the initial state satisfies the goal, we immediately terminate
     if (task.get_initial_state()->satisfies(task.get_goal(), storages->l_storage)) {
-        node_ptr n0 = init_node(strategy, contraction_type, task.get_initial_state(), nullptr, true, nullptr, 0, visited_states_ids, storages, task.get_goal()->get_modal_depth());
+        node_ptr n0 = init_node(contraction_type, task.get_initial_state(), nullptr, true, nullptr, 0, visited_states_ids, storages, task.get_goal()->get_modal_depth());
         if (printer) print_goal_found(printer, n0);
         return extract_path(n0);
     }
@@ -178,7 +176,7 @@ node_deque planner::init_frontier(kripke::state_ptr &s0, const strategy strategy
     node_deque frontier;
 
     if (previous_iter_frontier.empty()) {   // If this is the first iteration
-        node_ptr n0 = init_node(strategy, contraction_type, s0, nullptr, true, nullptr, 0, visited_states_ids, storages, b);
+        node_ptr n0 = init_node(contraction_type, s0, nullptr, true, nullptr, 0, visited_states_ids, storages, b);
         if (n0)
             frontier.push_back(std::move(n0));
     } else {
@@ -241,15 +239,15 @@ node_ptr planner::update_node(const strategy strategy, contraction_type contract
     switch (strategy) {
         case strategy::unbounded_search: {
             kripke::state_ptr s_ = std::make_shared<kripke::state>(kripke::updater::product_update(*n->get_state(), *a, storages->l_storage));
-            return init_node(strategy, contraction_type, s_, a, true, n, ++id, visited_states_ids, storages);
+            return init_node(contraction_type, s_, a, true, n, ++id, visited_states_ids, storages);
         } case strategy::iterative_bounded_search:
             if (n->is_bisim() or n->get_bound() - a->get_maximum_depth() >= goal_depth) {
                 kripke::state_ptr s_ = std::make_shared<kripke::state>(kripke::updater::product_update(*n->get_state(), *a, storages->l_storage));
 
                 if (n->is_bisim())
-                    return init_node(strategy, contraction_type, s_, a, true, n, ++id, visited_states_ids, storages, n->get_bound());
+                    return init_node(contraction_type, s_, a, true, n, ++id, visited_states_ids, storages, n->get_bound());
                 if (n->get_bound() - a->get_maximum_depth() >= goal_depth)
-                    return init_node(strategy, contraction_type, s_, a, false, n, ++id, visited_states_ids, storages, n->get_bound() - a->get_maximum_depth());
+                    return init_node(contraction_type, s_, a, false, n, ++id, visited_states_ids, storages, n->get_bound() - a->get_maximum_depth());
             }
             return nullptr;
     }
@@ -267,7 +265,7 @@ void planner::refresh_node(node_ptr &n, contraction_type contraction_type, const
     }
 }
 
-node_ptr planner::init_node(const strategy strategy, contraction_type contraction_type, const kripke::state_ptr &s, const kripke::action_ptr &a, bool was_bisim,
+node_ptr planner::init_node(contraction_type contraction_type, const kripke::state_ptr &s, const kripke::action_ptr &a, bool was_bisim,
                             const node_ptr &parent, unsigned long long id, const states_ids_set &visited_states_ids,
                             const del::storages_ptr &storages, unsigned long b) {
     auto [is_bisim, s_contr] = kripke::bisimulator::contract(contraction_type, *s, b, storages);

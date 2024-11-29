@@ -39,7 +39,6 @@ bool updater::is_applicable(const state &s, const action &a, const del::label_st
 
 bool updater::is_applicable_world(const state &s, const action &a, const world_id wd, const del::label_storage_ptr &l_storage) {
     const auto check = [&](const event_id ed) { return model_checker::holds_in(s, wd, *a.get_precondition(ed), l_storage); };
-//    const auto check = [&](const event_id ed) { return a.get_precondition(ed)->holds_in(s, wd); };
     return std::any_of(a.get_designated_events().begin(), a.get_designated_events().end(), check);
 }
 

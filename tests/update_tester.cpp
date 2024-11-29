@@ -36,25 +36,25 @@
 using namespace daedalus::tester;
 using namespace kripke;
 
-state update_tester::test_CB_1(const std::string &out_path, bool print) {
+state update_tester::test_CB_1(const std::string &out_path, const del::label_storage_ptr &l_storage, bool print) {
     std::string cb_dir = "coin_in_the_box/";
 
-    state s0 = coin_in_the_box::build_initial_state();
+    state s0 = coin_in_the_box::build_initial_state(l_storage);
     del::language_ptr l = s0.get_language();
 
     del::formula_ptr heads = std::make_shared<del::atom_formula>(l->get_atom_id("heads"));
     action act = action_builder::build_public_announcement("shout_heads", l, heads);
 
-    state s_cb_heads = updater::product_update(s0, act);
+    state s_cb_heads = updater::product_update(s0, act, l_storage);
     printer::print_state(s_cb_heads, out_path + cb_dir, "cb_heads");
 
     return s_cb_heads;
 }
 
-state update_tester::test_CB_2(const std::string &out_path, bool print) {
+state update_tester::test_CB_2(const std::string &out_path, const del::label_storage_ptr &l_storage, bool print) {
     std::string cb_dir = "coin_in_the_box/";
 
-    state s0 = coin_in_the_box::build_initial_state();
+    state s0 = coin_in_the_box::build_initial_state(l_storage);
     del::language_ptr l = s0.get_language();
 
     const del::agent a = l->get_agent_id("a"), b = l->get_agent_id("b");
@@ -70,16 +70,16 @@ state update_tester::test_CB_2(const std::string &out_path, bool print) {
 
     action act = coin_in_the_box::build_open(a, fo_ags);
 
-    state s_cb_open = updater::product_update(s0, act);
+    state s_cb_open = updater::product_update(s0, act, l_storage);
     printer::print_state(s_cb_open, out_path + cb_dir, "cb_open");
 
     return s_cb_open;
 }
 
-state update_tester::test_CB_3(const std::string &out_path, bool print) {
+state update_tester::test_CB_3(const std::string &out_path, const del::label_storage_ptr &l_storage, bool print) {
     std::string cb_dir = "coin_in_the_box/";
 
-    state s_open = daedalus::tester::update_tester::test_CB_2(out_path, false);
+    state s_open = daedalus::tester::update_tester::test_CB_2(out_path, l_storage, false);
     del::language_ptr l = s_open.get_language();
 
     const del::agent a = l->get_agent_id("a"), b = l->get_agent_id("b");
@@ -93,7 +93,7 @@ state update_tester::test_CB_3(const std::string &out_path, bool print) {
 
     action act = action_builder::build_semi_private_sensing("peek_a", l, K_a_opened, heads, fo_ags, po_ags);
 
-    state s_cb_open_peek = kripke::updater::product_update(s_open, act);
+    state s_cb_open_peek = kripke::updater::product_update(s_open, act, l_storage);
     printer::print_state(s_cb_open_peek, out_path + cb_dir, "cb_open_peek");
 
     return s_cb_open_peek;

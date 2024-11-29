@@ -27,16 +27,14 @@
 
 using namespace kripke;
 
-std::pair<bool, state> bisimulator::contract(contraction_type type, state &s, unsigned long k,
-                                             const signature_storage_ptr &s_storage,
-                                             const information_state_storage_ptr &is_storage) {
+std::pair<bool, state> bisimulator::contract(contraction_type type, state &s, unsigned long k, const del::storages_ptr &storages) {
     switch (type) {
         case contraction_type::full:
-            return bounded_contraction_builder::calculate_rooted_contraction(s, s.get_max_depth() + 1, true, s_storage, is_storage);           // Classic Paige and Tarjan algorithm
+            return bounded_contraction_builder::calculate_rooted_contraction(s, s.get_max_depth() + 1, true, storages);           // Classic Paige and Tarjan algorithm
         case contraction_type::rooted:
             return bounded_contraction_builder::calculate_rooted_contraction(s, k);
         case contraction_type::canonical:
-            return bounded_contraction_builder::calculate_rooted_contraction(s, k, true, s_storage, is_storage);
+            return bounded_contraction_builder::calculate_rooted_contraction(s, k, true, storages);
     }
 }
 

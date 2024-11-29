@@ -53,38 +53,15 @@
 using namespace daedalus::tester;
 using namespace clipp;
 
-void storage_test();
+//void storage_test();
 void run(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
     run(argc, argv);
-//    storage_test();
-//    signature_storage_ptr s_storage = std::make_shared<storage<possibility>>();
-//    information_state_storage_ptr is_storage = std::make_shared<storage<information_state>>(information_state{});
-//
-//    search::planning_task t = collaboration_communication::build_task(2, 3, 2, 1);
-//    const unsigned long b = 1;
-//
-////    state s0_contr = bisimulator::contract(contraction_type::canonical, *t.get_initial_state(), b, s_storage, is_storage).second;
-//    state_deque ss = state_deque{t.get_initial_state()};
-//    kripke::action_deque as = t.get_actions({"left_a_11", "right_a_11", "left_a_11", "right_a_11", "left_b_11", "right_b_11"});
-//
-//    daedalus::tester::printer::print_states(ss, as, t.get_goal(),
-//                                            OUT_PATH + "product_update/" + t.get_domain_name() + "/" + t.get_problem_id() + "/",
-//                                            "s0", true, contraction_type::canonical, s_storage, is_storage);
-//
-////    state s2_contr = updater::product_update(s0_contr, as, true, contraction_type::canonical, b, s_storage, is_storage);
-//    assert(*ss[0] == *ss[ss.size()-1]);
-
-//    unsigned long k = 3;
-//    signature_storage_ptr s_storage = std::make_shared<storage<possibility>>();
-//    information_state_storage_ptr is_storage = std::make_shared<storage<information_state>>();
-
-//    search_tester::run_contractions_tests();
     return 0;
 }
 
-void storage_test() {
+/*void storage_test() {
 //    storage<int> int_storage;
 //    int x = 5, y = 5;
 //
@@ -117,7 +94,7 @@ void storage_test() {
     assert(sign_x_h->get_label() == sign_y_h->get_label());
     assert(sign_x_h->get_information_state(0) == sign_y_h->get_information_state(0));
     assert(*sign_x_h == *sign_y_h);
-}
+}*/
 
 void run(int argc, char *argv[]) {
     std::string semantics = "kripke", strategy = "unbounded", contraction_type = "full";
@@ -143,23 +120,28 @@ void run(int argc, char *argv[]) {
     }
 
     search::planning_task_ptr task;
+    del::label_storage_ptr l_storage = std::make_shared<storage<label>>();
+    del::signature_storage_ptr s_storage = std::make_shared<storage<signature>>();
+    del::information_state_storage_ptr is_storage = std::make_shared<storage<information_state>>(information_state{});
+
+    storages_ptr storages = std::make_shared<del::storages>(del::storages{std::move(l_storage), std::move(s_storage), std::move(is_storage)});
 
     if (domain == "active_muddy_children" or domain == "amc")
-        task = std::make_unique<search::planning_task>(active_muddy_children::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2])));
+        task = std::make_unique<search::planning_task>(active_muddy_children::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), storages->l_storage));
     else if (domain == "coin_in_the_box" or domain == "cb")
-        task = std::make_unique<search::planning_task>(coin_in_the_box::build_task(std::stoul(parameters[0])));
+        task = std::make_unique<search::planning_task>(coin_in_the_box::build_task(std::stoul(parameters[0]), storages->l_storage));
     else if (domain == "collaboration_communication" or domain == "cc")
-        task = std::make_unique<search::planning_task>(collaboration_communication::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), std::stoul(parameters[3])));
+        task = std::make_unique<search::planning_task>(collaboration_communication::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), std::stoul(parameters[3]), storages->l_storage));
     else if (domain == "consecutive_numbers" or domain == "cn")
-        task = std::make_unique<search::planning_task>(consecutive_numbers::build_task(std::stoul(parameters[0])));
+        task = std::make_unique<search::planning_task>(consecutive_numbers::build_task(std::stoul(parameters[0]), storages->l_storage));
     else if (domain == "gossip" or domain == "gos")
-        task = std::make_unique<search::planning_task>(gossip::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2])));
+        task = std::make_unique<search::planning_task>(gossip::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), storages->l_storage));
     else if (domain == "grapevine" or domain == "gra")
-        task = std::make_unique<search::planning_task>(grapevine::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2])));
+        task = std::make_unique<search::planning_task>(grapevine::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), storages->l_storage));
     else if (domain == "selective_communication" or domain == "sc")
-        task = std::make_unique<search::planning_task>(selective_communication::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2])));
+        task = std::make_unique<search::planning_task>(selective_communication::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), storages->l_storage));
     else if (domain == "tiger" or domain == "tig")
-        task = std::make_unique<search::planning_task>(tiger::build_task(std::stoul(parameters[0]), std::stoul(parameters[1])));
+        task = std::make_unique<search::planning_task>(tiger::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), storages->l_storage));
 
 //    search::delphic_planning_task task_ = delphic_utils::convert(*task);
 
@@ -169,7 +151,7 @@ void run(int argc, char *argv[]) {
     if (debug) {
         if (actions.empty()) {
             if (semantics == "kripke")
-                daedalus::tester::printer::print_results(*task, t, type, OUT_PATH);
+                daedalus::tester::printer::print_results(*task, t, type, storages, OUT_PATH);
             else if (semantics == "delphic") {}
 //                daedalus::tester::printer::print_delphic_results(task_, t, OUT_PATH);
         } else {
@@ -179,7 +161,7 @@ void run(int argc, char *argv[]) {
                 kripke::action_deque as = task->get_actions(actions);
 //                daedalus::tester::printer::print_state(*task->get_initial_state(), OUT_PATH + path, "s0");
                 state_deque ss = {task->get_initial_state()};
-                daedalus::tester::printer::print_states(ss, as, task->get_goal(), OUT_PATH + path, "s0", true, type);
+                daedalus::tester::printer::print_states(ss, as, storages, task->get_goal(), OUT_PATH + path, "s0", true, type);
             } else if (semantics == "delphic") {
 //                delphic::action_deque as = task_.get_actions(actions);
 //                daedalus::tester::printer::print_state(*task_.get_initial_state(), OUT_PATH + path, "W0");
@@ -217,8 +199,8 @@ void run(int argc, char *argv[]) {
 
         if (not print_info) {
             if (semantics == "kripke") {
-                if (print_results) daedalus::tester::printer::print_time_results(*task, t, type, out_file);
-                else search::planner::search(*task, t, type);
+                if (print_results) daedalus::tester::printer::print_time_results(*task, t, type, storages, out_file);
+                else search::planner::search(*task, t, type, storages);
             } else if (semantics == "delphic") {
 //                if (print_results) daedalus::tester::printer::print_delphic_time_results(task_, t, out_file);
 //                else search::delphic_planner::search(task_, t);

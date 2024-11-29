@@ -47,7 +47,7 @@ del::language_ptr consecutive_numbers::build_language(unsigned long n) {
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-kripke::state consecutive_numbers::build_initial_state(unsigned long n) {
+kripke::state consecutive_numbers::build_initial_state(unsigned long n, const label_storage_ptr &l_storage) {
     language_ptr language = consecutive_numbers::build_language(n);
 
     world_id worlds_number = n;
@@ -83,7 +83,8 @@ kripke::state consecutive_numbers::build_initial_state(unsigned long n) {
         lw[has_ag1_n] = true;
         lw[has_ag2_n] = true;
 
-        ls[w] = label{std::move(lw)};
+        label l = label{std::move(lw)};
+        ls[w] = l_storage->emplace(std::move(l));
     }
 
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
@@ -116,10 +117,10 @@ action_deque consecutive_numbers::build_actions(unsigned long n) {
     return actions;
 }
 
-search::planning_task consecutive_numbers::build_task(unsigned long n) {
+search::planning_task consecutive_numbers::build_task(unsigned long n, const label_storage_ptr &l_storage) {
     language_ptr language = consecutive_numbers::build_language(n);
 
-    state s0 = consecutive_numbers::build_initial_state(n);
+    state s0 = consecutive_numbers::build_initial_state(n, l_storage);
     action_deque actions = consecutive_numbers::build_actions(n);
 
     agent a = language->get_agent_id("a");
@@ -134,12 +135,12 @@ search::planning_task consecutive_numbers::build_task(unsigned long n) {
     return search::planning_task{consecutive_numbers::get_name(), std::to_string(n), language, std::move(s0), std::move(actions), std::move(goal)};
 }
 
-std::vector<search::planning_task> consecutive_numbers::build_tasks() {
+std::vector<search::planning_task> consecutive_numbers::build_tasks(const label_storage_ptr &l_storage) {
     const unsigned long N_MIN_TASKS = 4, N_MAX_TASK = 20;
     std::vector<search::planning_task> tasks;
 
     for (unsigned long n = N_MIN_TASKS; n <= N_MAX_TASK; ++n)
-        tasks.emplace_back(consecutive_numbers::build_task(n));
+        tasks.emplace_back(consecutive_numbers::build_task(n, l_storage));
 
     return tasks;
 }

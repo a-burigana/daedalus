@@ -24,9 +24,10 @@
 #ifndef DAEDALUS_UPDATER_H
 #define DAEDALUS_UPDATER_H
 
+#include "../../../language/language.h"
+#include "../../../../utils/storage_types.h"
 #include "../states/state.h"
 #include "../actions/action.h"
-#include "../../../language/language.h"
 #include "boost/dynamic_bitset.hpp"
 #include "../bisimulation/bisimulation_types.h"
 #include "../bisimulation/bounded_bisimulation_types.h"
@@ -34,33 +35,33 @@
 namespace kripke {
     class updater {
     public:
-        static bool is_applicable(const state &s, const action &a);
-        static state product_update(const state &s, const action &a);
+        static bool is_applicable(const state &s, const action &a, const del::label_storage_ptr &l_storage);
+        static state product_update(const state &s, const action &a, const del::label_storage_ptr &l_storage);
 
-        static state product_update(const state &s, const action_deque &as, bool apply_contraction = false,
-                                    contraction_type type = contraction_type::full, unsigned long k = 0,
-                                    const signature_storage_ptr &s_storage = nullptr,
-                                    const information_state_storage_ptr &is_storage = nullptr);
+        static state product_update(const state &s, const action_deque &as, const del::storages_ptr &storage,
+                                    bool apply_contraction = false, contraction_type type = contraction_type::full,
+                                    unsigned long k = 0);
 
     private:
         using updated_world            = std::pair<const world_id, const event_id>;
         using updated_world_pair       = std::pair<const updated_world, const updated_world>;
         using updated_worlds_map       = std::map<updated_world, world_id>;
-        using updated_world_pair_deque = std::deque<updated_world_pair>;        // std::deque<updated_world_pair>;   TODO: CHANGE BACK TO DEQUE!!!!!!!!!!!!!!!!!
+        using updated_world_pair_deque = std::deque<updated_world_pair>;
         using updated_edges_vector     = std::vector<updated_world_pair_deque>;
 
-        static bool is_applicable_world(const state &s, const action &a, world_id wd);
+        static bool is_applicable_world(const state &s, const action &a, world_id wd, const del::label_storage_ptr &l_storage);
 
-        static std::pair<world_id, world_set> calculate_worlds(const state &s, const action &a,
-                                                               updated_worlds_map &w_map, updated_edges_vector &r_map);
+        static std::pair<world_id, world_set> calculate_worlds(const state &s, const action &a, updated_worlds_map &w_map,
+                                                               updated_edges_vector &r_map, const del::label_storage_ptr &l_storage);
 
         static relations calculate_relations(const state &s, const action &a, world_id worlds_number,
                                              const updated_worlds_map &w_map, const updated_edges_vector &r_map);
 
         static label_vector calculate_labels(const state &s, const action &a, world_id worlds_number,
-                                             const updated_worlds_map &w_map);
+                                             const updated_worlds_map &w_map, const del::label_storage_ptr &l_storage);
 
-        static del::label update_world(const state &s, const world_id &w, const action &a, const event_id &e);
+        static label_id update_world(const state &s, const world_id &w, const action &a, const event_id &e,
+                                     const del::label_storage_ptr &l_storage);
     };
 }
 

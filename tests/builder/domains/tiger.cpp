@@ -56,7 +56,7 @@ del::language_ptr tiger::build_language(unsigned long doors_no, unsigned long ti
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-kripke::state tiger::build_initial_state(unsigned long doors_no, unsigned long tigers_no) {
+kripke::state tiger::build_initial_state(unsigned long doors_no, unsigned long tigers_no, const label_storage_ptr &l_storage) {
     language_ptr language = tiger::build_language(doors_no, tigers_no);
 
     unsigned long worlds_number = doors_no * domain_utils::binom(doors_no - 1, tigers_no), count = 0;
@@ -72,15 +72,16 @@ kripke::state tiger::build_initial_state(unsigned long doors_no, unsigned long t
         atom princess_i = language->get_atom_id("princess_" + std::to_string(i + 1));
 
         for (const auto &combination: room_combinations) {
-            boost::dynamic_bitset<> lw(language->get_atoms_number());
+            boost::dynamic_bitset<> bw(language->get_atoms_number());
 
-            lw[knight_1] = true;
-            lw[princess_i] = true;
+            bw[knight_1] = true;
+            bw[princess_i] = true;
 
             for (unsigned long j = 0; j < doors_no; ++j)
-                if (combination[j]) lw[language->get_atom_id("tiger_" + std::to_string(j + 1))] = true;
+                if (combination[j]) bw[language->get_atom_id("tiger_" + std::to_string(j + 1))] = true;
 
-            ls[count++] = label{std::move(lw)};
+            label lw = label{std::move(bw)};
+            ls[count++] = l_storage->emplace(std::move(lw));
         }
     }
 
@@ -116,18 +117,18 @@ kripke::action_deque tiger::build_actions(unsigned long doors_no, unsigned long 
     return actions;
 }
 
-search::planning_task tiger::build_task(unsigned long doors_no, unsigned long tigers_no) {
+search::planning_task tiger::build_task(unsigned long doors_no, unsigned long tigers_no, const label_storage_ptr &l_storage) {
     std::string name = tiger::get_name();
     std::string id = std::to_string(doors_no) + "_" + std::to_string(tigers_no);
 
     language_ptr language = tiger::build_language(doors_no, tigers_no);
-    state s0 = tiger::build_initial_state(doors_no, tigers_no);
+    state s0 = tiger::build_initial_state(doors_no, tigers_no, l_storage);
 
     action_deque actions = tiger::build_actions(doors_no, tigers_no);
     formula_ptr saved_princess = std::make_shared<atom_formula>(language->get_atom_id("saved_princess"));
 
     formula_deque fs = {std::move(saved_princess)};
-    const label &l = s0.get_label(s0.get_worlds_number()-1);
+    const label &l = *l_storage->get(s0.get_label_id(s0.get_worlds_number() - 1));
 
     for (unsigned long door = 0; door < doors_no; ++door) {
         atom tiger_d = language->get_atom_id("tiger_" + std::to_string(door+1));
@@ -141,13 +142,13 @@ search::planning_task tiger::build_task(unsigned long doors_no, unsigned long ti
     return search::planning_task{std::move(name), std::move(id), language, std::move(s0), std::move(actions), std::move(goal)};
 }
 
-std::vector<search::planning_task> tiger::build_tasks() {
+std::vector<search::planning_task> tiger::build_tasks(const label_storage_ptr &l_storage) {
     const unsigned long N_MIN_DOORS = 3, N_MAX_DOORS = 4, N_MIN_TIGERS = 1;
     std::vector<search::planning_task> tasks;
 
     for (unsigned long doors_no = N_MIN_DOORS; doors_no <= N_MAX_DOORS; ++doors_no)
         for (unsigned long tigers_no = N_MIN_TIGERS; tigers_no < doors_no; ++tigers_no)
-            tasks.push_back(build_task(doors_no, tigers_no));
+            tasks.push_back(build_task(doors_no, tigers_no, l_storage));
 
     return tasks;
 }

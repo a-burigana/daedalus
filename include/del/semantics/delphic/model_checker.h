@@ -31,16 +31,16 @@
 namespace delphic {
     class model_checker {
     public:
-        static bool holds_in(const possibility &w, const del::formula &f);
+        static bool holds_in(const possibility &w, const del::formula &f, const del::storages_ptr &storages);
 
     private:
-        static bool holds_in(const possibility &w, const del::atom_formula &f);
-        static bool holds_in(const possibility &w, const del::not_formula &f);
-        static bool holds_in(const possibility &w, const del::and_formula &f);
-        static bool holds_in(const possibility &w, const del::or_formula &f);
-        static bool holds_in(const possibility &w, const del::imply_formula &f);
-        static bool holds_in(const possibility &w, const del::box_formula &f);
-        static bool holds_in(const possibility &w, const del::diamond_formula &f);
+        static bool holds_in(const possibility &w, const del::atom_formula &f, const del::storages_ptr &storages);
+        static bool holds_in(const possibility &w, const del::not_formula &f, const del::storages_ptr &storages);
+        static bool holds_in(const possibility &w, const del::and_formula &f, const del::storages_ptr &storages);
+        static bool holds_in(const possibility &w, const del::or_formula &f, const del::storages_ptr &storages);
+        static bool holds_in(const possibility &w, const del::imply_formula &f, const del::storages_ptr &storages);
+        static bool holds_in(const possibility &w, const del::box_formula &f, const del::storages_ptr &storages);
+        static bool holds_in(const possibility &w, const del::diamond_formula &f, const del::storages_ptr &storages);
     };
 }
 

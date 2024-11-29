@@ -27,11 +27,10 @@
 
 using namespace delphic;
 
-possibility::possibility(del::language_ptr language, possibility_storage_ptr p_storage, information_state_storage_ptr is_storage,
-                         del::label label, agents_information_state state, unsigned long bound, std::optional<unsigned long> world) :
+possibility::possibility(del::language_ptr language, del::storages_ptr storages, label_id label,
+                         agents_information_state state, unsigned long bound, std::optional<unsigned long> world) :
     m_language{std::move(language)},
-    m_p_storage{std::move(p_storage)},
-    m_is_storage{std::move(is_storage)},
+    m_storages{std::move(storages)},
     m_label{std::move(label)},
     m_information_state{std::move(state)},
     m_bound{bound},
@@ -49,11 +48,11 @@ del::language_ptr possibility::get_language() const {
 //    return m_is_storage;
 //}
 
-possibility_ptr possibility::get(delphic::possibility_id w) const {
-    return m_p_storage->get(w);
-}
+//possibility_ptr possibility::get(delphic::possibility_id w) const {
+//    return m_storages->s_storage->get(w);
+//}
 
-const del::label &possibility::get_label() const {
+const label_id &possibility::get_label_id() const {
     return m_label;
 }
 
@@ -61,9 +60,10 @@ unsigned long possibility::get_bound() const {
     return m_bound;
 }
 
-const information_state &possibility::get_information_state(del::agent ag) const {
-    return *m_is_storage->get(m_information_state[ag]);
-}
+// todo:: use ids everywhere and do not use storages_ptr in states/actions. Use storages_ptr only where we need to extract information
+//const information_state &possibility::get_information_state(del::agent ag) const {
+//    return *m_storages->is_storage->get(m_information_state[ag]);
+//}
 
 const information_state_id possibility::get_information_state_id(del::agent ag) const {
     return m_information_state[ag];
@@ -73,8 +73,8 @@ void possibility::set_information_state(del::agent ag, delphic::information_stat
     m_information_state[ag] = is;
 }
 
-bool possibility::satisfies(const del::formula_ptr &f) const {
-    return model_checker::holds_in(*this, *f);
+bool possibility::satisfies(const del::formula_ptr &f, const del::storages_ptr &storages) const {
+    return model_checker::holds_in(*this, *f, storages);
 }
 
 bool possibility::operator<(const possibility &rhs) const {

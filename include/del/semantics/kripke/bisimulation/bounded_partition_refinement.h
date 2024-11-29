@@ -64,7 +64,7 @@ namespace kripke {
         // Initialization of structures
         static bpr_structures init_structures(const state &s, unsigned long long k);
 
-        static void init_partitions_helper(const state &s, std::map<const del::label, block_ptr> &partition,
+        static void init_partitions_helper(const state &s, std::map<const label_id, block_ptr> &partition,
                                            world_id w, block_matrix &worlds_blocks, block_id &count);
 
         static relations init_preimage(const state &s);

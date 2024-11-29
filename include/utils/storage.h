@@ -28,31 +28,39 @@
 #include <deque>
 #include <map>
 
-template<typename Elem>
-class storage {
-    using Elem_ptr = std::shared_ptr<Elem>;
-    using Elem_id = unsigned long long;
+namespace del {
+    template<typename Elem>
+    class storage {
+        using storage_ptr = std::shared_ptr<storage<Elem>>;
+        using Elem_ptr = std::shared_ptr<Elem>;
+        using Elem_id = unsigned long long;
 
-public:
-    storage();
-    explicit storage(Elem &&null);
+    public:
+        storage();
 
-    storage(const storage&) = default;
-    storage& operator=(const storage&) = default;
+        explicit storage(Elem &&null);
 
-    storage(storage&&) noexcept = default;
-    storage& operator=(storage&&) noexcept = default;
+        storage(const storage &) = default;
+        storage &operator=(const storage &) = default;
 
-    ~storage() = default;
+        storage(storage &&) noexcept = default;
+        storage &operator=(storage &&) noexcept = default;
 
-    Elem_id emplace(Elem &&elem);
-    Elem_ptr get(Elem_id id) const;
-    [[nodiscard]] bool is_null(Elem_id id) const;
+        ~storage() = default;
 
-private:
-    std::map<Elem, Elem_id> m_elements_ids;
-    std::deque<Elem_ptr> m_elements;
-    unsigned long m_count;
-};
+        Elem_id emplace(Elem &&elem);
+        Elem_ptr get(Elem_id id) const;
+        [[nodiscard]] bool is_null(Elem_id id) const;
+
+//        static Elem_id emplace(const storage_ptr &storage, Elem &&elem);
+//        static Elem_ptr get(const storage_ptr &storage, Elem_id id);
+//        [[nodiscard]] static bool is_null(const storage_ptr &storage, Elem_id id);
+
+    private:
+        std::map<Elem, Elem_id> m_elements_ids;
+        std::deque<Elem_ptr> m_elements;
+        unsigned long m_count;
+    };
+}
 
 #endif //DAEDALUS_STORAGE_H

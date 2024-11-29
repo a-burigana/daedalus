@@ -34,20 +34,17 @@ namespace kripke {
     class bounded_identification {
     public:
         static std::pair<signature_matrix, signature_map>
-        calculate_signatures(const state &s, unsigned long k, const signature_storage_ptr& s_storage,
-                             const information_state_storage_ptr &is_storage);
+        calculate_signatures(const state &s, unsigned long k, const del::storages_ptr &storages);
 
-        static information_state_id calculate_state_id(const state &s, unsigned long k, const signature_storage_ptr& s_storage,
-                                                       const information_state_storage_ptr &is_storage);
+        static information_state_id calculate_state_id(const state &s, unsigned long k, const del::storages_ptr &storages);
 
         static unsigned long long calculate_world_signature(const state &s, unsigned long k, world_id x, unsigned long h,
-                                              const signature_storage_ptr& s_storage, const information_state_storage_ptr &is_storage,
-                                              signature_matrix &worlds_signatures);
+                                                            const del::storages_ptr &storages, signature_matrix &worlds_signatures);
 
     private:
         static void calculate_world_signature(const state &s, unsigned long k, world_id x, unsigned long h,
-                                              const signature_storage_ptr& s_storage, const information_state_storage_ptr &is_storage,
-                                              signature_matrix &worlds_signatures, signature_map &sign_map);
+                                              const del::storages_ptr &storages, signature_matrix &worlds_signatures,
+                                              signature_map &sign_map);
     };
 }
 

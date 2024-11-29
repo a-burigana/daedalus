@@ -107,43 +107,44 @@ void printer::print_action(const kripke::action &a, const std::string &path) {
     dot_file.close();
 }
 
-state_deque printer::print_states(kripke::state_deque &ss, kripke::action_deque &as, const del::formula_ptr &goal,
-                                  const std::string &path, const std::string &name, bool apply_contraction, kripke::contraction_type type,
-                                  const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage) {
+state_deque printer::print_states(kripke::state_deque &ss, kripke::action_deque &as, const del::storages_ptr &storages,
+                                  const del::formula_ptr &goal, const std::string &path, const std::string &name,
+                                  bool apply_contraction, kripke::contraction_type type) {
     kripke::state &s = *ss.back();
 
     if (apply_contraction)
-        s = kripke::bisimulator::contract(type, s, goal->get_modal_depth(), s_storage, is_storage).second;
+        s = kripke::bisimulator::contract(type, s, goal->get_modal_depth(), storages).second;
 
     print_state(s, path, name);
 
     if (as.empty())
         return ss;
 
-    if (not kripke::updater::is_applicable(s, *as.front())) {
+    if (not kripke::updater::is_applicable(s, *as.front(), storages->l_storage)) {
         std::cout << "Action '" << as.front()->get_name() << "' is not applicable" << std::endl;
         return ss;
     }
 
-    kripke::state s_ = kripke::updater::product_update(s, *as.front());
+    kripke::state s_ = kripke::updater::product_update(s, *as.front(), storages->l_storage);
 
-    if (s_.satisfies(goal))
+    if (s_.satisfies(goal, storages->l_storage))
         std::cout << "Goal found after applying '" << as.front()->get_name() << "'" << std::endl;
 
     std::string new_name = name + "_" + as.front()->get_name();
     ss.emplace_back(std::make_shared<kripke::state>(std::move(s_)));
     as.pop_front();
 
-    return print_states(ss, as, goal, path, new_name, apply_contraction, type, s_storage, is_storage);
+    return print_states(ss, as, storages, goal, path, new_name, apply_contraction, type);
 }
 
 void
 printer::print_states(const delphic::possibility_spectrum_ptr &W, const delphic::action_deque &as, const del::formula_ptr &goal,
                       const std::string &path, const std::string &name) {
-    if (not delphic::union_updater::is_applicable(W, as.front())) {
-        std::cout << "Action '" << as.front()->get_name() << "' is not applicable" << std::endl;
-        return;
-    }
+    // todo: UNCOMMENT AND FIX
+//    if (not delphic::union_updater::is_applicable(W, as.front())) {
+//        std::cout << "Action '" << as.front()->get_name() << "' is not applicable" << std::endl;
+//        return;
+//    }
 
     auto W_ = delphic::union_updater::update(W, as.front());
     std::string new_name = name + "_" + as.front()->get_name();
@@ -152,8 +153,9 @@ printer::print_states(const delphic::possibility_spectrum_ptr &W, const delphic:
     delphic::action_deque as_ = as;
     as_.pop_front();
 
-    if (W_->satisfies(goal))
-        std::cout << "Goal found after applying '" << as.front()->get_name() << "'" << std::endl;
+    // todo: UNCOMMENT AND FIX
+//    if (W_->satisfies(goal))
+//        std::cout << "Goal found after applying '" << as.front()->get_name() << "'" << std::endl;
 
     if (as_.empty())
         return;
@@ -181,7 +183,7 @@ void printer::print_task(const search::planning_task &task, const std::string &p
         printer::print_action(*a,task_path + "actions/");
 }
 
-void printer::print_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, const std::string &out_path) {
+void printer::print_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, const del::storages_ptr &storages, const std::string &out_path) {
     std::string out_task_path =
             out_path + "search/" + task.get_domain_name() + "/problem_" + task.get_problem_id() + "/";
     std::string strategy_str = strategy == search::strategy::unbounded_search
@@ -189,7 +191,7 @@ void printer::print_results(const search::planning_task &task, search::strategy 
                                : "iter_bounded/";
 
     printer search_printer(true, out_task_path + strategy_str, "search_tree.txt");
-    search::node_deque path = search::planner::search(task, strategy, contraction_type,
+    search::node_deque path = search::planner::search(task, strategy, contraction_type, storages,
                                                       std::make_unique<printer>(std::move(search_printer)));
     std::string state_name = "s0";
 
@@ -211,16 +213,17 @@ void printer::print_delphic_results(const search::delphic_planning_task &task, s
                                : "iter_bounded/";
 
     printer search_printer(true, out_task_path + strategy_str, "search_tree.txt");
-    search::delphic_node_deque path = search::delphic_planner::search(task, strategy, std::make_unique<printer>(std::move(search_printer)));
-    std::string state_name = "s0";
-
-    for (const auto &node: path) {
-        if (node->get_action())
-            state_name += "_" + node->get_action()->get_name();
-
-        if (not out_path.empty())
-            daedalus::tester::printer::print_state(delphic::delphic_utils::convert(*node->get_state()), out_task_path + strategy_str, state_name);
-    }
+    // todo: UNCOMMENT AND FIX
+//    search::delphic_node_deque path = search::delphic_planner::search(task, strategy, std::make_unique<printer>(std::move(search_printer)));
+//    std::string state_name = "s0";
+//
+//    for (const auto &node: path) {
+//        if (node->get_action())
+//            state_name += "_" + node->get_action()->get_name();
+//
+//        if (not out_path.empty())
+//            daedalus::tester::printer::print_state(delphic::delphic_utils::convert(*node->get_state()), out_task_path + strategy_str, state_name);
+//    }
 }
 
 void printer::print_domain_info(const search::planning_task &task, std::ofstream &table) {
@@ -237,9 +240,9 @@ void printer::print_domain_info(const search::planning_task &task, std::ofstream
         << task.get_initial_state()->get_worlds_number() << ";" << actions_no << ";" << goal_depth << ";";
 }
 
-void printer::print_time_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, std::ofstream &table) {
+void printer::print_time_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, const del::storages_ptr &storages, std::ofstream &table) {
     auto start = std::chrono::steady_clock::now();
-    search::node_deque path = search::planner::search(task, strategy, contraction_type);
+    search::node_deque path = search::planner::search(task, strategy, contraction_type, storages);
     auto end = std::chrono::steady_clock::now();
     auto delta = since(start).count();
 
@@ -259,19 +262,20 @@ void printer::print_time_results(const search::planning_task &task, search::stra
 }
 
 void printer::print_delphic_time_results(const search::delphic_planning_task &task, search::strategy strategy, std::ofstream &table) {
-    auto start = std::chrono::steady_clock::now();
-    search::delphic_node_deque path = search::delphic_planner::search(task, strategy);
-    auto end = std::chrono::steady_clock::now();
-    auto delta = since(start).count();
-
-    unsigned long plan_length = path.size() - 1;
-    double time = static_cast<double>(delta) / 1000;
-
-    table
-        << std::to_string(plan_length) << ";"
-        << path.back()->get_id() << ";"
-        << std::to_string(time);
-
-    std::chrono::seconds pause(10);
-    std::this_thread::sleep_for(pause);
+    // todo: UNCOMMENT AND FIX
+//    auto start = std::chrono::steady_clock::now();
+//    search::delphic_node_deque path = search::delphic_planner::search(task, strategy);
+//    auto end = std::chrono::steady_clock::now();
+//    auto delta = since(start).count();
+//
+//    unsigned long plan_length = path.size() - 1;
+//    double time = static_cast<double>(delta) / 1000;
+//
+//    table
+//        << std::to_string(plan_length) << ";"
+//        << path.back()->get_id() << ";"
+//        << std::to_string(time);
+//
+//    std::chrono::seconds pause(10);
+//    std::this_thread::sleep_for(pause);
 }

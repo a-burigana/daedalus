@@ -36,11 +36,11 @@ namespace daedalus::tester {
         static std::string get_name();
 
         static del::language_ptr build_language();
-        static kripke::state build_initial_state();
+        static kripke::state build_initial_state(const del::label_storage_ptr &l_storage);
 
         static kripke::action_deque build_actions();
-        static search::planning_task build_task(unsigned long id);
-        static std::vector<search::planning_task> build_tasks();
+        static search::planning_task build_task(unsigned long id, const del::label_storage_ptr &l_storage);
+        static std::vector<search::planning_task> build_tasks(const del::label_storage_ptr &l_storage);
 
         static kripke::action build_open(del::agent ag, const del::agent_set &fo_ags);
         static kripke::action build_peek(del::agent ag, const del::agent_set &po_ags);
@@ -49,12 +49,12 @@ namespace daedalus::tester {
         static kripke::action build_walk_out(del::agent ag, const del::agent_set &fo_ags);
 
     private:
-        static search::planning_task build_task_1();
-        static search::planning_task build_task_2();
-        static search::planning_task build_task_3();
-        static search::planning_task build_task_4();
-        static search::planning_task build_task_5();
-        static search::planning_task build_task_6();
+        static search::planning_task build_task_1(const del::label_storage_ptr &l_storage);
+        static search::planning_task build_task_2(const del::label_storage_ptr &l_storage);
+        static search::planning_task build_task_3(const del::label_storage_ptr &l_storage);
+        static search::planning_task build_task_4(const del::label_storage_ptr &l_storage);
+        static search::planning_task build_task_5(const del::label_storage_ptr &l_storage);
+        static search::planning_task build_task_6(const del::label_storage_ptr &l_storage);
 
         static del::formula_deque looking_agents(const del::language_ptr &language, const del::agent_set &ags);
         static del::formula_deque B_looking_agents(const del::language_ptr &language, const del::agent_set &ags,

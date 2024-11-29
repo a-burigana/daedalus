@@ -56,7 +56,7 @@ bool state::has_edge(const agent ag, const world_id w, const world_id v) const {
     return (*m_relations[ag][w])[v];
 }
 
-const del::label &state::get_label(const world_id w) const {
+const label_id &state::get_label_id(const world_id w) const {
     return m_labels[w];
 }
 
@@ -84,9 +84,9 @@ unsigned long long state::get_max_depth() const {
     return m_max_depth;
 }
 
-bool state::satisfies(const formula_ptr &f) const {
+bool state::satisfies(const formula_ptr &f, const del::label_storage_ptr &l_storage) const {
     return std::all_of(m_designated_worlds.begin(), m_designated_worlds.end(),
-                       [&](const world_id wd) { return model_checker::holds_in(*this, wd, *f); });
+                       [&](const world_id wd) { return model_checker::holds_in(*this, wd, *f, l_storage); });
 }
 
 void state::calculate_worlds_depth() {
@@ -265,13 +265,13 @@ std::ostream &kripke::operator<<(std::ostream &os, const state &s) {
         os << "\t\t\t\t<TD>" << std::endl;
 
         for (atom p = 0; p < s.get_language()->get_atoms_number(); ++p) {
-            if (s.get_label(w)[p]) {
+//            if (s.get_label(w)[p]) { todo: UNCOMMENT AND FIX
                 std::string_view color = "blue";        // s.get_label(w)[p] ? "blue" : "red";
                 std::string_view sep   = " ";           // p < s.get_language()->get_atoms_number() - 1 ? ", " : "";
 
                 os << "\t\t\t\t\t<font color=\"" << color << "\">" << s.get_language()->get_atom_name(p) << "</font>"
                    << sep << std::endl;
-            }
+//            }
         }
 
         os

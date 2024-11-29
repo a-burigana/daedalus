@@ -25,19 +25,17 @@
 #define DAEDALUS_BISIMULATOR_H
 
 #include <utility>
-#include "../states/state.h"
 #include "../../../language/language.h"
-#include "bisimulation_types.h"
-#include "../../../../search/search_types.h"
 #include "bounded_bisimulation_types.h"
-#include "../../../../utils/storage.h"
+#include "../../../../utils/storage_types.h"
+#include "../states/state.h"
+#include "bisimulation_types.h"
 
 namespace kripke {
     class bisimulator {
     public:
         static std::pair<bool, state> contract(contraction_type type, state &s, unsigned long k = 0,
-                                               const signature_storage_ptr &s_storage = nullptr,
-                                               const information_state_storage_ptr &is_storage = nullptr);
+                                               const del::storages_ptr &storages = nullptr);
 //        static bool contract(bisimulation_type type, search::node_ptr &n);
 //        static bool repeat_contraction(search::node_ptr &n);
     };

@@ -29,7 +29,6 @@
 #include <set>
 #include <unordered_set>
 #include <unordered_map>
-#include "../../../../utils/storage.h"
 
 namespace delphic {
     class possibility;
@@ -39,6 +38,8 @@ namespace delphic {
     using possibility_id = unsigned long long;
     using possibility_ptr = std::shared_ptr<possibility>;
     using possibility_spectrum_ptr = std::shared_ptr<possibility_spectrum>;
+
+    using label_id = unsigned long long;
 
     using information_state = std::set<possibility_id>;
     using information_state_id = unsigned long long;
@@ -52,8 +53,8 @@ namespace delphic {
 //    template<> class storage<possibility>;
 //    template<> class storage<information_state>;
 //
-    using possibility_storage_ptr = std::shared_ptr<storage<possibility>>;
-    using information_state_storage_ptr = std::shared_ptr<storage<information_state>>;
+//    using possibility_storage_ptr = std::shared_ptr<storage<possibility>>;
+//    using information_state_storage_ptr = std::shared_ptr<storage<information_state>>;
 }
 
 #endif //DAEDALUS_POSSIBILITY_TYPES_H

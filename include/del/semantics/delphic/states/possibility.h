@@ -32,12 +32,13 @@
 #include "../../../language/label.h"
 #include "../../../formulas/formula.h"
 #include "../../../language/language.h"
+#include "../../../../utils/storage_types.h"
 
 namespace delphic {
     class possibility {
     public:
-        possibility(del::language_ptr language, possibility_storage_ptr p_storage, information_state_storage_ptr is_storage,
-                    del::label label, agents_information_state state, unsigned long bound = 0,
+        possibility(del::language_ptr language, del::storages_ptr storages,
+                    label_id label, agents_information_state state, unsigned long bound = 0,
                     std::optional<unsigned long> world = std::nullopt);
 
         possibility(const possibility&) = default;
@@ -52,15 +53,15 @@ namespace delphic {
 //        [[nodiscard]] possibility_storage_ptr get_possibility_storage() const;
 //        [[nodiscard]] information_state_storage_ptr get_information_state_storage() const;
 
-        [[nodiscard]] possibility_ptr get(possibility_id w) const;
-        [[nodiscard]] const del::label &get_label() const;
+//        [[nodiscard]] possibility_ptr get(possibility_id w) const;
+        [[nodiscard]] const label_id &get_label_id() const;
         [[nodiscard]] unsigned long get_bound() const;
-        [[nodiscard]] const information_state &get_information_state(del::agent ag) const;
+//        [[nodiscard]] const information_state &get_information_state(del::agent ag) const;
         [[nodiscard]] const information_state_id get_information_state_id(del::agent ag) const;
 
         void set_information_state(del::agent ag, information_state_id &is);
 
-        [[nodiscard]] bool satisfies(const del::formula_ptr &f) const;
+        [[nodiscard]] bool satisfies(const del::formula_ptr &f, const del::storages_ptr &storages) const;
 
         bool operator< (const possibility &rhs) const;
         bool operator> (const possibility &rhs) const;
@@ -71,10 +72,9 @@ namespace delphic {
 
     private:
         del::language_ptr m_language;
-        possibility_storage_ptr m_p_storage;
-        information_state_storage_ptr m_is_storage;
+        del::storages_ptr m_storages;
 
-        del::label m_label;
+        label_id m_label;
         agents_information_state m_information_state;
         unsigned long m_bound;
         std::optional<unsigned long> m_world;

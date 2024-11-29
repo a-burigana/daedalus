@@ -107,15 +107,16 @@ kripke::state delphic_utils::convert(const delphic::possibility_spectrum &W) {
     while (not to_visit.empty()) {
         auto first = to_visit.begin();
         const possibility_id current_id = *first;
-        const possibility_ptr &current = W.get(current_id);
+        const possibility_ptr current; // todo: UNCOMMENT AND FIX = W.get(current_id);
 
         world_map[current_id] = worlds_number++;
         visited.emplace(current_id);
 
-        for (del::agent ag = 0; ag < W.get_language()->get_agents_number(); ++ag)
-            for (auto &w : current->get_information_state(ag))
-                if (visited.find(w) == visited.end())
-                    to_visit.emplace(w);
+        // todo: UNCOMMENT AND FIX
+//        for (del::agent ag = 0; ag < W.get_language()->get_agents_number(); ++ag)
+//            for (auto &w : current->get_information_state(ag))
+//                if (visited.find(w) == visited.end())
+//                    to_visit.emplace(w);
 
         to_visit.erase(first);
     }
@@ -128,15 +129,17 @@ kripke::state delphic_utils::convert(const delphic::possibility_spectrum &W) {
         for (kripke::world_id w = 0; w < worlds_number; ++w)
             r[ag][w] = kripke::world_set(worlds_number);
 
-        for (const auto &[w, w_id] : world_map)
-            for (auto &v : W.get(w)->get_information_state(ag))
-                r[ag][w_id].push_back(world_map[v]);
+        // todo: UNCOMMENT AND FIX
+//        for (const auto &[w, w_id] : world_map)
+//            for (auto &v : W.get(w)->get_information_state(ag))
+//                r[ag][w_id].push_back(world_map[v]);
     }
 
     kripke::label_vector ls(worlds_number);
 
-    for (const auto &[w, w_id] : world_map)
-        ls[w_id] = W.get(w)->get_label();
+    // todo: UNCOMMENT AND FIX
+//    for (const auto &[w, w_id] : world_map)
+//        ls[w_id] = W.get(w)->get_label();
 
     kripke::world_set designated_worlds(worlds_number);
 

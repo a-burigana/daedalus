@@ -31,25 +31,26 @@
 namespace daedalus::tester {
     class search_tester {
     public:
-        static void run_formulas_tests();
+        static void run_formulas_tests(const del::label_storage_ptr &l_storage);
         static void run_actions_tests();
-        static void run_product_update_tests();
-        static void run_contractions_tests();
+        static void run_product_update_tests(const del::label_storage_ptr &l_storage);
+        static void run_contractions_tests(const del::storages_ptr &storage);
 
-        static void run_coin_in_the_box_search_tests();
-        static void run_consecutive_numbers_search_tests();
-        static void run_selective_communication_search_tests();
-        static void run_collaboration_communication_search_tests();
+        static void run_coin_in_the_box_search_tests(const del::storages_ptr &storages);
+        static void run_consecutive_numbers_search_tests(const del::storages_ptr &storages);
+        static void run_selective_communication_search_tests(const del::storages_ptr &storages);
+        static void run_collaboration_communication_search_tests(const del::storages_ptr &storages);
 
-        static void print_coin_in_the_box_search_tests();
-        static void print_consecutive_numbers_search_tests();
-        static void print_selective_communication_search_tests();
-        static void print_collaboration_communication_search_tests();
+        static void print_coin_in_the_box_search_tests(const del::storages_ptr &storages);
+        static void print_consecutive_numbers_search_tests(const del::storages_ptr &storages);
+        static void print_selective_communication_search_tests(const del::storages_ptr &storages);
+        static void print_collaboration_communication_search_tests(const del::storages_ptr &storages);
 
-        static void run_search_tests(const std::vector<search::planning_task> &tasks);
-        static void print_search_results(const std::vector<search::planning_task> &tasks);
+        static void run_search_tests(const std::vector<search::planning_task> &tasks, const del::storages_ptr &storages);
+        static void print_search_results(const std::vector<search::planning_task> &tasks, const del::storages_ptr &storages);
         static void print_time_results(const std::vector<search::planning_task> &tasks, search::strategy strategy,
-                                       kripke::contraction_type contraction_type, const std::string &table_path);
+                                       kripke::contraction_type contraction_type, const del::storages_ptr &storages,
+                                       const std::string &table_path);
 
 //        static void print_coin_in_the_box_time_results();
 //        static void print_consecutive_numbers_time_results();

@@ -21,33 +21,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef DAEDALUS_STATES_TYPES_H
-#define DAEDALUS_STATES_TYPES_H
+#ifndef DAEDALUS_STORAGE_TYPES_H
+#define DAEDALUS_STORAGE_TYPES_H
 
-#include <vector>
-#include <deque>
-#include <boost/dynamic_bitset.hpp>
-#include "../../../language/label.h"
-#include "../../../language/language_types.h"
-#include "../../../../utils/bit_deque.h"
+#include <memory>
+#include "storage.h"
+#include "../del/semantics/delphic/states/possibility_types.h"
 
-namespace kripke {
-    class state;
-    using state_ptr = std::shared_ptr<state>;
+namespace del {
+    class label;
 
-    using state_id          = unsigned long long;
-    using state_deque       = std::deque<state_ptr>;
+    using label_storage_ptr             = std::shared_ptr<storage<label>>;
+    using possibility_storage_ptr       = std::shared_ptr<storage<delphic::possibility>>;
+    using signature_storage_ptr         = possibility_storage_ptr;
+    using information_state_storage_ptr = std::shared_ptr<storage<delphic::information_state>>;
 
-    using world_id          = unsigned long long;
-    using world_set         = bit_deque;
-    using world_deque       = std::deque<world_id>;
+    struct storages {
+        label_storage_ptr l_storage;
+        signature_storage_ptr s_storage;
+        information_state_storage_ptr is_storage;
+    };
 
-    using agent_relation    = std::vector<world_set>;
-    using relations         = std::vector<agent_relation>;
-
-    using label_id          = unsigned long long;
-    using label_vector      = std::vector<label_id>;
-//    using label_storage_ptr = std::shared_ptr<storage<del::label>>;
+    using storages_ptr = std::shared_ptr<storages>;
 }
 
-#endif //DAEDALUS_STATES_TYPES_H
+#endif //DAEDALUS_STORAGE_TYPES_H

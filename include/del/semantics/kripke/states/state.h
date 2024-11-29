@@ -31,6 +31,7 @@
 #include "states_types.h"
 #include "../../../formulas/formula.h"
 #include "../../../language/language.h"
+#include "../../../../utils/storage_types.h"
 
 namespace kripke {
     class state {
@@ -49,7 +50,7 @@ namespace kripke {
         [[nodiscard]] unsigned long long get_worlds_number() const;
         [[nodiscard]] const world_set &get_agent_possible_worlds(del::agent ag, world_id w) const;
         [[nodiscard]] bool has_edge(del::agent ag, world_id w, world_id v) const;
-        [[nodiscard]] const del::label &get_label(world_id w) const;
+        [[nodiscard]] const label_id &get_label_id(world_id w) const;
         [[nodiscard]] const world_set &get_designated_worlds() const;
         [[nodiscard]] unsigned long long get_id() const;
         [[nodiscard]] bool is_designated(world_id w) const;
@@ -57,7 +58,7 @@ namespace kripke {
         [[nodiscard]] del::language_ptr get_language() const;
         [[nodiscard]] unsigned long long get_depth(world_id w) const;
         [[nodiscard]] unsigned long long get_max_depth() const;
-        [[nodiscard]] bool satisfies(const del::formula_ptr &f) const;
+        [[nodiscard]] bool satisfies(const del::formula_ptr &f, const del::label_storage_ptr &l_storage) const;
 
         bool operator< (const state &rhs) const;
         bool operator<=(const state &rhs) const;

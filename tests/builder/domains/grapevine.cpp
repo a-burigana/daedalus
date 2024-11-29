@@ -56,7 +56,7 @@ del::language_ptr grapevine::build_language(unsigned long agents_no, unsigned lo
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-kripke::state grapevine::build_initial_state(unsigned long agents_no, unsigned long secrets_no) {
+kripke::state grapevine::build_initial_state(unsigned long agents_no, unsigned long secrets_no, const label_storage_ptr &l_storage) {
     language_ptr language = grapevine::build_language(agents_no, secrets_no);
 
     const auto worlds_number = static_cast<const world_id>(std::exp2(secrets_no));
@@ -69,7 +69,8 @@ kripke::state grapevine::build_initial_state(unsigned long agents_no, unsigned l
         for (unsigned long bit = 0; bit < agents_no; ++bit)
             combination.push_back(true);
 
-        ls[count++] = label{combination};
+        label l = label{combination};
+        ls[count++] = l_storage->emplace(std::move(l));
     }
     boost::dynamic_bitset<> all_worlds(worlds_number);
     all_worlds.set();
@@ -85,14 +86,19 @@ kripke::state grapevine::build_initial_state(unsigned long agents_no, unsigned l
 
     for (agent ag = 0; ag < secrets_no; ++ag)
         for (world_id w = 0; w < worlds_number; ++w)
-            for (world_id v = 0; v < worlds_number; ++v)
-                if (ls[w][ag] != ls[v][ag])
+            for (world_id v = 0; v < worlds_number; ++v) {
+                label &lw = *l_storage->get(ls[w]), &lv = *l_storage->get(ls[v]);
+
+                if (lw[ag] != lv[ag])
                     r[ag][w].remove(v);
+            }
 
     world_id designated;
 
-    for (world_id w = 0; w < worlds_number; ++w)
-        if (ls[w].get_bitset().all()) designated = w;
+    for (world_id w = 0; w < worlds_number; ++w) {
+        label &lw = *l_storage->get(ls[w]);
+        if (lw.get_bitset().all()) designated = w;
+    }
 
     world_set designated_worlds = world_set{worlds_number, world_deque{designated}};
 
@@ -120,19 +126,19 @@ kripke::action_deque grapevine::build_actions(unsigned long agents_no, unsigned 
     return actions;
 }
 
-search::planning_task grapevine::build_task(unsigned long agents_no, unsigned long secrets_no, unsigned long learning_ags_no) {
+search::planning_task grapevine::build_task(unsigned long agents_no, unsigned long secrets_no, unsigned long learning_ags_no, const label_storage_ptr &l_storage) {
     std::string name = grapevine::get_name();
     std::string id   = std::to_string(agents_no) + "_" + std::to_string(secrets_no) + "_" + std::to_string(learning_ags_no);
     language_ptr language = grapevine::build_language(agents_no, secrets_no);
 
-    state s0 = grapevine::build_initial_state(agents_no, secrets_no);
+    state s0 = grapevine::build_initial_state(agents_no, secrets_no, l_storage);
     action_deque actions = grapevine::build_actions(agents_no, secrets_no);
     formula_ptr goal = grapevine::build_goal(agents_no, secrets_no, learning_ags_no);
 
     return search::planning_task{std::move(name), std::move(id), language, std::move(s0), std::move(actions), std::move(goal)};
 }
 
-std::vector<search::planning_task> grapevine::build_tasks() {
+std::vector<search::planning_task> grapevine::build_tasks(const label_storage_ptr &l_storage) {
     const unsigned long N_MIN_AGS = 3, N_MAX_AGS = 7, N_MIN_SECRETS = 1, N_MAX_SECRETS = 4;
 
     std::vector<search::planning_task> tasks;
@@ -140,7 +146,7 @@ std::vector<search::planning_task> grapevine::build_tasks() {
     for (unsigned long agents_no = N_MIN_AGS; agents_no <= N_MAX_AGS; ++agents_no)
         for (unsigned long secrets_no = N_MIN_SECRETS; secrets_no <= N_MAX_SECRETS; ++secrets_no)
             for (unsigned long learning_ags_no = 1; learning_ags_no <= agents_no; ++learning_ags_no)
-                tasks.push_back(build_task(agents_no, secrets_no, learning_ags_no));
+                tasks.push_back(build_task(agents_no, secrets_no, learning_ags_no, l_storage));
 
     return tasks;
 }

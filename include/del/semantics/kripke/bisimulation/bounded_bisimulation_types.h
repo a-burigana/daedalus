@@ -65,8 +65,8 @@ namespace kripke {
     using information_state_id = delphic::information_state_id;
     using agents_information_state = delphic::agents_information_state;
 
-    using signature_storage_ptr = std::shared_ptr<storage<signature>>;
-    using information_state_storage_ptr = delphic::information_state_storage_ptr;
+//    using signature_storage_ptr = std::shared_ptr<storage<signature>>;
+//    using information_state_storage_ptr = delphic::information_state_storage_ptr;
 
 //    struct bi_structures {
 //        signature_matrix worlds_signatures;

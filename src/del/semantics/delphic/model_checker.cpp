@@ -26,59 +26,59 @@
 
 using namespace delphic;
 
-bool model_checker::holds_in(const possibility &w, const del::formula &f) {
+bool model_checker::holds_in(const possibility &w, const del::formula &f, const del::storages_ptr &storages) {
     switch (f.get_type()) {
         case del::formula_type::true_formula:
             return true;
         case del::formula_type::false_formula:
             return false;
         case del::formula_type::atom_formula:
-            return model_checker::holds_in(w, dynamic_cast<const del::atom_formula &>(f));
+            return model_checker::holds_in(w, dynamic_cast<const del::atom_formula &>(f), storages);
         case del::formula_type::not_formula:
-            return model_checker::holds_in(w, dynamic_cast<const del::not_formula &>(f));
+            return model_checker::holds_in(w, dynamic_cast<const del::not_formula &>(f), storages);
         case del::formula_type::and_formula:
-            return model_checker::holds_in(w, dynamic_cast<const del::and_formula &>(f));
+            return model_checker::holds_in(w, dynamic_cast<const del::and_formula &>(f), storages);
         case del::formula_type::or_formula:
-            return model_checker::holds_in(w, dynamic_cast<const del::or_formula &>(f));
+            return model_checker::holds_in(w, dynamic_cast<const del::or_formula &>(f), storages);
         case del::formula_type::imply_formula:
-            return model_checker::holds_in(w, dynamic_cast<const del::imply_formula &>(f));
+            return model_checker::holds_in(w, dynamic_cast<const del::imply_formula &>(f), storages);
         case del::formula_type::box_formula:
-            return model_checker::holds_in(w, dynamic_cast<const del::box_formula &>(f));
+            return model_checker::holds_in(w, dynamic_cast<const del::box_formula &>(f), storages);
         case del::formula_type::diamond_formula:
-            return model_checker::holds_in(w, dynamic_cast<const del::diamond_formula &>(f));
+            return model_checker::holds_in(w, dynamic_cast<const del::diamond_formula &>(f), storages);
     }
 }
 
-bool model_checker::holds_in(const possibility &w, const del::atom_formula &f) {
-    return w.get_label()[f.get_atom()];
+bool model_checker::holds_in(const possibility &w, const del::atom_formula &f, const del::storages_ptr &storages) {
+    return (*storages->l_storage->get(w.get_label_id()))[f.get_atom()];
 }
 
-bool model_checker::holds_in(const possibility &w, const del::not_formula &f) {
-    return not model_checker::holds_in(w, *f.get_f());
+bool model_checker::holds_in(const possibility &w, const del::not_formula &f, const del::storages_ptr &storages) {
+    return not model_checker::holds_in(w, *f.get_f(), storages);
 }
 
-bool model_checker::holds_in(const possibility &w, const del::and_formula &f) {
-    auto check = [&](const del::formula_ptr &f) { return model_checker::holds_in(w, *f); };
+bool model_checker::holds_in(const possibility &w, const del::and_formula &f, const del::storages_ptr &storages) {
+    auto check = [&](const del::formula_ptr &f) { return model_checker::holds_in(w, *f, storages); };
     return std::all_of(f.get_fs().begin(), f.get_fs().end(), check);
 }
 
-bool model_checker::holds_in(const possibility &w, const del::or_formula &f) {
-    auto check = [&](const del::formula_ptr &f) { return model_checker::holds_in(w, *f); };
+bool model_checker::holds_in(const possibility &w, const del::or_formula &f, const del::storages_ptr &storages) {
+    auto check = [&](const del::formula_ptr &f) { return model_checker::holds_in(w, *f, storages); };
     return std::any_of(f.get_fs().begin(), f.get_fs().end(), check);
 }
 
-bool model_checker::holds_in(const possibility &w, const del::imply_formula &f) {
-    return not model_checker::holds_in(w, *f.get_f1()) or model_checker::holds_in(w, *f.get_f2());
+bool model_checker::holds_in(const possibility &w, const del::imply_formula &f, const del::storages_ptr &storages) {
+    return not model_checker::holds_in(w, *f.get_f1(), storages) or model_checker::holds_in(w, *f.get_f2(), storages);
 }
 
-bool model_checker::holds_in(const possibility &w, const del::box_formula &f) {
-    const auto &w_ag = w.get_information_state(f.get_ag());
+bool model_checker::holds_in(const possibility &w, const del::box_formula &f, const del::storages_ptr &storages) {
+    const auto &w_ag = *storages->is_storage->get(w.get_information_state_id(f.get_ag()));
     return std::all_of(w_ag.begin(), w_ag.end(),
-        [&](const possibility_id &v) { return model_checker::holds_in(*w.get(v), *f.get_f()); });
+        [&](const possibility_id &v) { return model_checker::holds_in(*storages->s_storage->get(v), *f.get_f(), storages); });
 }
 
-bool model_checker::holds_in(const possibility &w, const del::diamond_formula &f) {
-    const auto &w_ag = w.get_information_state(f.get_ag());
+bool model_checker::holds_in(const possibility &w, const del::diamond_formula &f, const del::storages_ptr &storages) {
+    const auto &w_ag = *storages->is_storage->get(w.get_information_state_id(f.get_ag()));
     return std::any_of(w_ag.begin(), w_ag.end(),
-        [&](const possibility_id &v) { return model_checker::holds_in(*w.get(v), *f.get_f()); });
+        [&](const possibility_id &v) { return model_checker::holds_in(*storages->s_storage->get(v), *f.get_f(), storages); });
 }

@@ -33,8 +33,8 @@
 namespace delphic {
     class union_updater {
     public:
-        static bool is_applicable(const possibility_ptr &w, const eventuality_ptr &e);
-        static bool is_applicable(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
+        static bool is_applicable(const possibility_ptr &w, const eventuality_ptr &e, const del::storages_ptr &storages);
+        static bool is_applicable(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E, const del::storages_ptr &storages);
 
         static possibility_spectrum_ptr update(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E);
 

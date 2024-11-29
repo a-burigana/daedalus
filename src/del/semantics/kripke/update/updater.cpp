@@ -21,7 +21,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <iostream>
 #include <queue>
 #include <utility>
 #include <list>
@@ -29,46 +28,46 @@
 #include "../../../../../include/del/semantics/kripke/update/updater.h"
 #include "../../../../../include/del/semantics/kripke/model_checker.h"
 #include "../../../../../include/del/semantics/kripke/bisimulation/bisimulator.h"
+#include "../../../../utils/storage.cpp"
 
 using namespace kripke;
 
-bool updater::is_applicable(const state &s, const action &a) {
-    const auto check = [&](const world_id wd) { return is_applicable_world(s, a, wd); };
+bool updater::is_applicable(const state &s, const action &a, const del::label_storage_ptr &l_storage) {
+    const auto check = [&](const world_id wd) { return is_applicable_world(s, a, wd, l_storage); };
     return std::all_of(s.get_designated_worlds().begin(), s.get_designated_worlds().end(), check);
 }
 
-bool updater::is_applicable_world(const state &s, const action &a, const world_id wd) {
-    const auto check = [&](const event_id ed) { return model_checker::holds_in(s, wd, *a.get_precondition(ed)); };
+bool updater::is_applicable_world(const state &s, const action &a, const world_id wd, const del::label_storage_ptr &l_storage) {
+    const auto check = [&](const event_id ed) { return model_checker::holds_in(s, wd, *a.get_precondition(ed), l_storage); };
 //    const auto check = [&](const event_id ed) { return a.get_precondition(ed)->holds_in(s, wd); };
     return std::any_of(a.get_designated_events().begin(), a.get_designated_events().end(), check);
 }
 
-state updater::product_update(const state &s, const action_deque &as, bool apply_contraction,
-                              contraction_type type, const unsigned long k, const signature_storage_ptr &s_storage,
-                              const information_state_storage_ptr &is_storage) {
-    state s_ = product_update(s, *as.front());
+state updater::product_update(const state &s, const action_deque &as, const del::storages_ptr &storages,
+                              bool apply_contraction, contraction_type type, const unsigned long k) {
+    state s_ = product_update(s, *as.front(), storages->l_storage);
 
     if (apply_contraction)
-        s_ = bisimulator::contract(type, s_, k, s_storage, is_storage).second;
+        s_ = bisimulator::contract(type, s_, k, storages).second;
 
     action_deque as_ = as;
     as_.pop_front();
-    return as_.empty() ? std::move(s_) : product_update(s_, as_, apply_contraction, type, k, s_storage, is_storage);
+    return as_.empty() ? std::move(s_) : product_update(s_, as_, storages, apply_contraction, type, k);
 }
 
-state updater::product_update(const state &s, const action &a) {
+state updater::product_update(const state &s, const action &a, const del::label_storage_ptr &l_storage) {
     updated_worlds_map w_map;
     updated_edges_vector r_map(s.get_language()->get_agents_number());
 
-    auto [worlds_number, designated_worlds] = calculate_worlds(s, a, w_map, r_map);
+    auto [worlds_number, designated_worlds] = calculate_worlds(s, a, w_map, r_map, l_storage);
     relations r = calculate_relations(s, a, worlds_number, w_map, r_map);
-    label_vector labels = calculate_labels(s, a, worlds_number, w_map);
+    label_vector labels = calculate_labels(s, a, worlds_number, w_map, l_storage);
 
     return state{s.get_language(), worlds_number, std::move(r), std::move(labels), std::move(designated_worlds)};
 }
 
 std::pair<world_id, world_set> updater::calculate_worlds(const state &s, const action &a, updated_worlds_map &w_map,
-                                                           updated_edges_vector &r_map) {
+                                                           updated_edges_vector &r_map, const del::label_storage_ptr &l_storage) {
     world_id worlds_number = 0;
     world_deque designated_worlds;
 
@@ -80,7 +79,7 @@ std::pair<world_id, world_set> updater::calculate_worlds(const state &s, const a
 
     for (const world_id wd : s.get_designated_worlds())
         for (const event_id ed : a.get_designated_events())
-            if (model_checker::holds_in(s, wd, *a.get_precondition(ed)))
+            if (model_checker::holds_in(s, wd, *a.get_precondition(ed), l_storage))
 //            if (a.get_precondition(ed)->holds_in(s, wd))
                 to_expand.emplace(wd, ed);
 
@@ -99,7 +98,7 @@ std::pair<world_id, world_set> updater::calculate_worlds(const state &s, const a
 
             for (const world_id v : ag_worlds) {
                 for (const event_id f : ag_events) {
-                    if (model_checker::holds_in(s, v, *a.get_precondition(f))) {
+                    if (model_checker::holds_in(s, v, *a.get_precondition(f), l_storage)) {
 //                    if (a.get_precondition(f)->holds_in(s, v)) {
                         updated_world w_ = {w, e}, v_ = {v, f};
                         r_map[ag].emplace_back(w_, v_);
@@ -139,21 +138,22 @@ relations updater::calculate_relations(const state &s, const action &a, const wo
 }
 
 label_vector updater::calculate_labels(const state &s, const action &a, const world_id worlds_number,
-                                       const updated_worlds_map &w_map) {
+                                       const updated_worlds_map &w_map, const del::label_storage_ptr &l_storage) {
     label_vector labels = label_vector(worlds_number);
 
     for (const auto &[w_, w_id] : w_map) {
         const auto &[w, e] = w_;
-        labels[w_id] = a.is_ontic(e) ? update_world(s, w, a, e) : s.get_label(w);
+        labels[w_id] = a.is_ontic(e) ? update_world(s, w, a, e, l_storage) : s.get_label_id(w);
     }
     return labels;
 }
 
-del::label updater::update_world(const state &s, const world_id &w, const action &a, const event_id &e) {
-    auto bitset = s.get_label(w).get_bitset();
+label_id updater::update_world(const state &s, const world_id &w, const action &a, const event_id &e,
+                               const del::label_storage_ptr &l_storage) {
+    auto bitset = l_storage->get(s.get_label_id(w))->get_bitset();
 
     for (const auto &[p, post] : a.get_postconditions(e))
-        bitset[p] = model_checker::holds_in(s, w, *post);
+        bitset[p] = model_checker::holds_in(s, w, *post, l_storage);
 
-    return del::label{std::move(bitset)};
+    return l_storage->emplace(del::label{std::move(bitset)});
 }

@@ -24,15 +24,16 @@
 #ifndef DAEDALUS_POSSIBILITY_SPECTRUM_H
 #define DAEDALUS_POSSIBILITY_SPECTRUM_H
 
-#include "../../../language/language.h"
 #include "possibility_types.h"
+#include "../../../language/language.h"
 #include "../../../formulas/formula.h"
+#include "../../../../utils/storage_types.h"
 
 namespace delphic {
     class possibility_spectrum {
     public:
-        possibility_spectrum(del::language_ptr language, possibility_storage_ptr p_storage,
-                             information_state_storage_ptr is_storage, information_state_id designated_possibilities); // , unsigned long possibilities_number);
+        possibility_spectrum(del::language_ptr language, const del::possibility_storage_ptr &p_storage,
+                             const del::information_state_storage_ptr &is_storage, information_state_id designated_possibilities); // , unsigned long possibilities_number);
 
         possibility_spectrum(const possibility_spectrum&) = delete;
         possibility_spectrum& operator=(const possibility_spectrum&) = delete;
@@ -45,24 +46,24 @@ namespace delphic {
         [[nodiscard]] const information_state &get_designated_possibilities() const;
 
         [[nodiscard]] del::language_ptr get_language() const;
-        [[nodiscard]] possibility_storage_ptr get_possibility_storage() const;
-        [[nodiscard]] information_state_storage_ptr get_information_state_storage() const;
+//        [[nodiscard]] possibility_storage_ptr get_possibility_storage() const;
+//        [[nodiscard]] information_state_storage_ptr get_information_state_storage() const;
 //        [[nodiscard]] unsigned long get_possibilities_number() const;
 
-        [[nodiscard]] possibility_ptr get(possibility_id w) const;
-        [[nodiscard]] possibility_id emplace_possibility(possibility &&w);
-        [[nodiscard]] information_state_id emplace_information_state(information_state &&is);
+//        [[nodiscard]] possibility_ptr get(possibility_id w) const;
+//        [[nodiscard]] possibility_id emplace_possibility(possibility &&w);
+//        [[nodiscard]] information_state_id emplace_information_state(information_state &&is);
 
         [[nodiscard]] bool is_designated(possibility_id w) const;
         [[nodiscard]] unsigned long long get_max_depth() const;
-        [[nodiscard]] bool satisfies(const del::formula_ptr &f) const;
+        [[nodiscard]] bool satisfies(const del::formula_ptr &f, const del::storages_ptr &storages) const;
 
         friend std::ostream &operator<<(std::ostream &os, const possibility_spectrum &s);
 
     private:
         del::language_ptr m_language;
-        possibility_storage_ptr m_p_storage;
-        information_state_storage_ptr m_is_storage;
+//        possibility_storage_ptr m_p_storage;
+//        information_state_storage_ptr m_is_storage;
         information_state m_designated_possibilities;
 //        unsigned long m_possibilities_number;
         unsigned long long m_max_depth;

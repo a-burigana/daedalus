@@ -36,18 +36,18 @@
 namespace search {
     class delphic_planner {
     public:
-        static delphic_node_deque search(const delphic_planning_task &task, strategy strategy, const daedalus::tester::printer_ptr &printer = nullptr);
+        static delphic_node_deque search(const delphic_planning_task &task, strategy strategy, const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer = nullptr);
 
         static void print_plan(const delphic_node_deque &path);
 
     private:
-        static delphic_node_deque unbounded_search(const delphic_planning_task &task, const daedalus::tester::printer_ptr &printer);
+        static delphic_node_deque unbounded_search(const delphic_planning_task &task, const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer);
         static delphic_node_deque iterative_bounded_search(const delphic_planning_task &task, const daedalus::tester::printer_ptr &printer);
 
-        static delphic_node_deque bfs(const delphic_planning_task &task, strategy strategy,
+        static delphic_node_deque bfs(const delphic_planning_task &task, strategy strategy, const del::storages_ptr &storages,
                               unsigned long b, unsigned long long &id, const daedalus::tester::printer_ptr &printer);
 
-        static delphic_node_deque expand_node(const delphic_planning_task &task, strategy strategy, delphic_node_ptr &n,
+        static delphic_node_deque expand_node(const delphic_planning_task &task, strategy strategy, const del::storages_ptr &storages, delphic_node_ptr &n,
                                       const delphic::action_deque &actions, delphic_node_deque &frontier, unsigned long goal_depth,
                                       unsigned long long &id, const daedalus::tester::printer_ptr &printer);
 

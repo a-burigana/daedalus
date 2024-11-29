@@ -32,7 +32,7 @@
 
 using namespace search;
 
-delphic_node_deque delphic_planner::search(const delphic_planning_task &task, const strategy strategy, const daedalus::tester::printer_ptr &printer) {
+delphic_node_deque delphic_planner::search(const delphic_planning_task &task, const strategy strategy, const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer) {
     std::cout << "==================================================" << std::endl;
     std::cout << "                     DAEDALUS                     " << std::endl;
     std::cout << "==================================================" << std::endl << std::endl;
@@ -62,7 +62,7 @@ delphic_node_deque delphic_planner::search(const delphic_planning_task &task, co
     auto start = std::chrono::steady_clock::now();
 
     // If the initial state satisfies the goal, we immediately terminate
-    if (task.get_initial_state()->satisfies(task.get_goal())) {
+    if (task.get_initial_state()->satisfies(task.get_goal(), storages)) {
         delphic_node_ptr n0 = init_node(strategy, task.get_initial_state(), nullptr, true, nullptr, 0, task.get_goal()->get_modal_depth());
         if (printer) print_goal_found(printer, n0);
         return extract_path(n0);
@@ -70,7 +70,7 @@ delphic_node_deque delphic_planner::search(const delphic_planning_task &task, co
 
     switch (strategy) {
         case strategy::unbounded_search:
-            path = unbounded_search(task, printer);
+            path = unbounded_search(task, storages, printer);
             break;
         case strategy::iterative_bounded_search:
             path = iterative_bounded_search(task, printer);
@@ -85,18 +85,18 @@ delphic_node_deque delphic_planner::search(const delphic_planning_task &task, co
     return path;
 }
 
-delphic_node_deque delphic_planner::unbounded_search(const delphic_planning_task &task, const daedalus::tester::printer_ptr &printer) {
+delphic_node_deque delphic_planner::unbounded_search(const delphic_planning_task &task, const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer) {
     unsigned long long id = 0;
 
-    return bfs(task, strategy::unbounded_search, 0, id, printer);
+    return bfs(task, strategy::unbounded_search, storages, 0, id, printer);
 }
 
 delphic_node_deque delphic_planner::iterative_bounded_search(const delphic_planning_task &task, const daedalus::tester::printer_ptr &printer) {
     std::cout << "Not implemented yet... " << std::endl;
-   return {};
+    return {};
 }
 
-delphic_node_deque delphic_planner::bfs(const delphic_planning_task &task, const strategy strategy,
+delphic_node_deque delphic_planner::bfs(const delphic_planning_task &task, const strategy strategy, const del::storages_ptr &storages,
                         const unsigned long b, unsigned long long &id, const daedalus::tester::printer_ptr &printer) {
     delphic::possibility_spectrum_ptr s0 = task.get_initial_state();
     delphic_node_deque frontier;
@@ -116,7 +116,7 @@ delphic_node_deque delphic_planner::bfs(const delphic_planning_task &task, const
         }
 
         if (printer) print_begin_expanding_node(printer, n, strategy);
-        delphic_node_deque path = expand_node(task, strategy, n, task.get_actions(), frontier, goal_depth, id, printer);
+        delphic_node_deque path = expand_node(task, strategy, storages, n, task.get_actions(), frontier, goal_depth, id, printer);
 
         if (not path.empty()) return path;
         frontier.pop_front();
@@ -124,14 +124,14 @@ delphic_node_deque delphic_planner::bfs(const delphic_planning_task &task, const
     return {};
 }
 
-delphic_node_deque delphic_planner::expand_node(const delphic_planning_task &task, const strategy strategy, delphic_node_ptr &n,
+delphic_node_deque delphic_planner::expand_node(const delphic_planning_task &task, const strategy strategy, const del::storages_ptr &storages, delphic_node_ptr &n,
                                 const delphic::action_deque &actions, delphic_node_deque &frontier, const unsigned long goal_depth,
                                 unsigned long long &id, const daedalus::tester::printer_ptr &printer) {
     bool is_dead_node = true;
 
     for (const delphic::eventuality_spectrum_ptr &a : actions)
-        if (delphic::union_updater::is_applicable(n->get_state(), a)) {      // For all applicable actions. Let n_ be the
-            delphic_node_ptr n_ = update_node(strategy, n, a, id, goal_depth);  // result of updating node n with 'a'
+        if (delphic::union_updater::is_applicable(n->get_state(), a, storages)) {   // For all applicable actions. Let n_ be the
+            delphic_node_ptr n_ = update_node(strategy, n, a, id, goal_depth);      // result of updating node n with 'a'
             if (printer) print_applying_action(printer, a, n_, strategy);
 
             if (n_) {                                                   // If the update is successful
@@ -139,7 +139,7 @@ delphic_node_deque delphic_planner::expand_node(const delphic_planning_task &tas
                 n->add_child(n_);                                       // We add n_ to the children of n
 
                 // If n_'s state satisfies the goal, we return the path from the root of the search tree to n_
-                if (n_->get_state()->satisfies(task.get_goal())) {
+                if (n_->get_state()->satisfies(task.get_goal(), storages)) {
                     if (printer) print_goal_found(printer, n_);
                     return extract_path(n_);
                 }

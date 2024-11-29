@@ -51,7 +51,7 @@ del::language_ptr active_muddy_children::build_language(unsigned long children_n
 }
 
 kripke::state
-active_muddy_children::build_initial_state(unsigned long children_no, unsigned long muddy_no, bool is_0_muddy) {
+active_muddy_children::build_initial_state(unsigned long children_no, unsigned long muddy_no, bool is_0_muddy, const label_storage_ptr &l_storage) {
     assert(children_no >= muddy_no and muddy_no > 0);
 
     language_ptr language = active_muddy_children::build_language(children_no, muddy_no);
@@ -74,7 +74,8 @@ active_muddy_children::build_initial_state(unsigned long children_no, unsigned l
         if (combination == actual_muddy_children)
             designated = count;
 
-        ls[count++] = label{combination};
+        label l = label{combination};
+        ls[count++] = l_storage->emplace(std::move(l));
     }
 
     relations r(language->get_agents_number());
@@ -92,7 +93,9 @@ active_muddy_children::build_initial_state(unsigned long children_no, unsigned l
                 bool is_good_edge = true;
 
                 for (agent ag_1 = 0; ag_1 < children_no; ++ag_1) {
-                    if ((ag_1 == ag) == (ls[w][ag_1] == ls[v][ag_1]))
+                    label &lw = *l_storage->get(ls[w]), &lv = *l_storage->get(ls[v]);
+
+                    if ((ag_1 == ag) == (lw[ag_1] == lv[ag_1]))
                         is_good_edge = false;
                 }
 
@@ -114,12 +117,12 @@ kripke::action_deque active_muddy_children::build_actions(unsigned long children
     return actions;
 }
 
-search::planning_task active_muddy_children::build_task(unsigned long children_no, unsigned long muddy_no, bool is_0_muddy) {
+search::planning_task active_muddy_children::build_task(unsigned long children_no, unsigned long muddy_no, bool is_0_muddy, const label_storage_ptr &l_storage) {
     std::string name = active_muddy_children::get_name();
     std::string id   = std::to_string(children_no) + "_" + std::to_string(muddy_no) + "_" + std::to_string(is_0_muddy);
     language_ptr language = active_muddy_children::build_language(children_no, muddy_no);
 
-    state s0 = active_muddy_children::build_initial_state(children_no, muddy_no, is_0_muddy);
+    state s0 = active_muddy_children::build_initial_state(children_no, muddy_no, is_0_muddy, l_storage);
     action_deque actions = active_muddy_children::build_actions(children_no, muddy_no);
 
     formula_ptr muddy_0     = std::make_shared<atom_formula>(0);
@@ -134,15 +137,15 @@ search::planning_task active_muddy_children::build_task(unsigned long children_n
     return search::planning_task{std::move(name), std::move(id), language, std::move(s0), std::move(actions), std::move(goal)};
 }
 
-std::vector<search::planning_task> active_muddy_children::build_tasks() {
+std::vector<search::planning_task> active_muddy_children::build_tasks(const label_storage_ptr &l_storage) {
     const unsigned long N_MIN_CHILDREN = 3, N_MAX_CHILDREN = 12, N_MIN_MUDDY = 1;
     std::vector<search::planning_task> tasks;
 
     for (unsigned long children_no = N_MIN_CHILDREN; children_no <= N_MAX_CHILDREN; ++children_no)
         for (unsigned long muddy_no = N_MIN_MUDDY; muddy_no <= children_no; ++muddy_no) {
-            tasks.push_back(build_task(children_no, muddy_no, true));
+            tasks.push_back(build_task(children_no, muddy_no, true, l_storage));
             if (muddy_no < children_no)
-                tasks.push_back(build_task(children_no, muddy_no, false));
+                tasks.push_back(build_task(children_no, muddy_no, false, l_storage));
         }
 
     return tasks;

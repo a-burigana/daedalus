@@ -35,8 +35,8 @@
 using namespace daedalus::tester;
 using namespace kripke;
 
-void formula_tester::test_CB_1() {
-    const state s = coin_in_the_box::build_initial_state();
+void formula_tester::test_CB_1(const del::label_storage_ptr &l_storage) {
+    const state s = coin_in_the_box::build_initial_state(l_storage);
     const del::language_ptr l = s.get_language();
 
     del::formula_ptr heads = std::make_shared<del::atom_formula>(l->get_atom_id("heads"));
@@ -46,14 +46,14 @@ void formula_tester::test_CB_1() {
     del::formula_deque fs = {heads, looking_a};     // , has_key_a};
     del::formula_ptr f = std::make_shared<del::and_formula>(std::move(fs));
 
-    assert(kripke::model_checker::holds_in(s, 0, *f));
-    assert(not kripke::model_checker::holds_in(s, 1, *f));
+    assert(kripke::model_checker::holds_in(s, 0, *f, l_storage));
+    assert(not kripke::model_checker::holds_in(s, 1, *f, l_storage));
 //    assert(f->holds_in(s, 0));
 //    assert(not f->holds_in(s, 1));
 }
 
-void formula_tester::test_CB_2() {
-    const state s = coin_in_the_box::build_initial_state();
+void formula_tester::test_CB_2(const del::label_storage_ptr &l_storage) {
+    const state s = coin_in_the_box::build_initial_state(l_storage);
     const del::language_ptr l = s.get_language();
     const del::agent a = l->get_agent_id("a");
 
@@ -62,14 +62,14 @@ void formula_tester::test_CB_2() {
     del::formula_ptr K_a_opened     = std::make_shared<del::box_formula>(a, opened);
     del::formula_ptr K_a_not_opened = std::make_shared<del::box_formula>(a, not_opened);
 
-    assert(s.satisfies(K_a_not_opened));
-    assert(not s.satisfies(K_a_opened));
-    assert(kripke::model_checker::holds_in(s, 1, *K_a_not_opened));
+    assert(s.satisfies(K_a_not_opened, l_storage));
+    assert(not s.satisfies(K_a_opened, l_storage));
+    assert(kripke::model_checker::holds_in(s, 1, *K_a_not_opened, l_storage));
 //    assert(K_a_not_opened->holds_in(s, 1));
 }
 
-void formula_tester::test_CB_3() {
-    const state s = coin_in_the_box::build_initial_state();
+void formula_tester::test_CB_3(const del::label_storage_ptr &l_storage) {
+    const state s = coin_in_the_box::build_initial_state(l_storage);
     const del::language_ptr l = s.get_language();
     const del::agent a = l->get_agent_id("a"), b = l->get_agent_id("b"), c = l->get_agent_id("c");
 
@@ -79,7 +79,7 @@ void formula_tester::test_CB_3() {
     del::formula_ptr K_b_K_a_not_opened     = std::make_shared<del::box_formula>(b, K_a_not_opened);
     del::formula_ptr K_c_K_b_K_a_not_opened = std::make_shared<del::box_formula>(c, K_b_K_a_not_opened);
 
-    assert(s.satisfies(K_c_K_b_K_a_not_opened));
-    assert(kripke::model_checker::holds_in(s, 1, *K_c_K_b_K_a_not_opened));
+    assert(s.satisfies(K_c_K_b_K_a_not_opened, l_storage));
+    assert(kripke::model_checker::holds_in(s, 1, *K_c_K_b_K_a_not_opened, l_storage));
 //    assert(K_c_K_b_K_a_not_opened->holds_in(s, 1));
 }

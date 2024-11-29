@@ -33,42 +33,33 @@ using namespace kripke;
 namespace daedalus::tester {
     class bisimulation_tester {
     public:
-        static void test_bisim_1(const std::string &out_path, unsigned long k, const signature_storage_ptr &s_storage,
-                                 const information_state_storage_ptr &is_storage);
+        static void test_bisim_1(const std::string &out_path, unsigned long k, const del::storages_ptr &storages);
 
-        static void test_bisim_singleton(const std::string &out_path, unsigned long k, const signature_storage_ptr &s_storage,
-                                 const information_state_storage_ptr &is_storage);
-        static void test_bisim_singleton_no_loop(const std::string &out_path, unsigned long k, const signature_storage_ptr &s_storage,
-                                 const information_state_storage_ptr &is_storage);
+        static void test_bisim_singleton(const std::string &out_path, unsigned long k, const del::storages_ptr &storages);
+
+        static void test_bisim_singleton_no_loop(const std::string &out_path, unsigned long k, const del::storages_ptr &storages);
 
         static void test_bisim_chain(const std::string &out_path, unsigned long k, unsigned long length,
-                                     const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage,
-                                     bool all_designated = false);
+                                     const del::storages_ptr &storages, bool all_designated = false);
 
         static void test_bisim_chain_no_loop(const std::string &out_path, unsigned long k, unsigned long length,
-                                             const signature_storage_ptr &s_storage, const information_state_storage_ptr &is_storage,
-                                             bool all_designated = false);
+                                             const del::storages_ptr &storages, bool all_designated = false);
 
-        static void test_bisim_k_tree(const std::string &out_path, unsigned long k, const signature_storage_ptr &s_storage,
-                                      const information_state_storage_ptr &is_storage);
+        static void test_bisim_k_tree(const std::string &out_path, unsigned long k, const del::storages_ptr &storages);
 
-        static void test_bisim_cn(const std::string &out_path, unsigned long n, unsigned long k, const signature_storage_ptr &s_storage,
-                                      const information_state_storage_ptr &is_storage);
+        static void test_bisim_cn(const std::string &out_path, unsigned long n, unsigned long k, const del::storages_ptr &storages);
 
-        static state test_full_bisim_1();
-        static state test_full_bisim_singleton(bool has_loop);
-        static state test_full_bisim_chain(unsigned long length, bool has_final_loop, bool all_designated = false);
-        static state test_full_bisim_k_tree(unsigned long k);
-        static state test_full_bisim_cn(unsigned long n, unsigned long k);
+        static state test_full_bisim_1(const del::label_storage_ptr &l_storage);
+        static state test_full_bisim_singleton(bool has_loop, const del::label_storage_ptr &l_storage);
+        static state test_full_bisim_chain(unsigned long length, const del::label_storage_ptr &l_storage, bool has_final_loop, bool all_designated = false);
+        static state test_full_bisim_k_tree(unsigned long k, const del::label_storage_ptr &l_storage);
+        static state test_full_bisim_cn(unsigned long n, unsigned long k, const del::label_storage_ptr &l_storage);
 
-        static std::pair<bool, state> test_bounded_bisim_1(unsigned long k);
-        static std::pair<bool, state> test_bounded_bisim_singleton(unsigned long k, bool has_loop);
-        static std::pair<bool, state> test_bounded_bisim_chain(unsigned long k, unsigned long length, bool has_final_loop, bool all_designated = false);
-        static std::pair<bool, state> test_bounded_bisim_k_tree(unsigned long k);
-        static std::pair<bool, state> test_bounded_bisim_cn(unsigned long n, unsigned long k);
-
-        static std::pair<bool, state> test_bounded_bisim_1(unsigned long k, const signature_storage_ptr &s_storage,
-                                                           const information_state_storage_ptr &is_storage);
+        static std::pair<bool, state> test_bounded_bisim_1(unsigned long k, const del::label_storage_ptr &l_storage);
+        static std::pair<bool, state> test_bounded_bisim_singleton(unsigned long k, bool has_loop, const del::label_storage_ptr &l_storage  );
+        static std::pair<bool, state> test_bounded_bisim_chain(unsigned long k, const del::label_storage_ptr &l_storage, unsigned long length, bool has_final_loop, bool all_designated = false);
+        static std::pair<bool, state> test_bounded_bisim_k_tree(unsigned long k, const del::label_storage_ptr &l_storage);
+        static std::pair<bool, state> test_bounded_bisim_cn(unsigned long n, unsigned long k, const del::label_storage_ptr &l_storage);
     };
 }
 

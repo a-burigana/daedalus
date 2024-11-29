@@ -52,7 +52,7 @@ del::language_ptr switches::build_language(unsigned long n) {
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-kripke::state switches::build_initial_state(unsigned long n) {
+kripke::state switches::build_initial_state(unsigned long n, const label_storage_ptr &l_storage) {
     language_ptr language = switches::build_language(n);
 
     world_id worlds_number = 1;
@@ -67,8 +67,9 @@ kripke::state switches::build_initial_state(unsigned long n) {
     }
 
     label_vector ls = label_vector(worlds_number);
-    boost::dynamic_bitset<> l0(language->get_atoms_number());
-    ls[0] = label{std::move(l0)};
+    boost::dynamic_bitset<> b0(language->get_atoms_number());
+    label l0 = label{std::move(l0)};
+    ls[0] = l_storage->emplace(std::move(l0));
 
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
 }
@@ -96,10 +97,10 @@ kripke::action_deque switches::build_actions(unsigned long n) {
     return actions;
 }
 
-search::planning_task switches::build_task(unsigned long n) {
+search::planning_task switches::build_task(unsigned long n, const label_storage_ptr &l_storage) {
     language_ptr language = switches::build_language(n);
 
-    state s0 = switches::build_initial_state(n);
+    state s0 = switches::build_initial_state(n, l_storage);
     action_deque actions = switches::build_actions(n);
 
     formula_deque fs;
@@ -114,12 +115,12 @@ search::planning_task switches::build_task(unsigned long n) {
     return search::planning_task{switches::get_name(), std::to_string(n), language, std::move(s0), std::move(actions), std::move(goal)};
 }
 
-std::vector<search::planning_task> switches::build_tasks() {
+std::vector<search::planning_task> switches::build_tasks(const label_storage_ptr &l_storage) {
     const unsigned long N_MIN_TASKS = 2, N_MAX_TASK = 10;
     std::vector<search::planning_task> tasks;
 
     for (unsigned long n = N_MIN_TASKS; n <= N_MAX_TASK; ++n)
-        tasks.emplace_back(switches::build_task(n));
+        tasks.emplace_back(switches::build_task(n, l_storage));
 
     return tasks;
 }

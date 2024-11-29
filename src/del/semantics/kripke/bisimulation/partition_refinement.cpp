@@ -119,7 +119,7 @@ state partition_refinement::build_full_contraction(const state &s, const agent_r
 
     label_vector quotient_l = label_vector(worlds_number);
     for (world_id w = 0; w < s.get_worlds_number(); ++w)
-        quotient_l[contracted_worlds_map[w]] = s.get_label(w);
+        quotient_l[contracted_worlds_map[w]] = s.get_label_id(w);
 
     world_set designated_worlds(worlds_number);
 
@@ -295,7 +295,7 @@ void partition_refinement::init_data_structures(const state &s, const agent_rela
 void partition_refinement::init_partitions(const state &s, const agent_relation &r, const agent_worlds_labels &labels,
                                            q_partition &Q, q_partition &Q_sinks, x_partition &X, compound_x_blocks_set &C,
                                            q_block_ptr_vector &worlds_blocks, const world_id preprocessed_worlds_no) {
-    std::map<const del::label, q_block> initial_partition, initial_partition_sinks;
+    std::map<const label_id, q_block> initial_partition, initial_partition_sinks;
     std::map<const del::agent, q_block> initial_agent_worlds_partition;      // By construction, "agent worlds" can not be sinks
 
     worlds_blocks = q_block_ptr_vector(r.size());
@@ -308,9 +308,9 @@ void partition_refinement::init_partitions(const state &s, const agent_relation 
     for (world_id w = 0; w < r.size(); ++w)
         if (w < s.get_worlds_number()) {        // If w is a world of the original state
             if (is_sink(s, w))
-                init_partitions_helper<const del::label>(initial_partition_sinks, w, s.get_label(w), preprocessed_worlds_no);
+                init_partitions_helper<const label_id>(initial_partition_sinks, w, s.get_label_id(w), preprocessed_worlds_no);
             else
-                init_partitions_helper<const del::label>(initial_partition, w, s.get_label(w), preprocessed_worlds_no);
+                init_partitions_helper<const label_id>(initial_partition, w, s.get_label_id(w), preprocessed_worlds_no);
         } else
             init_partitions_helper<const del::agent>(initial_agent_worlds_partition, w, labels[w - s.get_worlds_number()], preprocessed_worlds_no);
 

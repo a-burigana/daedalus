@@ -30,7 +30,7 @@
 class bit_deque {
 public:
     using index = unsigned long long;
-    using index_deque = std::unordered_set<index>;          // todo: use unordered_set instead of deque?
+    using index_deque = std::unordered_set<index>;
     using iterator = index_deque::const_iterator;
 
     bit_deque() : m_id{0} {}

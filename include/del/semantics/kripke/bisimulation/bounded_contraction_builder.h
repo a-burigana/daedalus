@@ -54,9 +54,9 @@ namespace kripke {
         static void update_block_max_representative(const state &s, const block_ptr &block, world_id max_representative,
                                                     boost::dynamic_bitset<> &represented, std::vector<world_id> &worlds_max_reprs);
 
-        static world_id get_max_representative_sign(const state &s, const world_set &worlds);
+        static world_id get_max_representative_sign(const state &s, const world_bitset &worlds);
 
-        static void update_max_representative_sign(const state &s, unsigned long k, const world_set &worlds,
+        static void update_max_representative_sign(const state &s, unsigned long k, const world_bitset &worlds,
                                                    world_id max_representative, boost::dynamic_bitset<> &represented,
                                                    const signature_matrix &worlds_signatures, signature_vector &worlds_max_signs,
                                                    std::vector<world_id> &worlds_max_reprs);

@@ -121,7 +121,7 @@ state partition_refinement::build_full_contraction(const state &s, const agent_r
     for (world_id w = 0; w < s.get_worlds_number(); ++w)
         quotient_l[contracted_worlds_map[w]] = s.get_label_id(w);
 
-    world_set designated_worlds(worlds_number);
+    world_bitset designated_worlds(worlds_number);
 
     for (world_id wd : s.get_designated_worlds())
         designated_worlds.push_back(contracted_worlds_map[wd]);
@@ -263,7 +263,7 @@ std::pair<agent_relation, agent_worlds_labels> partition_refinement::build_prepr
     agent_relation r = agent_relation(worlds_number);
 
     for (world_id w = 0; w < worlds_number; ++w)
-        r[w] = world_set{worlds_number};
+        r[w] = world_bitset{worlds_number};
 
     world_id count = s.get_worlds_number() - 1;
     agent_worlds_labels agent_labels = std::vector<del::agent>(worlds_number - s.get_worlds_number());
@@ -372,7 +372,7 @@ void partition_refinement::init_partitions_helper(std::map<T, q_block> &partitio
     const auto it = partition.find(key);
 
     if (it == partition.end())
-        partition.emplace(key, q_block{block{preprocessed_worlds_no, world_deque{w}}, std::shared_ptr<x_block>(nullptr)});
+        partition.emplace(key, q_block{block{preprocessed_worlds_no, world_set{w}}, std::shared_ptr<x_block>(nullptr)});
     else {
         q_block &block = it->second;
         block.elements.push_back(w);
@@ -384,7 +384,7 @@ void partition_refinement::init_preimage(const agent_relation &r, agent_relation
     r_preimage = agent_relation(r.size());
 
     for (world_id w = 0; w < r.size(); ++w)                 // We make sure that the preimage of worlds with
-        r_preimage[w] = world_set{preprocessed_worlds_no};  // no incoming edges is correctly computed
+        r_preimage[w] = world_bitset{preprocessed_worlds_no};  // no incoming edges is correctly computed
 
     for (world_id w = 0; w < r.size(); ++w)
         for (const auto &v : r[w])

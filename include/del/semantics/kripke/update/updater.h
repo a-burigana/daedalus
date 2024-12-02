@@ -51,8 +51,8 @@ namespace kripke {
 
         static bool is_applicable_world(const state &s, const action &a, world_id wd, const del::label_storage_ptr &l_storage);
 
-        static std::pair<world_id, world_set> calculate_worlds(const state &s, const action &a, updated_worlds_map &w_map,
-                                                               updated_edges_vector &r_map, const del::label_storage_ptr &l_storage);
+        static std::pair<world_id, world_bitset> calculate_worlds(const state &s, const action &a, updated_worlds_map &w_map,
+                                                                  updated_edges_vector &r_map, const del::label_storage_ptr &l_storage);
 
         static relations calculate_relations(const state &s, const action &a, world_id worlds_number,
                                              const updated_worlds_map &w_map, const updated_edges_vector &r_map);

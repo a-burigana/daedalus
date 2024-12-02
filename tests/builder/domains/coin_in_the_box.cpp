@@ -54,7 +54,7 @@ kripke::state coin_in_the_box::build_initial_state(const label_storage_ptr &l_st
     language_ptr language = coin_in_the_box::build_language();
 
     const world_id worlds_number = 2;
-    world_set designated_worlds = world_set{worlds_number, world_deque{0}};
+    world_bitset designated_worlds = world_bitset{worlds_number, world_set{0}};
 
     relations r(language->get_agents_number());
 
@@ -62,7 +62,7 @@ kripke::state coin_in_the_box::build_initial_state(const label_storage_ptr &l_st
         r[ag] = agent_relation(worlds_number);
 
         for (world_id w = 0; w < worlds_number; ++w)
-            r[ag][w] = world_set(worlds_number);
+            r[ag][w] = world_bitset(worlds_number);
     }
 
     for (agent ag = 0; ag < language->get_agents_number(); ++ag)

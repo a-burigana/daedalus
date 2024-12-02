@@ -127,7 +127,7 @@ kripke::state delphic_utils::convert(const delphic::possibility_spectrum &W) {
         r[ag] = kripke::agent_relation(worlds_number);
 
         for (kripke::world_id w = 0; w < worlds_number; ++w)
-            r[ag][w] = kripke::world_set(worlds_number);
+            r[ag][w] = kripke::world_bitset(worlds_number);
 
         // todo: UNCOMMENT AND FIX
 //        for (const auto &[w, w_id] : world_map)
@@ -141,7 +141,7 @@ kripke::state delphic_utils::convert(const delphic::possibility_spectrum &W) {
 //    for (const auto &[w, w_id] : world_map)
 //        ls[w_id] = W.get(w)->get_label();
 
-    kripke::world_set designated_worlds(worlds_number);
+    kripke::world_bitset designated_worlds(worlds_number);
 
     for (const auto &w : W.get_designated_possibilities())
         designated_worlds.push_back(world_map[w]);
@@ -178,7 +178,7 @@ kripke::action delphic_utils::convert(const delphic::eventuality_spectrum &E) {
         q[ag] = kripke::action_agent_relations(events_number);
 
         for (kripke::event_id e = 0; e < events_number; ++e)
-            q[ag][e] = kripke::event_set(events_number);
+            q[ag][e] = kripke::event_bitset(events_number);
 
         for (const auto &[e, e_id] : event_map)
             for (auto &f : e->get_information_state(ag))
@@ -195,10 +195,10 @@ kripke::action delphic_utils::convert(const delphic::eventuality_spectrum &E) {
         is_ontic[e_id] = e->is_ontic();
     }
 
-    kripke::event_deque designated_events(events_number);
+    kripke::event_set designated_events(events_number);
 
     for (const auto &e : E.get_designated_eventualities())
-        designated_events.push_back(event_map[e]);
+        designated_events.emplace(event_map[e]);
 
     return kripke::action{E.get_language(), E.get_type(), E.get_name(), events_number, std::move(q), std::move(pre),
                           std::move(post), std::move(is_ontic), std::move(designated_events)};

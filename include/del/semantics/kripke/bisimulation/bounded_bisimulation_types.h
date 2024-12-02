@@ -59,7 +59,7 @@ namespace kripke {
     using signature_id = delphic::possibility_id;
     using signature_vector = std::vector<signature_id>;
     using signature_matrix = std::vector<signature_vector>;
-    using signature_map = std::unordered_map<signature_id, std::pair<std::unique_ptr<world_set>, world_id>>;
+    using signature_map = std::unordered_map<signature_id, std::pair<std::unique_ptr<world_bitset>, world_id>>;
 
     using information_state = delphic::information_state;
     using information_state_id = delphic::information_state_id;

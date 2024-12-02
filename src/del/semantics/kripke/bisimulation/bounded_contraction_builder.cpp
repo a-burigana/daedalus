@@ -59,7 +59,7 @@ std::pair<bool, state> bounded_contraction_builder::calculate_rooted_contraction
         quotient_r[ag] = agent_relation(bounded_worlds_number);
 
         for (world_id w = 0; w < bounded_worlds_number; ++w)
-            quotient_r[ag][w] = world_set(bounded_worlds_number);
+            quotient_r[ag][w] = world_bitset(bounded_worlds_number);
     }
 
     for (const world_id x : max_reprs_set) {
@@ -77,7 +77,7 @@ std::pair<bool, state> bounded_contraction_builder::calculate_rooted_contraction
         }
     }
 
-    world_set designated_worlds(bounded_worlds_number);
+    world_bitset designated_worlds(bounded_worlds_number);
 
     for (world_id wd : s.get_designated_worlds())
         designated_worlds.push_back(contracted_worlds_map[wd]);
@@ -243,7 +243,7 @@ void bounded_contraction_builder::update_block_max_representative(const state &s
     return max_representative;
 }*/
 
-void bounded_contraction_builder::update_max_representative_sign(const state &s, const unsigned long k, const world_set &worlds,
+void bounded_contraction_builder::update_max_representative_sign(const state &s, const unsigned long k, const world_bitset &worlds,
                                                                  world_id max_representative, boost::dynamic_bitset<> &represented,
                                                                  const signature_matrix &worlds_signatures, signature_vector &worlds_max_signs,
                                                                  std::vector<world_id> &worlds_max_reprs) {

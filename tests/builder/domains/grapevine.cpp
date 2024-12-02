@@ -81,7 +81,7 @@ kripke::state grapevine::build_initial_state(unsigned long agents_no, unsigned l
         r[ag] = agent_relation(worlds_number);
 
         for (world_id w = 0; w < worlds_number; ++w)
-            r[ag][w] = world_set(all_worlds);
+            r[ag][w] = world_bitset(all_worlds);
     }
 
     for (agent ag = 0; ag < secrets_no; ++ag)
@@ -100,7 +100,7 @@ kripke::state grapevine::build_initial_state(unsigned long agents_no, unsigned l
         if (lw.get_bitset().all()) designated = w;
     }
 
-    world_set designated_worlds = world_set{worlds_number, world_deque{designated}};
+    world_bitset designated_worlds = world_bitset{worlds_number, world_set{designated}};
 
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
 }

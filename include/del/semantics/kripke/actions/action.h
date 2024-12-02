@@ -35,7 +35,7 @@ namespace kripke {
     class action {
     public:
         action(del::language_ptr language, action_type type, std::string name, unsigned long long events_number, action_relations relations,
-               preconditions pre, postconditions post, boost::dynamic_bitset<> is_ontic, event_deque designated_events);
+               preconditions pre, postconditions post, boost::dynamic_bitset<> is_ontic, event_set designated_events);
 
         action(const action&) = delete;
         action& operator=(const action&) = delete;
@@ -49,11 +49,11 @@ namespace kripke {
         [[nodiscard]] action_type get_type() const;
         [[nodiscard]] std::string get_name() const;
         [[nodiscard]] unsigned long long get_events_number() const;
-        [[nodiscard]] const event_set &get_agent_possible_events(del::agent ag, event_id e) const;
+        [[nodiscard]] const event_bitset &get_agent_possible_events(del::agent ag, event_id e) const;
         [[nodiscard]] bool has_edge(del::agent ag, event_id e, event_id f) const;
         [[nodiscard]] del::formula_ptr get_precondition(event_id e) const;
         [[nodiscard]] const event_post &get_postconditions(event_id e) const;
-        [[nodiscard]] const event_deque &get_designated_events() const;
+        [[nodiscard]] const event_set &get_designated_events() const;
         [[nodiscard]] bool is_designated(event_id e) const;
 
         [[nodiscard]] bool is_ontic(event_id e) const;
@@ -72,7 +72,7 @@ namespace kripke {
         preconditions m_preconditions;
         postconditions m_postconditions;
         boost::dynamic_bitset<> m_is_ontic;
-        event_deque m_designated_events;
+        event_set m_designated_events;
         unsigned long m_maximum_depth;
 
         void calculate_maximum_depth();

@@ -74,7 +74,7 @@ kripke::state collaboration_communication::build_initial_state(unsigned long age
     auto room_combinations = domain_utils::all_permutations_with_repetitions(all_rooms_but_2, boxes_no);
 
     const world_id worlds_number = room_combinations.size();    // (rooms_no-1) * boxes_no;
-    world_set designated_worlds = world_set{worlds_number};
+    world_bitset designated_worlds = world_bitset{worlds_number};
 
     relations r(language->get_agents_number());
 
@@ -82,7 +82,7 @@ kripke::state collaboration_communication::build_initial_state(unsigned long age
         r[ag] = agent_relation(worlds_number);
 
         for (world_id w = 0; w < worlds_number; ++w)
-            r[ag][w] = world_set(worlds_number);
+            r[ag][w] = world_bitset(worlds_number);
     }
 
     for (agent ag = 0; ag < language->get_agents_number(); ++ag)

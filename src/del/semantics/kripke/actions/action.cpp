@@ -31,7 +31,7 @@ using namespace kripke;
 
 action::action(del::language_ptr language, action_type type, std::string name, unsigned long long events_number, action_relations relations,
                preconditions pre, postconditions post, boost::dynamic_bitset<> is_ontic,
-               event_deque designated_events) :
+               event_set designated_events) :
        m_language{std::move(language)},
        m_type{type},
        m_name{std::move(name)},
@@ -73,7 +73,7 @@ unsigned long long action::get_events_number() const {
     return m_events_number;
 }
 
-const event_set &action::get_agent_possible_events(const del::agent ag, const event_id e) const {
+const event_bitset &action::get_agent_possible_events(const del::agent ag, const event_id e) const {
     return m_relations[ag][e];
 }
 
@@ -89,7 +89,7 @@ const event_post &action::get_postconditions(const event_id e) const {
     return m_postconditions[e];
 }
 
-const event_deque &action::get_designated_events() const {
+const event_set &action::get_designated_events() const {
     return m_designated_events;
 }
 

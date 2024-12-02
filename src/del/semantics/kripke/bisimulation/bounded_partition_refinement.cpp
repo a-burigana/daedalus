@@ -177,7 +177,7 @@ void bounded_partition_refinement::init_partitions_helper(const state &s, std::m
     const auto it = partition.find(s.get_label_id(w));
 
     if (it == partition.end()) {
-        block_ptr b = std::make_shared<block>(block{s.get_worlds_number(), world_deque{w}, count++});
+        block_ptr b = std::make_shared<block>(block{s.get_worlds_number(), world_set{w}, count++});
         worlds_blocks[w][0] = b;
         partition.emplace(s.get_label_id(w), std::move(b));
     } else {
@@ -194,7 +194,7 @@ relations bounded_partition_refinement::init_preimage(const state &s) {
         agent_relation r_ag = agent_relation(s.get_worlds_number());
 
         for (world_id w = 0; w < s.get_worlds_number(); ++w)    // Initializing world sets
-            r_ag[w] = world_set(s.get_worlds_number());
+            r_ag[w] = world_bitset(s.get_worlds_number());
 
         for (world_id w = 0; w < s.get_worlds_number(); ++w)
             for (const world_id v: s.get_agent_possible_worlds(ag, w))

@@ -56,14 +56,14 @@ kripke::state switches::build_initial_state(unsigned long n, const label_storage
     language_ptr language = switches::build_language(n);
 
     world_id worlds_number = 1;
-    world_set designated_worlds = world_set{worlds_number, world_deque{0}};
+    world_bitset designated_worlds = world_bitset{worlds_number, world_set{0}};
 
     relations r(language->get_agents_number());
 
     for (agent ag = 0; ag < language->get_agents_number(); ++ag) {
         r[ag] = agent_relation(worlds_number);
 
-        r[ag][0] = world_set(worlds_number, world_deque{0});
+        r[ag][0] = world_bitset(worlds_number, world_set{0});
     }
 
     label_vector ls = label_vector(worlds_number);

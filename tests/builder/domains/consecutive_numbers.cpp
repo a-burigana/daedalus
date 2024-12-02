@@ -51,7 +51,7 @@ kripke::state consecutive_numbers::build_initial_state(unsigned long n, const la
     language_ptr language = consecutive_numbers::build_language(n);
 
     world_id worlds_number = n;
-    world_set designated_worlds = world_set{worlds_number, world_deque{0, 1}};           // We assume n >= 2
+    world_bitset designated_worlds = world_bitset{worlds_number, world_set{0, 1}};           // We assume n >= 2
 
     relations r(language->get_agents_number());
 
@@ -59,7 +59,7 @@ kripke::state consecutive_numbers::build_initial_state(unsigned long n, const la
         r[ag] = agent_relation(worlds_number);
 
         for (world_id w = 0; w < worlds_number; ++w)
-            r[ag][w] = world_set(worlds_number);
+            r[ag][w] = world_bitset(worlds_number);
     }
 
     for (world_id w = 0; w < worlds_number; ++w) {

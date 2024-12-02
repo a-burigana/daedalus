@@ -26,6 +26,7 @@
 
 #include <vector>
 #include <deque>
+#include <unordered_set>
 #include <boost/dynamic_bitset.hpp>
 #include "../../../language/label.h"
 #include "../../../language/language_types.h"
@@ -39,10 +40,10 @@ namespace kripke {
     using state_deque       = std::deque<state_ptr>;
 
     using world_id          = unsigned long long;
-    using world_set         = bit_deque;
-    using world_deque       = std::deque<world_id>;
+    using world_bitset      = bit_deque;
+    using world_set         = std::unordered_set<world_id>;
 
-    using agent_relation    = std::vector<world_set>;
+    using agent_relation    = std::vector<world_bitset>;
     using relations         = std::vector<agent_relation>;
 
     using label_id          = unsigned long long;

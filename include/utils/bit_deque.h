@@ -25,12 +25,12 @@
 #define DAEDALUS_BIT_DEQUE_H
 
 #include <boost/dynamic_bitset.hpp>
-#include <deque>
+#include <unordered_set>
 
 class bit_deque {
 public:
     using index = unsigned long long;
-    using index_deque = std::deque<index>;          // todo: use unordered_set instead of deque?
+    using index_deque = std::unordered_set<index>;          // todo: use unordered_set instead of deque?
     using iterator = index_deque::const_iterator;
 
     bit_deque() : m_id{0} {}
@@ -71,14 +71,14 @@ public:
     void push_back(const index i) {
         if (not m_bitset[i]) {
             m_bitset[i].flip();
-            m_deque.push_back(i);
+            m_deque.emplace(i);
         }
     }
 
     void remove(const index i) {
         if (m_bitset[i]) {
             m_bitset[i].flip();
-            m_deque.erase(std::find(m_deque.begin(), m_deque.end(), i));      // todo: this takes O(n)... Can we do better?
+            m_deque.erase(std::find(m_deque.begin(), m_deque.end(), i));
         }
     }
 

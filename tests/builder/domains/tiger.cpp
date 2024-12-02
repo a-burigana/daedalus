@@ -92,10 +92,10 @@ kripke::state tiger::build_initial_state(unsigned long doors_no, unsigned long t
         r[ag] = agent_relation(worlds_number);
 
         for (world_id w = 0; w < worlds_number; ++w)
-            r[ag][w] = world_set(all_worlds);
+            r[ag][w] = world_bitset(all_worlds);
     }
 
-    world_set designated_worlds = world_set{worlds_number, world_deque{worlds_number - 1}};
+    world_bitset designated_worlds = world_bitset{worlds_number, world_set{worlds_number - 1}};
 
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
 }

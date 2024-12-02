@@ -65,10 +65,10 @@ state updater::product_update(const state &s, const action &a, const del::label_
     return state{s.get_language(), worlds_number, std::move(r), std::move(labels), std::move(designated_worlds)};
 }
 
-std::pair<world_id, world_set> updater::calculate_worlds(const state &s, const action &a, updated_worlds_map &w_map,
-                                                           updated_edges_vector &r_map, const del::label_storage_ptr &l_storage) {
+std::pair<world_id, world_bitset> updater::calculate_worlds(const state &s, const action &a, updated_worlds_map &w_map,
+                                                            updated_edges_vector &r_map, const del::label_storage_ptr &l_storage) {
     world_id worlds_number = 0;
-    world_deque designated_worlds;
+    world_set designated_worlds;
 
     std::set<updated_world> to_expand;
     std::set<updated_world> visited;
@@ -89,11 +89,11 @@ std::pair<world_id, world_set> updater::calculate_worlds(const state &s, const a
         visited.emplace(w, e);
 
         if (s.is_designated(w) and a.is_designated(e))
-            designated_worlds.push_back(worlds_number - 1);
+            designated_worlds.emplace(worlds_number-1);
 
         for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
-            const world_set &ag_worlds = s.get_agent_possible_worlds(ag, w);
-            const event_set &ag_events = a.get_agent_possible_events(ag, e);
+            const world_bitset &ag_worlds = s.get_agent_possible_worlds(ag, w);
+            const event_bitset &ag_events = a.get_agent_possible_events(ag, e);
 
             for (const world_id v : ag_worlds) {
                 for (const event_id f : ag_events) {
@@ -110,7 +110,7 @@ std::pair<world_id, world_set> updater::calculate_worlds(const state &s, const a
         }
         to_expand.erase(first);
     }
-    return {worlds_number, world_set{worlds_number, std::move(designated_worlds)}};
+    return {worlds_number, world_bitset{worlds_number, std::move(designated_worlds)}};
 }
 
 relations updater::calculate_relations(const state &s, const action &a, const world_id worlds_number,
@@ -121,7 +121,7 @@ relations updater::calculate_relations(const state &s, const action &a, const wo
         r[ag] = agent_relation(worlds_number);
 
         for (world_id w = 0; w < worlds_number; ++w)
-            r[ag][w] = world_set(worlds_number);
+            r[ag][w] = world_bitset(worlds_number);
     }
 
     for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {

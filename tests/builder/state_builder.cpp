@@ -55,15 +55,15 @@ state state_builder::build_test_state1(const del::label_storage_ptr &l_storage) 
     r[0] = agent_relation(worlds_number);
 
     for (world_id w = 0; w < worlds_number; ++w)    // Initializing world sets
-        r[0][w] = world_set(worlds_number);
+        r[0][w] = world_bitset(worlds_number);
 
-    r[a][w0] = world_set(worlds_number, world_deque{w1, w2});
-    r[a][w1] = world_set(worlds_number, world_deque{w1, w3});
-    r[a][w2] = world_set(worlds_number, world_deque{w2, w4});
-    r[a][w3] = world_set(worlds_number, world_deque{w5});
-    r[a][w4] = world_set(worlds_number, world_deque{w6});
-    r[a][w5] = world_set(worlds_number);
-    r[a][w6] = world_set(worlds_number);
+    r[a][w0] = world_bitset(worlds_number, world_set{w1, w2});
+    r[a][w1] = world_bitset(worlds_number, world_set{w1, w3});
+    r[a][w2] = world_bitset(worlds_number, world_set{w2, w4});
+    r[a][w3] = world_bitset(worlds_number, world_set{w5});
+    r[a][w4] = world_bitset(worlds_number, world_set{w6});
+    r[a][w5] = world_bitset(worlds_number);
+    r[a][w6] = world_bitset(worlds_number);
 
     label_vector v = label_vector{worlds_number};
     v[w0] = l_storage->emplace(label{bs0});
@@ -74,7 +74,7 @@ state state_builder::build_test_state1(const del::label_storage_ptr &l_storage) 
     v[w5] = l_storage->emplace(label{bs1});
     v[w6] = l_storage->emplace(label{bs2});
 
-    return state{language, worlds_number, std::move(r), std::move(v), world_set{worlds_number, world_deque{w0}}};
+    return state{language, worlds_number, std::move(r), std::move(v), world_bitset{worlds_number, world_set{w0}}};
 }
 
 state state_builder::build_singleton(bool has_loop, const del::label_storage_ptr &l_storage) {
@@ -94,15 +94,15 @@ state state_builder::build_singleton(bool has_loop, const del::label_storage_ptr
     r[a] = agent_relation(worlds_number);
 
     for (world_id w = 0; w < worlds_number; ++w)    // Initializing world sets
-        r[a][w] = world_set(worlds_number);
+        r[a][w] = world_bitset(worlds_number);
 
     if (has_loop)
-        r[a][0] = world_set{worlds_number, world_deque{0}};
+        r[a][0] = world_bitset{worlds_number, world_set{0}};
 
     label_vector v = label_vector{worlds_number};
     v[0] = l_storage->emplace(label{std::move(bs0)});
 
-    return state{language, worlds_number, std::move(r), std::move(v), world_set{worlds_number, world_deque{0}}};
+    return state{language, worlds_number, std::move(r), std::move(v), world_bitset{worlds_number, world_set{0}}};
 }
 
 state state_builder::build_chain(unsigned long length, const del::label_storage_ptr &l_storage, bool has_final_loop, bool all_designated) {
@@ -123,7 +123,7 @@ state state_builder::build_chain(unsigned long length, const del::label_storage_
         r[ag] = agent_relation(worlds_number);
 
         for (world_id w = 0; w < worlds_number; ++w)    // Initializing world sets
-            r[ag][w] = world_set(worlds_number);
+            r[ag][w] = world_bitset(worlds_number);
     }
 
     label_vector v = label_vector{worlds_number};
@@ -137,13 +137,13 @@ state state_builder::build_chain(unsigned long length, const del::label_storage_
         v[w] = l_storage->emplace(label{bs0});
     }
 
-    world_deque designated_worlds = {0};
+    world_set designated_worlds = {0};
 
     if (all_designated)
         for (world_id w = 1; w < worlds_number; ++w)
-            designated_worlds.push_back(w);
+            designated_worlds.emplace(w);
 
-    return state{language, worlds_number, std::move(r), std::move(v), world_set{worlds_number, std::move(designated_worlds)}};
+    return state{language, worlds_number, std::move(r), std::move(v), world_bitset{worlds_number, std::move(designated_worlds)}};
 }
 
 state state_builder::build_k_tree(const unsigned long k, const del::label_storage_ptr &l_storage) {
@@ -166,7 +166,7 @@ state state_builder::build_k_tree(const unsigned long k, const del::label_storag
         r[ag] = agent_relation(worlds_number);
 
         for (world_id w = 0; w < worlds_number; ++w)    // Initializing world sets
-            r[ag][w] = world_set(worlds_number);
+            r[ag][w] = world_bitset(worlds_number);
     }
 
     struct tree {
@@ -193,7 +193,7 @@ state state_builder::build_k_tree(const unsigned long k, const del::label_storag
     };
 
     build_tree(k);
-    return state{language, worlds_number, std::move(r), std::move(v), world_set{worlds_number, world_deque{0}}};
+    return state{language, worlds_number, std::move(r), std::move(v), world_bitset{worlds_number, world_set{0}}};
 
 //    std::vector<world_id>
 //            pascal_triangle_row = std::vector<world_id>(k + 1),

@@ -28,6 +28,7 @@
 #include <vector>
 #include <set>
 #include <deque>
+#include <unordered_set>
 #include "../../../language/language_types.h"
 #include "../../../../utils/bit_deque.h"
 #include "../../../formulas/formula.h"
@@ -39,9 +40,10 @@ namespace kripke {
     using action_deque = std::deque<kripke::action_ptr>;
 
     using event_id               = unsigned long long;
-    using event_deque            = std::deque<event_id>;
-    using event_set              = bit_deque;
-    using action_agent_relations = std::vector<event_set>;
+    using event_bitset           = bit_deque;
+    using event_set              = std::unordered_set<event_id>;
+
+    using action_agent_relations = std::vector<event_bitset>;
     using action_relations       = std::vector<action_agent_relations>;
 
     using preconditions  = std::vector<del::formula_ptr>;

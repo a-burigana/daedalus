@@ -33,7 +33,7 @@ using namespace del;
 using namespace kripke;
 
 state::state(language_ptr language, unsigned long long worlds_number, relations relations,
-             label_vector valuation, world_set designated_worlds, unsigned long long state_id) :
+             label_vector valuation, world_bitset designated_worlds, unsigned long long state_id) :
         m_language{std::move(language)},
         m_worlds_number{worlds_number},
         m_relations{std::move(relations)},
@@ -47,7 +47,7 @@ unsigned long long state::get_worlds_number() const {
     return m_worlds_number;
 }
 
-const world_set &state::get_agent_possible_worlds(const agent ag, const world_id w) const {
+const world_bitset &state::get_agent_possible_worlds(const agent ag, const world_id w) const {
     return m_relations[ag].at(w);
 }
 
@@ -60,7 +60,7 @@ const label_id &state::get_label_id(const world_id w) const {
     return m_labels[w];
 }
 
-const world_set &state::get_designated_worlds() const {
+const world_bitset &state::get_designated_worlds() const {
     return m_designated_worlds;
 }
 

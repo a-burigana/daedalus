@@ -84,7 +84,7 @@ active_muddy_children::build_initial_state(unsigned long children_no, unsigned l
         r[ag] = agent_relation(worlds_number);
 
         for (world_id w = 0; w < worlds_number; ++w)
-            r[ag][w] = world_set(worlds_number);
+            r[ag][w] = world_bitset(worlds_number);
     }
 
     for (agent ag = 0; ag < children_no; ++ag)
@@ -103,7 +103,7 @@ active_muddy_children::build_initial_state(unsigned long children_no, unsigned l
                     r[ag][w].push_back(v);
             }
 
-    world_set designated_worlds = world_set{worlds_number, world_deque{designated}};
+    world_bitset designated_worlds = world_bitset{worlds_number, world_set{designated}};
 
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
 }

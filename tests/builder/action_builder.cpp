@@ -38,7 +38,7 @@ action action_builder::build_public_announcement(std::string name, const languag
 
     for (agent ag = 0; ag < language->get_agents_number(); ++ag) {
         q[ag] = action_agent_relations(events_number);
-        q[ag][0] = event_set(events_number, event_deque{0});
+        q[ag][0] = event_bitset(events_number, event_set{0});
     }
 
     preconditions pre(events_number);
@@ -47,7 +47,7 @@ action action_builder::build_public_announcement(std::string name, const languag
     postconditions post;
 
     boost::dynamic_bitset<> is_ontic(events_number);
-    event_deque designated_events = {0};
+    event_set designated_events = {0};
 
     return action{language, action_type::public_announcement, std::move(name), events_number, q, pre, post, is_ontic, designated_events};
 }
@@ -59,7 +59,7 @@ action action_builder::build_public_ontic(std::string name, const del::language_
 
     for (agent ag = 0; ag < language->get_agents_number(); ++ag) {
         q[ag] = action_agent_relations(events_number);
-        q[ag][0] = event_set(events_number, event_deque{0});
+        q[ag][0] = event_bitset(events_number, event_set{0});
     }
 
     preconditions pre(events_number);
@@ -71,7 +71,7 @@ action action_builder::build_public_ontic(std::string name, const del::language_
     boost::dynamic_bitset<> is_ontic(events_number);
     is_ontic.set(0);
 
-    event_deque designated_events = {0};
+    event_set designated_events = {0};
 
     return action{language, action_type::public_ontic, std::move(name), events_number, q, pre, post, is_ontic, designated_events};
 }
@@ -85,16 +85,16 @@ action action_builder::build_private_ontic(std::string name, const language_ptr 
         q[ag] = action_agent_relations(events_number);
 
         for (event_id e = 0; e < events_number; ++e)
-            q[ag][e] = event_set(events_number);
+            q[ag][e] = event_bitset(events_number);
     }
 
     for (agent ag = 0; ag < language->get_agents_number(); ++ag) {
-        q[ag][1] = event_set{events_number, event_deque{1}};
+        q[ag][1] = event_bitset{events_number, event_set{1}};
 
         if (fo_ags[ag])
-            q[ag][0] = event_set{events_number, event_deque{0}};
+            q[ag][0] = event_bitset{events_number, event_set{0}};
         else
-            q[ag][0] = event_set{events_number, event_deque{1}};
+            q[ag][0] = event_bitset{events_number, event_set{1}};
     }
 
     preconditions pre(events_number);
@@ -107,7 +107,7 @@ action action_builder::build_private_ontic(std::string name, const language_ptr 
     boost::dynamic_bitset<> is_ontic(events_number);
     is_ontic.set(0);
 
-    event_deque designated_events = {0};
+    event_set designated_events = {0};
 
     return action{language, action_type::private_ontic, std::move(name), events_number, q, pre, post, is_ontic, designated_events};
 }
@@ -119,8 +119,8 @@ action action_builder::build_public_sensing(std::string name, const del::languag
 
     for (agent ag = 0; ag < language->get_agents_number(); ++ag) {
         q[ag] = action_agent_relations(events_number);
-        q[ag][0] = event_set(events_number, event_deque{0});
-        q[ag][1] = event_set(events_number, event_deque{1});
+        q[ag][0] = event_bitset(events_number, event_set{0});
+        q[ag][1] = event_bitset(events_number, event_set{1});
     }
 
     preconditions pre(events_number);
@@ -132,7 +132,7 @@ action action_builder::build_public_sensing(std::string name, const del::languag
     postconditions post = postconditions(events_number);
     boost::dynamic_bitset<> is_ontic(events_number);
 
-    event_deque designated_events = {0, 1};
+    event_set designated_events = {0, 1};
 
     return action{language, action_type::public_sensing, std::move(name), events_number, q, pre, post, is_ontic, designated_events};
 }
@@ -147,21 +147,21 @@ action action_builder::build_semi_private_sensing(std::string name, const langua
         q[ag] = action_agent_relations(events_number);
 
         for (event_id e = 0; e < events_number; ++e)
-            q[ag][e] = event_set(events_number);
+            q[ag][e] = event_bitset(events_number);
     }
 
     for (agent ag = 0; ag < language->get_agents_number(); ++ag) {
-        q[ag][2] = event_set{events_number, event_deque({2})};
+        q[ag][2] = event_bitset{events_number, event_set({2})};
 
         if (fo_ags[ag]) {
-            q[ag][0] = event_set{events_number, event_deque({0})};
-            q[ag][1] = event_set{events_number, event_deque({1})};
+            q[ag][0] = event_bitset{events_number, event_set({0})};
+            q[ag][1] = event_bitset{events_number, event_set({1})};
         } else if (po_ags[ag]) {
-            q[ag][0] = event_set{events_number, event_deque({0, 1})};
-            q[ag][1] = event_set{events_number, event_deque({0, 1})};
+            q[ag][0] = event_bitset{events_number, event_set({0, 1})};
+            q[ag][1] = event_bitset{events_number, event_set({0, 1})};
         } else {
-            q[ag][0] = event_set{events_number, event_deque({2})};
-            q[ag][1] = event_set{events_number, event_deque({2})};
+            q[ag][0] = event_bitset{events_number, event_set({2})};
+            q[ag][1] = event_bitset{events_number, event_set({2})};
         }
     }
 
@@ -175,7 +175,7 @@ action action_builder::build_semi_private_sensing(std::string name, const langua
     postconditions post;
 
     boost::dynamic_bitset<> is_ontic(events_number);
-    event_deque designated_events = {0, 1};    // {0, 1};
+    event_set designated_events = {0, 1};    // {0, 1};
 
     return action{language, action_type::semi_private_sensing, std::move(name), events_number, q, pre, post, is_ontic, designated_events};
 }
@@ -190,21 +190,21 @@ action action_builder::build_semi_private_announcement(std::string name, const l
         q[ag] = action_agent_relations(events_number);
 
         for (event_id e = 0; e < events_number; ++e)
-            q[ag][e] = event_set(events_number);
+            q[ag][e] = event_bitset(events_number);
     }
 
     for (agent ag = 0; ag < language->get_agents_number(); ++ag) {
-        q[ag][2] = event_set{events_number, event_deque({2})};
+        q[ag][2] = event_bitset{events_number, event_set({2})};
 
         if (fo_ags[ag]) {
-            q[ag][0] = event_set{events_number, event_deque({0})};
-            q[ag][1] = event_set{events_number, event_deque({1})};
+            q[ag][0] = event_bitset{events_number, event_set({0})};
+            q[ag][1] = event_bitset{events_number, event_set({1})};
         } else if (po_ags[ag]) {
-            q[ag][0] = event_set{events_number, event_deque({0, 1})};
-            q[ag][1] = event_set{events_number, event_deque({0, 1})};
+            q[ag][0] = event_bitset{events_number, event_set({0, 1})};
+            q[ag][1] = event_bitset{events_number, event_set({0, 1})};
         } else {
-            q[ag][0] = event_set{events_number, event_deque({2})};
-            q[ag][1] = event_set{events_number, event_deque({2})};
+            q[ag][0] = event_bitset{events_number, event_set({2})};
+            q[ag][1] = event_bitset{events_number, event_set({2})};
         }
     }
 
@@ -218,7 +218,7 @@ action action_builder::build_semi_private_announcement(std::string name, const l
     postconditions post;
 
     boost::dynamic_bitset<> is_ontic(events_number);
-    event_deque designated_events = {0};
+    event_set designated_events = {0};
 
     return action{language, action_type::semi_private_announcement, std::move(name), events_number, q, pre, post, is_ontic, designated_events};
 }
@@ -231,16 +231,16 @@ action action_builder::build_private_announcement(std::string name, const langua
         q[ag] = action_agent_relations(events_number);
 
         for (event_id e = 0; e < events_number; ++e)
-            q[ag][e] = event_set(events_number);
+            q[ag][e] = event_bitset(events_number);
     }
 
     for (agent ag = 0; ag < language->get_agents_number(); ++ag) {
-        q[ag][1] = event_set{events_number, event_deque{1}};
+        q[ag][1] = event_bitset{events_number, event_set{1}};
 
         if (fo_ags[ag])
-            q[ag][0] = event_set{events_number, event_deque{0}};
+            q[ag][0] = event_bitset{events_number, event_set{0}};
         else
-            q[ag][0] = event_set{events_number, event_deque{1}};
+            q[ag][0] = event_bitset{events_number, event_set{1}};
     }
 
     preconditions pre(events_number);
@@ -251,7 +251,7 @@ action action_builder::build_private_announcement(std::string name, const langua
 
     boost::dynamic_bitset<> is_ontic(events_number);
 
-    event_deque designated_events = {0};
+    event_set designated_events = {0};
 
     return action{language, action_type::private_announcement, std::move(name), events_number, q, pre, post, is_ontic, designated_events};
 }

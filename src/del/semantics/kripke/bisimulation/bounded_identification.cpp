@@ -80,7 +80,7 @@ void bounded_identification::calculate_world_signature(const state &s, const uns
     worlds_signatures[h][x] = storages->s_storage->emplace(std::move(sign_x_h));                   // we add it to the storage, and we put it into worlds_signatures[h][x]
 
     if (auto worlds_it = sign_map.find(worlds_signatures[h][x]); worlds_it == sign_map.end()) {
-        sign_map[worlds_signatures[h][x]] = {std::make_unique<world_set>(world_set{s.get_worlds_number()}), x};
+        sign_map[worlds_signatures[h][x]] = {std::make_unique<world_bitset>(world_bitset{s.get_worlds_number()}), x};
         sign_map.at(worlds_signatures[h][x]).first->push_back(x);
     } else {
         worlds_it->second.first->push_back(x);                           // The first element of the pair is the set of worlds x that have the same h-signature

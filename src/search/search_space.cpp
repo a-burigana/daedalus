@@ -38,6 +38,7 @@ node::node(unsigned long long id, kripke::state_ptr state, kripke::action_ptr ac
         m_already_visited{already_visited},
         m_parent{std::move(parent)} {
     m_tree_depth = m_parent ? m_parent->get_tree_depth() + 1 : 0;
+    m_visited_worlds = m_state->get_worlds_number() + (m_parent ? m_parent->m_visited_worlds : 0);
 }
 
 unsigned long long node::get_id() const {
@@ -46,6 +47,10 @@ unsigned long long node::get_id() const {
 
 unsigned long long node::get_tree_depth() const {
     return m_tree_depth;
+}
+
+unsigned long long node::get_visited_worlds() const {
+    return m_visited_worlds;
 }
 
 kripke::state_ptr node::get_state() const {

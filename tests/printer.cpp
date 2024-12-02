@@ -236,8 +236,11 @@ void printer::print_domain_info(const search::planning_task &task, std::ofstream
         << std::endl
         << task.get_domain_name() << ";"
         << task.get_problem_id() << ";"
-        << atoms_no << ";" << agents_no << ";"
-        << task.get_initial_state()->get_worlds_number() << ";" << actions_no << ";" << goal_depth << ";";
+        << atoms_no << ";"
+        << agents_no << ";"
+        << task.get_initial_state()->get_worlds_number() << ";"
+        << actions_no << ";"
+        << goal_depth << ";";
 }
 
 void printer::print_time_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, const del::storages_ptr &storages, std::ofstream &table) {
@@ -255,6 +258,7 @@ void printer::print_time_results(const search::planning_task &task, search::stra
     table
         << std::to_string(plan_length) << ";"
         << path.back()->get_id() << ";"
+        << path.back()->get_visited_worlds() << ";"
         << std::to_string(time);
 
     std::chrono::seconds pause(10);

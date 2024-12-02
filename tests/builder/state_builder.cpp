@@ -24,6 +24,7 @@
 #include "state_builder.h"
 #include "language_builder.h"
 #include <memory>
+#include <deque>
 
 using namespace daedalus::tester;
 using namespace del;
@@ -171,7 +172,7 @@ state state_builder::build_k_tree(const unsigned long k, const del::label_storag
 
     struct tree {
         world_id w;
-        std::list<std::unique_ptr<tree>> children;
+        std::deque<std::unique_ptr<tree>> children;
     };
 
     auto build_tree = [&](unsigned long k_) {

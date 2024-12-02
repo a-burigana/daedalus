@@ -25,7 +25,6 @@
 #define DAEDALUS_PLANNER_H
 
 #include <functional>
-#include <list>
 #include <memory>
 #include <queue>
 #include "planning_task.h"

@@ -25,7 +25,6 @@
 #define DAEDALUS_SEARCH_SPACE_H
 
 #include <memory>
-#include <list>
 #include "search_types.h"
 #include "../del/semantics/kripke/states/state.h"
 #include "../del/semantics/kripke/actions/action.h"
@@ -47,6 +46,7 @@ namespace search {
 
         [[nodiscard]] unsigned long long get_id() const;
         [[nodiscard]] unsigned long long get_tree_depth() const;
+        [[nodiscard]] unsigned long long get_visited_worlds() const;
 
         [[nodiscard]] kripke::state_ptr get_state() const;
         [[nodiscard]] kripke::state_ptr get_original_state() const;
@@ -72,7 +72,7 @@ namespace search {
         void clear_original_state();
 
     private:
-        unsigned long long m_id, m_tree_depth;
+        unsigned long long m_id, m_tree_depth, m_visited_worlds;
 
         kripke::state_ptr m_state, m_original_state;
         kripke::action_ptr m_action;

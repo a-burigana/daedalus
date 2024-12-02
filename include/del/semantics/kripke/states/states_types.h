@@ -48,7 +48,6 @@ namespace kripke {
 
     using label_id          = unsigned long long;
     using label_vector      = std::vector<label_id>;
-//    using label_storage_ptr = std::shared_ptr<storage<del::label>>;
 }
 
 #endif //DAEDALUS_STATES_TYPES_H

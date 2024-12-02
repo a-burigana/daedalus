@@ -25,7 +25,6 @@
 #define DAEDALUS_DELPHIC_PLANNER_H
 
 #include <functional>
-#include <list>
 #include <memory>
 #include <queue>
 #include "delphic_planning_task.h"

@@ -107,7 +107,7 @@ void run(int argc, char *argv[]) {
             required("-p", "--parameters") & values("parameters", parameters),
             option("-s", "--semantics") & value("semantics", semantics).doc("Selects the preferred DEL semantics ('kripke' or 'delphic')"),
             option("-t", "--strategy" ) & value("strategy", strategy).doc("Selects the search strategy ('unbounded' or 'bounded')"),
-            option("-c", "--contr" ) & value("contraction type", contraction_type).doc("Selects the type of bisimulation contraction to perform ('full', 'rooted' or 'canonical')"),
+            option("-c", "--contraction" ) & value("contraction type", contraction_type).doc("Selects the type of bisimulation contraction to perform ('full', 'rooted' or 'canonical')"),
             option("-a", "--actions" ) & values("actions", actions).doc("Actions to execute"),
             option("--print").set(print_results).doc("Print time results"),
             option("--info").set(print_info),
@@ -169,7 +169,7 @@ void run(int argc, char *argv[]) {
             }
         }
     } else {
-        std::string out_file_path = "thesis/time_results/" + task->get_domain_name() + "/";
+        std::string out_file_path = "ijcai/time_results/" + task->get_domain_name() + "/";
 
         if (not std::filesystem::exists(out_file_path))
             std::filesystem::create_directories(out_file_path);
@@ -184,11 +184,11 @@ void run(int argc, char *argv[]) {
         if (empty_file) {
             switch (t) {
                 case search::strategy::unbounded_search:
-                    out_file << "Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Plan length;#Nodes;Time"
+                    out_file << "Domain;Problem ID;#Atoms;#Agents;|W0|;#Actions;Goal depth;Plan length;#Nodes;#Worlds;Time"
                              << std::endl;
                     break;
                 case search::strategy::iterative_bounded_search:
-                    out_file << "Domain;Problem ID;#Atoms;#Agents;|W|;#Actions;Goal depth;Bound;Plan length;#Nodes;Time"
+                    out_file << "Domain;Problem ID;#Atoms;#Agents;|W0|;#Actions;Goal depth;Bound;Plan length;#Nodes;#Worlds;Time"
                              << std::endl;
                     break;
             }

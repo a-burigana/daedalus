@@ -23,7 +23,6 @@
 
 #include <queue>
 #include <utility>
-#include <list>
 #include "../../../../../include/del/formulas/formula_types.h"
 #include "../../../../../include/del/semantics/kripke/update/updater.h"
 #include "../../../../../include/del/semantics/kripke/model_checker.h"

@@ -26,15 +26,22 @@
 
 #include <memory>
 #include <deque>
-#include <list>
 
 namespace search {
     class node;
     using node_ptr   = std::shared_ptr<node>;
-    using node_deque = std::list<node_ptr>;     // TODO; CHANGE BACK TO DEQUE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    using node_deque = std::deque<node_ptr>;
 
     class delphic_node;
     using delphic_node_ptr   = std::shared_ptr<delphic_node>;
-    using delphic_node_deque = std::list<delphic_node_ptr>;
+    using delphic_node_deque = std::deque<delphic_node_ptr>;
+
+    struct statistics {
+        unsigned long long m_visited_states_no;
+        unsigned long long m_visited_worlds_no;
+        unsigned long long m_tree_depth;
+        unsigned long long m_revisited_states_no;       // Number of computed states that are discarded because already visited
+        unsigned long m_bound;
+    };
 }
 #endif //DAEDALUS_SEARCH_TYPES_H

@@ -137,7 +137,8 @@ void bounded_partition_refinement::split(const state &s, const unsigned long k, 
     // After the scanning, process the list of split blocks. For each such block D with associated block D'...
     for (auto &[D, D_]: split_blocks)
         if (D->empty())
-            Q[h+1].remove(D);
+            Q[h+1].erase(std::find(Q[h+1].begin(), Q[h+1].end(), D));
+//            Q[h+1].remove(D);
 }
 
 bpr_structures bounded_partition_refinement::init_structures(const state &s, unsigned long long k) {

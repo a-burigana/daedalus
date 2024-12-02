@@ -42,7 +42,6 @@ namespace kripke {
     using block_vector     = std::vector<block_ptr>;
     using block_matrix     = std::vector<block_vector>;
     using block_deque      = std::list<block_ptr>;
-    using block_set        = std::set<block_ptr>;
     using partition        = std::vector<block_deque>;
     using split_blocks_map = std::unordered_map<block_ptr, block_ptr>;
 

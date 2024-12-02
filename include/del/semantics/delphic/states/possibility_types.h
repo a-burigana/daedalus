@@ -33,7 +33,6 @@
 namespace delphic {
     class possibility;
     class possibility_spectrum;
-//    template<typename Elem> class storage;
 
     using possibility_id = unsigned long long;
     using possibility_ptr = std::shared_ptr<possibility>;
@@ -48,13 +47,6 @@ namespace delphic {
     using possibility_map = std::unordered_map<possibility_id, possibility_id>;
     using information_state_map    = std::unordered_map<possibility_id, information_state>;
     using information_state_id_map = std::unordered_map<possibility_id, information_state_id>;
-    using possibility_deque = std::deque<possibility_ptr>;
-
-//    template<> class storage<possibility>;
-//    template<> class storage<information_state>;
-//
-//    using possibility_storage_ptr = std::shared_ptr<storage<possibility>>;
-//    using information_state_storage_ptr = std::shared_ptr<storage<information_state>>;
 }
 
 #endif //DAEDALUS_POSSIBILITY_TYPES_H

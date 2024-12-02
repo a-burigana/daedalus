@@ -25,9 +25,8 @@
 #define DAEDALUS_BISIMULATION_TYPES_H
 
 #include <list>
-#include <set>
 #include <vector>
-#include <map>
+#include <unordered_set>
 #include <unordered_map>
 #include "../../../language/language_types.h"
 #include "../../../../utils/bit_deque.h"
@@ -49,7 +48,7 @@ namespace kripke {
     using x_block_ptr           = std::shared_ptr<x_block>;
     using q_partition           = std::vector<q_block_ptr>;
     using x_partition           = std::list<x_block_ptr>;
-    using compound_x_blocks_set = std::set<x_block_ptr>;
+    using compound_x_blocks_set = std::unordered_set<x_block_ptr>;
     using q_block_ptr_vector    = std::vector<q_block_ptr>;
     using q_block_ptr_list      = std::list<q_block_ptr>;
     using counts_vector         = std::vector<unsigned long>;

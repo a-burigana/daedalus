@@ -70,8 +70,8 @@ std::pair<world_id, world_bitset> updater::calculate_worlds(const state &s, cons
     world_id worlds_number = 0;
     world_set designated_worlds;
 
-    std::set<updated_world> to_expand;
-    std::set<updated_world> visited;
+    std::unordered_set<updated_world> to_expand;
+    std::unordered_set<updated_world> visited;
 
     for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
         r_map[ag] = updated_world_pair_deque{};
@@ -79,13 +79,12 @@ std::pair<world_id, world_bitset> updater::calculate_worlds(const state &s, cons
     for (const world_id wd : s.get_designated_worlds())
         for (const event_id ed : a.get_designated_events())
             if (model_checker::holds_in(s, wd, *a.get_precondition(ed), l_storage))
-//            if (a.get_precondition(ed)->holds_in(s, wd))
                 to_expand.emplace(wd, ed);
 
     while (not to_expand.empty()) {
         const auto first = to_expand.begin();
         const auto &[w, e] = *first;
-        w_map[{w, e}] = worlds_number++;
+        w_map[updated_world{w, e}] = worlds_number++;
         visited.emplace(w, e);
 
         if (s.is_designated(w) and a.is_designated(e))
@@ -98,7 +97,6 @@ std::pair<world_id, world_bitset> updater::calculate_worlds(const state &s, cons
             for (const world_id v : ag_worlds) {
                 for (const event_id f : ag_events) {
                     if (model_checker::holds_in(s, v, *a.get_precondition(f), l_storage)) {
-//                    if (a.get_precondition(f)->holds_in(s, v)) {
                         updated_world w_ = {w, e}, v_ = {v, f};
                         r_map[ag].emplace_back(w_, v_);
 

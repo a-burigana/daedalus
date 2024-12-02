@@ -24,6 +24,8 @@
 #ifndef DAEDALUS_UPDATER_H
 #define DAEDALUS_UPDATER_H
 
+#include <unordered_set>
+#include <unordered_map>
 #include "../../../language/language.h"
 #include "../../../../utils/storage_types.h"
 #include "../states/state.h"
@@ -35,6 +37,16 @@
 namespace kripke {
     class updater {
     public:
+        struct updated_world {
+            world_id m_w;
+            event_id m_e;
+
+            updated_world(world_id w, event_id e) : m_w{w}, m_e{e} {}
+
+            bool operator==(const updated_world &rhs) const { return m_w == rhs.m_w and m_e == rhs.m_e; }
+            bool operator!=(const updated_world &rhs) const { return !(rhs == *this); }
+        };
+
         static bool is_applicable(const state &s, const action &a, const del::label_storage_ptr &l_storage);
         static state product_update(const state &s, const action &a, const del::label_storage_ptr &l_storage);
 
@@ -43,9 +55,8 @@ namespace kripke {
                                     unsigned long k = 0);
 
     private:
-        using updated_world            = std::pair<const world_id, const event_id>;
         using updated_world_pair       = std::pair<const updated_world, const updated_world>;
-        using updated_worlds_map       = std::map<updated_world, world_id>;
+        using updated_worlds_map       = std::unordered_map<updated_world, world_id>;
         using updated_world_pair_deque = std::deque<updated_world_pair>;
         using updated_edges_vector     = std::vector<updated_world_pair_deque>;
 
@@ -64,5 +75,14 @@ namespace kripke {
                                      const del::label_storage_ptr &l_storage);
     };
 }
+
+template<>
+struct std::hash<kripke::updater::updated_world> {
+    std::size_t operator()(const kripke::updater::updated_world& uw) const noexcept {
+        std::size_t hw = std::hash<kripke::world_id>{}(uw.m_w);
+        std::size_t he = std::hash<kripke::event_id>{}(uw.m_e);
+        return hw ^ (he << 1);
+    }
+};
 
 #endif //DAEDALUS_UPDATER_H

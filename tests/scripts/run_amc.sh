@@ -11,8 +11,8 @@ N_INSTANCES=40
 count=0
 
 print_results() {
-    $DAEDALUS --domain $DOMAIN --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --info
-    timeout 10m $DAEDALUS --domain $DOMAIN --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --print
+    $DAEDALUS --domain $DOMAIN --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --info
+    timeout 10m $DAEDALUS --domain $DOMAIN --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
 }
 
 echo "####################################################################################################"
@@ -28,9 +28,9 @@ for (( children_no = N_MIN_CHILDREN; children_no <= N_MAX_CHILDREN; children_no+
                 count=$((count+1))
                 echo $'\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ' "${count}/${N_INSTANCES}" $'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n\n'
 
-                print_results "$children_no" "$muddy_no" "$is_muddy_0" kripke  bounded
-                print_results "$children_no" "$muddy_no" "$is_muddy_0" delphic unbounded
-                print_results "$children_no" "$muddy_no" "$is_muddy_0" kripke  unbounded
+                print_results "$children_no" "$muddy_no" "$is_muddy_0" kripke  bounded canonical
+#                print_results "$children_no" "$muddy_no" "$is_muddy_0" delphic unbounded
+                print_results "$children_no" "$muddy_no" "$is_muddy_0" kripke  unbounded full
             fi
         done
     done

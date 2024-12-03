@@ -2,9 +2,9 @@
 
 DOMAIN=consecutive_numbers
 MIN_N=5
-MAX_N=20
+MAX_N=40
 
-N_INSTANCES=16
+N_INSTANCES=36
 count=0
 
 print_results() {

@@ -22,6 +22,7 @@
 // SOFTWARE.
 
 #include <memory>
+#include <ostream>
 #include <unordered_set>
 #include <utility>
 #include <iostream>
@@ -55,7 +56,7 @@ planner::search(const planning_task &task, const strategy strategy, contraction_
                 case contraction_type::full:
                     break;
                 case contraction_type::rooted:
-                    std::cout << " - STRATEGY: Iterative Bounded Tree Search" << std::endl;
+                    std::cout << " - STRATEGY: Iterative Bounded graph Search" << std::endl;
                     break;
                 case contraction_type::canonical:
                     std::cout << " - STRATEGY: Iterative Bounded Graph Search" << std::endl;
@@ -92,7 +93,15 @@ planner::search(const planning_task &task, const strategy strategy, contraction_
 
     auto end = std::chrono::steady_clock::now();
     auto delta = since(start).count();
-    std::cout << "Plan found in " << (delta / 1000) << "." << (delta % 1000) << "s." << std::endl;
+
+    std::cout << "--------------------------------------------------" << std::endl;
+    std::cout << "Computation time:       " << (delta / 1000) << "." << (delta % 1000) << "s." << std::endl;
+    if (strategy == strategy::iterative_bounded_search)
+        std::cout << "Bound:                  " << stats.m_bound                               << std::endl;
+    std::cout << "Visited states:         " << stats.m_visited_states_no                       << std::endl;
+    std::cout << "Total number of worlds: " << stats.m_visited_worlds_no                       << std::endl;
+    std::cout << "Non revisited states:   " << stats.m_non_revisited_states_no                 << std::endl;
+    std::cout << "Depth of search graph:  " << stats.m_graph_depth                             << std::endl;
     std::cout << "--------------------------------------------------" << std::endl << std::endl;
 
     return {std::move(path), stats};
@@ -114,11 +123,11 @@ node_deque planner::iterative_bounded_search(const planning_task &task, contract
     unsigned long long id = 0;
 
     while (true) {
-        std::cout << "Entering Bounded Search iteration: " << b << std::endl;
+        std::cout << "Searching with bound: " << b << " " << std::flush;
         // If iteration 'b' produces a valid result, we return it. Otherwise, we move to the next iteration
         if (node_deque result = bounded_search(task, contraction_type, stats, previous_iter_frontier, b++, id, visited_states_ids, storages, printer); not result.empty())
             return result;
-        std::cout << "No plan was found with bound " << b << ". Going to next iteration." << std::endl << std::endl;
+        std::cout << "(no plan found, going to next iteration)" << std::endl;
     }
 }
 
@@ -136,26 +145,26 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, cont
     node_deque frontier = init_frontier(s0, contraction_type, b, previous_iter_frontier, visited_states_ids, storages);
 
     unsigned long goal_depth = task.get_goal()->get_modal_depth();
-    unsigned long long max_tree_depth = 0, is_bisim_tree_depth = 0;     // is_bisim_tree_depth: deepest level of the search tree such that all nodes in the previous levels have is_bisim = true
+    unsigned long long max_graph_depth = 0, is_bisim_graph_depth = 0;     // is_bisim_graph_depth: deepest level of the search graph such that all nodes in the previous levels have is_bisim = true
     statistics non_bisim_nodes_stats{};
 
     if (not previous_iter_frontier.empty())
         for (const node_ptr &n : previous_iter_frontier)
-            if (n->get_tree_depth() > max_tree_depth)
-                max_tree_depth = n->get_tree_depth();
+            if (n->get_graph_depth() > max_graph_depth)
+                max_graph_depth = n->get_graph_depth();
 
-    if (printer) print_max_tree_depth(printer, max_tree_depth);
+    if (printer) print_max_graph_depth(printer, max_graph_depth);
 
     while (not frontier.empty()) {
         node_ptr n = frontier.front();
 
         if (previous_iter_frontier.empty())
-            is_bisim_tree_depth = n->get_tree_depth();
+            is_bisim_graph_depth = n->get_graph_depth();
 
-        if (n->get_tree_depth() > max_tree_depth) {
-            max_tree_depth = n->get_tree_depth();
-            stats.m_tree_depth = max_tree_depth;
-            if (printer) print_max_tree_depth(printer, max_tree_depth);
+        if (n->get_graph_depth() > max_graph_depth) {
+            max_graph_depth = n->get_graph_depth();
+            stats.m_graph_depth = max_graph_depth;
+            if (printer) print_max_graph_depth(printer, max_graph_depth);
         }
 
         if (printer) print_begin_expanding_node(printer, n, strategy);
@@ -171,7 +180,7 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, cont
         if (not path.empty()) return path;
 
         if (strategy != strategy::unbounded_search and not n->get_to_apply_actions().empty()    // If there exists a node n_ calculated above such that n_.is_bisim
-            and n->get_tree_depth() == is_bisim_tree_depth)
+            and n->get_graph_depth() == is_bisim_graph_depth)
             previous_iter_frontier.push_back(n);                                                // is false, then we need to expand it in the next iteration
 
         frontier.pop_front();
@@ -207,7 +216,7 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
     bool is_dead_node = true;
 
     for (const kripke::action_ptr &a : actions) {
-        if (strategy == strategy::iterative_bounded_search and a->get_maximum_depth() > n->get_bound())     // If the modal depth of 'a' is too big         // todo: check instead a->get_maximum_depth() > n->get_bound() + goal_depth
+        if (strategy == strategy::iterative_bounded_search and a->get_maximum_depth() > n->get_bound())     // If the modal depth of 'a' is too big
             to_reapply_actions.push_back(a);
         else if (kripke::updater::is_applicable(*n->get_state(), *a, storages->l_storage)) {      // For all applicable actions. Let n_ be the result of updating node n with 'a'
             node_ptr n_ = update_node(strategy, contraction_type, n, a, id, visited_states_ids, storages, goal_depth);
@@ -217,14 +226,14 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
                 if (strategy != strategy::unbounded_search)             // If the update is unsuccessful, we need to
                     to_reapply_actions.push_back(a);                    // reapply 'a' to n in the next iteration
             } else if (n_->is_already_visited())
-                ++stats.m_revisited_states_no;
+                ++stats.m_non_revisited_states_no;
             else {                                                      // If the update is successful and n_'s state
                 is_dead_node = false;                                   // was not previously visited, then n is not a
                 n->add_child(n_);                                       // dead node and we add n_ to the children of n
                 visited_states_ids.emplace(n_->get_state()->get_id());
                 update_statistics(stats, non_bisim_nodes_stats, n_);
 
-                // If n_'s state satisfies the goal, we return the path from the root of the search tree to n_
+                // If n_'s state satisfies the goal, we return the path from the root of the search graph to n_
                 if (n_->get_state()->satisfies(task.get_goal(), storages->l_storage)) {
                     if (printer) print_goal_found(printer, n_);
                     calculate_final_statistics(stats, non_bisim_nodes_stats, n_);
@@ -247,7 +256,7 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
 void
 planner::update_statistics(search::statistics &stats, search::statistics &non_bisim_nodes_stats, search::node_ptr &n) {
     if (n->is_already_visited())
-        ++stats.m_revisited_states_no;
+        ++stats.m_non_revisited_states_no;
 
     if (n->is_bisim()) {
         ++stats.m_visited_states_no;
@@ -321,28 +330,29 @@ node_ptr planner::init_node(contraction_type contraction_type, const kripke::sta
 // Print utilities
 void planner::print_plan(const node_deque &path) {
     if (path.empty())
-        std::cout << "No plan was found" << std::endl;
+        std::cout << std::endl << std::endl << "No plan was found" << std::endl;
     else if (path.size() == 1)
         std::cout << "Goal found in initial state!" << std::endl;
     else {
-        std::cout << "Found plan of length " << (path.size() - 1) << ":" << std::endl;
+        std::cout << std::endl << std::endl << "Found plan of length " << (path.size() - 1) << ":" << std::endl;
         unsigned long count = 0;
 
         for (const auto &node : path)
             if (node->get_action())
-                std::cout << "  " << ++count << ". " << node->get_action()->get_name() << std::endl;
+                std::cout << "  " << ++count << ". " << node->get_action()->get_name();
+        std::cout << std::endl;
     }
     std::cout << std::endl;
 }
 
-void planner::print_max_tree_depth(const daedalus::tester::printer_ptr &printer, unsigned long long max_tree_depth) {
+void planner::print_max_graph_depth(const daedalus::tester::printer_ptr &printer, unsigned long long max_graph_depth) {
     printer->out() << "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*" << std::endl;
-    printer->out() << "                                      Search Tree Depth: " << max_tree_depth << "                                           " << std::endl;
+    printer->out() << "                                      Search Graph Depth: " << max_graph_depth << "                                           " << std::endl;
     printer->out() << "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*" << std::endl;
 }
 
 void planner::print_node_id(const daedalus::tester::printer_ptr &printer, const search::node_ptr &n) {
-    printer->out() << "(" << n->get_tree_depth() << ", " << n->get_id() << ")";
+    printer->out() << "(" << n->get_graph_depth() << ", " << n->get_id() << ")";
 }
 
 void planner::print_begin_expanding_node(const daedalus::tester::printer_ptr &printer, const node_ptr &n, const strategy strategy) {
@@ -376,7 +386,7 @@ void planner::print_applying_action(const daedalus::tester::printer_ptr &printer
 
     if (n_) {
         printer->out() << (strategy != strategy::unbounded_search ? " (successful). " : ". ");
-        printer->out() << "Generated child node ";   // << n_->get_tree_depth() << ", " << n_->get_id() << ")";
+        printer->out() << "Generated child node ";   // << n_->get_graph_depth() << ", " << n_->get_id() << ")";
         print_node_id(printer, n_);
         printer->out() << (strategy != strategy::unbounded_search
             ? (n_->is_bisim() ? " (bisimilar)." : " (not bisimilar).")

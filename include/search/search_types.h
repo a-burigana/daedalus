@@ -43,8 +43,8 @@ namespace search {
     struct statistics {
         unsigned long long m_visited_states_no;
         unsigned long long m_visited_worlds_no;
-        unsigned long long m_tree_depth;
-        unsigned long long m_revisited_states_no;       // Number of computed states that are discarded because already visited
+        unsigned long long m_graph_depth;
+        unsigned long long m_non_revisited_states_no;       // Number of computed states that are discarded because already visited
         unsigned long m_bound;
     };
 }

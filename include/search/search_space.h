@@ -45,7 +45,7 @@ namespace search {
         ~node() = default;
 
         [[nodiscard]] unsigned long long get_id() const;
-        [[nodiscard]] unsigned long long get_tree_depth() const;
+        [[nodiscard]] unsigned long long get_graph_depth() const;
         [[nodiscard]] unsigned long long get_visited_worlds() const;
 
         [[nodiscard]] kripke::state_ptr get_state() const;
@@ -72,7 +72,7 @@ namespace search {
         void clear_original_state();
 
     private:
-        unsigned long long m_id, m_tree_depth, m_visited_worlds;
+        unsigned long long m_id, m_graph_depth, m_visited_worlds;
 
         kripke::state_ptr m_state, m_original_state;
         kripke::action_ptr m_action;

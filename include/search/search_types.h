@@ -26,11 +26,15 @@
 
 #include <memory>
 #include <deque>
+#include <unordered_set>
+#include "../del/semantics/kripke/states/states_types.h"
 
 namespace search {
     class node;
     using node_ptr   = std::shared_ptr<node>;
     using node_deque = std::deque<node_ptr>;
+
+    using states_ids_set = std::unordered_set<kripke::state_id>;
 
     class delphic_node;
     using delphic_node_ptr   = std::shared_ptr<delphic_node>;

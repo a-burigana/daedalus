@@ -192,7 +192,7 @@ void printer::print_results(const search::planning_task &task, search::strategy 
 
     printer search_printer(true, out_task_path + strategy_str, "search_tree.txt");
     search::node_deque path = search::planner::search(task, strategy, contraction_type, storages,
-                                                      std::make_unique<printer>(std::move(search_printer)));
+                                                      std::make_unique<printer>(std::move(search_printer))).first;
     std::string state_name = "s0";
 
     for (const auto &node: path) {
@@ -245,7 +245,7 @@ void printer::print_domain_info(const search::planning_task &task, std::ofstream
 
 void printer::print_time_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, const del::storages_ptr &storages, std::ofstream &table) {
     auto start = std::chrono::steady_clock::now();
-    search::node_deque path = search::planner::search(task, strategy, contraction_type, storages);
+    search::node_deque path = search::planner::search(task, strategy, contraction_type, storages).first;
     auto end = std::chrono::steady_clock::now();
     auto delta = since(start).count();
 

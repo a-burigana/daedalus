@@ -33,45 +33,56 @@
 #include "../del/semantics/kripke/update/updater.h"
 #include "../del/semantics/kripke/bisimulation/bisimulator.h"
 #include "../../tests/printer.h"
+#include "search_types.h"
 #include "strategies.h"
 
 namespace search {
-    using states_ids_set = std::unordered_set<state_id>;
 
     class planner {
     public:
-        static node_deque search(const planning_task &task, strategy strategy, contraction_type contraction_type,
-                                 const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer = nullptr);
+        static std::pair<node_deque, statistics>
+        search(const planning_task &task, strategy strategy, contraction_type contraction_type,
+               const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer = nullptr);
 
         static void print_plan(const node_deque &path);
 
     private:
-        static node_deque unbounded_search(const planning_task &task, states_ids_set &visited_states_ids,
-                                           const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer);
+        static node_deque
+        unbounded_search(const planning_task &task, statistics &stats, states_ids_set &visited_states_ids,
+                         const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer);
 
-        static node_deque iterative_bounded_search(const planning_task &task, contraction_type contraction_type,
-                                                   states_ids_set &visited_states_ids, const del::storages_ptr &storages,
-                                                   const daedalus::tester::printer_ptr &printer);
+        static node_deque
+        iterative_bounded_search(const planning_task &task, contraction_type contraction_type, statistics &stats,
+                                 states_ids_set &visited_states_ids, const del::storages_ptr &storages,
+                                 const daedalus::tester::printer_ptr &printer);
 
-        static node_deque bounded_search(const planning_task &task, contraction_type contraction_type,
-                                         node_deque &previous_iter_frontier, unsigned long b,
-                                         unsigned long long &id, states_ids_set &visited_states_ids,
-                                         const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer);
+        static node_deque
+        bounded_search(const planning_task &task, contraction_type contraction_type, statistics &stats,
+                       node_deque &previous_iter_frontier, unsigned long b,
+                       unsigned long long &id, states_ids_set &visited_states_ids,
+                       const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer);
 
-        static node_deque bfs(const planning_task &task, strategy strategy, contraction_type contraction_type,
-                              node_deque &previous_iter_frontier, unsigned long b, unsigned long long &id,
-                              states_ids_set &visited_states_ids, const del::storages_ptr &storages,
-                              const daedalus::tester::printer_ptr &printer);
+        static node_deque
+        bfs(const planning_task &task, strategy strategy, contraction_type contraction_type, statistics &stats,
+            node_deque &previous_iter_frontier, unsigned long b, unsigned long long &id,
+            states_ids_set &visited_states_ids, const del::storages_ptr &storages,
+            const daedalus::tester::printer_ptr &printer);
 
-        static node_deque init_frontier(kripke::state_ptr &s0, strategy strategy, contraction_type contraction_type,
-                                        unsigned long b, node_deque &previous_iter_frontier,
-                                        const states_ids_set &visited_states_ids, const del::storages_ptr &storages);
+        static node_deque init_frontier(kripke::state_ptr &s0, contraction_type contraction_type, const unsigned long b,
+                                        node_deque &previous_iter_frontier, const states_ids_set &visited_states_ids,
+                                        const del::storages_ptr &storages);
 
         static node_deque expand_node(const planning_task &task, strategy strategy, contraction_type contraction_type,
-                                      node_ptr &n, const kripke::action_deque &actions, node_deque &frontier,
+                                      statistics &stats, statistics &non_bisim_nodes_stats, node_ptr &n,
+                                      const kripke::action_deque &actions, node_deque &frontier,
                                       unsigned long goal_depth, unsigned long long &id, states_ids_set &visited_states_ids,
                                       const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer);
-        
+
+        static void
+        update_statistics(search::statistics &stats, search::statistics &non_bisim_nodes_stats, search::node_ptr &n);
+
+        static void calculate_final_statistics(statistics &stats, statistics &non_bisim_nodes_stats, search::node_ptr &n);
+
         static node_deque extract_path(node_ptr n);
 
         static search::node_ptr update_node(strategy strategy, contraction_type contraction_type, const node_ptr &n,

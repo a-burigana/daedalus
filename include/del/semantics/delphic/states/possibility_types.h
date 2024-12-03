@@ -25,6 +25,7 @@
 #define DAEDALUS_POSSIBILITY_TYPES_H
 
 #include <memory>
+#include <vector>
 #include <deque>
 #include <set>
 #include <unordered_set>

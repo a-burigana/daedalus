@@ -244,24 +244,18 @@ void printer::print_domain_info(const search::planning_task &task, std::ofstream
 }
 
 void printer::print_time_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, const del::storages_ptr &storages, std::ofstream &table) {
-    auto start = std::chrono::steady_clock::now();
-    search::node_deque path = search::planner::search(task, strategy, contraction_type, storages).first;
-    auto end = std::chrono::steady_clock::now();
-    auto delta = since(start).count();
-
-    unsigned long plan_length = path.size() - 1;
-    double time = static_cast<double>(delta) / 1000;
+    const auto &[_, stats] = search::planner::search(task, strategy, contraction_type, storages);
 
     if (strategy == search::strategy::iterative_bounded_search)
-        table << std::to_string(path.back()->get_bound()) << ";";
+        table << std::to_string(stats.m_bound) << ";";
 
     table
-        << std::to_string(plan_length) << ";"
-        << path.back()->get_id() << ";"
-        << path.back()->get_visited_worlds() << ";"
-        << std::to_string(time);
+        << stats.m_plan_length << ";"
+        << stats.m_visited_states_no << ";"
+        << stats.m_visited_worlds_no << ";"
+        << stats.m_computation_time;
 
-    std::chrono::seconds pause(10);
+    std::chrono::seconds pause(5);
     std::this_thread::sleep_for(pause);
 }
 

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-DAEDALUS=../../cmake-build-debug/DAEDALUS
-
 DOMAIN=tiger
 N_MIN_DOORS=3
 N_MAX_DOORS=8
@@ -12,7 +10,7 @@ count=0
 
 print_results() {
     $DAEDALUS --domain $DOMAIN --parameters "$1" "$2" --semantics "$3"  --strategy "$4" --contraction "$5" --info
-    timeout 10m $DAEDALUS --domain $DOMAIN --parameters "$1" "$2" --semantics "$3"  --strategy "$4" --contraction "$5" --print
+    timeout 10m "$DAEDALUS" --domain $DOMAIN --parameters "$1" "$2" --semantics "$3"  --strategy "$4" --contraction "$5" --print
 }
 
 echo "####################################################################################################"

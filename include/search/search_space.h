@@ -46,7 +46,6 @@ namespace search {
 
         [[nodiscard]] unsigned long long get_id() const;
         [[nodiscard]] unsigned long long get_graph_depth() const;
-        [[nodiscard]] unsigned long long get_visited_worlds() const;
 
         [[nodiscard]] kripke::state_ptr get_state() const;
         [[nodiscard]] kripke::state_ptr get_original_state() const;
@@ -72,7 +71,7 @@ namespace search {
         void clear_original_state();
 
     private:
-        unsigned long long m_id, m_graph_depth, m_visited_worlds;
+        unsigned long long m_id, m_graph_depth;
 
         kripke::state_ptr m_state, m_original_state;
         kripke::action_ptr m_action;
@@ -82,8 +81,6 @@ namespace search {
         node_ptr m_parent;
         node_deque m_children, m_non_bisim_children;
         kripke::action_deque m_to_apply_actions;
-
-//        std::optional<del::bpr_structures> m_structures;
     };
 }
 

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-DAEDALUS=../../cmake-build-debug/DAEDALUS
-
 DOMAIN=selective_communication
 N_MIN_AGS=2
 N_MAX_AGS=4
@@ -14,7 +12,7 @@ count=0
 
 print_results() {
     $DAEDALUS --domain $DOMAIN --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --info
-    timeout 10m $DAEDALUS --domain $DOMAIN --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
+    timeout 10m "$DAEDALUS" --domain $DOMAIN --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
 }
 
 echo "####################################################################################################"

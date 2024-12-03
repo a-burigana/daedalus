@@ -25,6 +25,7 @@
 #define DAEDALUS_SEARCH_TYPES_H
 
 #include <memory>
+#include <chrono>
 #include <deque>
 #include <unordered_set>
 #include "../del/semantics/kripke/states/states_types.h"
@@ -41,11 +42,13 @@ namespace search {
     using delphic_node_deque = std::deque<delphic_node_ptr>;
 
     struct statistics {
-        unsigned long long m_visited_states_no;
-        unsigned long long m_visited_worlds_no;
-        unsigned long long m_graph_depth;
-        unsigned long long m_non_revisited_states_no;       // Number of computed states that are discarded because already visited
-        unsigned long m_bound;
+        unsigned long m_plan_length{};
+        double m_computation_time{};
+        unsigned long long m_visited_states_no{};
+        unsigned long long m_visited_worlds_no{};
+        unsigned long long m_graph_depth{};
+        unsigned long long m_non_revisited_states_no{};       // Number of computed states that are discarded because already visited
+        unsigned long m_bound{};
     };
 }
 #endif //DAEDALUS_SEARCH_TYPES_H

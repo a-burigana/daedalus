@@ -81,7 +81,7 @@ namespace search {
         static void
         update_statistics(search::statistics &stats, search::statistics &non_bisim_nodes_stats, search::node_ptr &n);
 
-        static void calculate_final_statistics(statistics &stats, statistics &non_bisim_nodes_stats, search::node_ptr &n);
+        static void merge_statistics(statistics &stats, statistics &non_bisim_nodes_stats);
 
         static node_deque extract_path(node_ptr n);
 

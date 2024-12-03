@@ -1,17 +1,15 @@
 #!/bin/bash
 
-DAEDALUS=../../cmake-build-debug/DAEDALUS
-
 DOMAIN=coin_in_the_box
 MIN_ID=1
 MAX_ID=5
 
-N_INSTANCES=5
+N_INSTANCES=6
 count=0
 
 print_results() {
     $DAEDALUS --domain $DOMAIN --parameters "$1" --semantics "$2" --strategy "$3" --contraction "$4" --info
-    timeout 10m $DAEDALUS --domain $DOMAIN --parameters "$1" --semantics "$2"  --strategy "$3" --contraction "$4" --print
+    timeout 10m "$DAEDALUS" --domain $DOMAIN --parameters "$1" --semantics "$2"  --strategy "$3" --contraction "$4" --print
 }
 
 echo "####################################################################################################"

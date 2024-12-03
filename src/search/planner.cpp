@@ -21,6 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <chrono>
 #include <memory>
 #include <ostream>
 #include <unordered_set>
@@ -68,40 +69,40 @@ planner::search(const planning_task &task, const strategy strategy, contraction_
     std::cout << "--------------------------------------------------" << std::endl << std::endl;
     std::cout << "-------------------- SOLVING ---------------------" << std::endl;
 
-//    std::pair<node_deque, statistics> result;
     node_deque path;
     statistics stats{};
 
     states_ids_set visited_states_ids;
-    auto start = std::chrono::steady_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
 
     // If the initial state satisfies the goal, we immediately terminate
     if (task.get_initial_state()->satisfies(task.get_goal(), storages->l_storage)) {
         node_ptr n0 = init_node(contraction_type, task.get_initial_state(), nullptr, true, nullptr, 0, visited_states_ids, storages, task.get_goal()->get_modal_depth());
         if (printer) print_goal_found(printer, n0);
-        return {extract_path(n0), statistics{1, n0->get_state()->get_worlds_number(), 0, 0, n0->get_bound()}};
+        path = extract_path(n0);
+        stats = statistics{0, 0, n0->get_state()->get_worlds_number(), 0, 0, n0->get_bound()};
+    } else {
+        switch (strategy) {
+            case strategy::unbounded_search:
+                path = unbounded_search(task, stats, visited_states_ids, storages, printer);
+                break;
+            case strategy::iterative_bounded_search:
+                path = iterative_bounded_search(task, contraction_type, stats, visited_states_ids, storages, printer);
+                break;
+        }
     }
 
-    switch (strategy) {
-        case strategy::unbounded_search:
-            path = unbounded_search(task, stats, visited_states_ids, storages, printer);
-            break;
-        case strategy::iterative_bounded_search:
-            path = iterative_bounded_search(task, contraction_type, stats, visited_states_ids, storages, printer);
-            break;
-    }
-
-    auto end = std::chrono::steady_clock::now();
-    auto delta = since(start).count();
+    stats.m_plan_length = path.size() - 1;
+    stats.m_computation_time = static_cast<double>(since(start).count()) / 1000;
 
     std::cout << "--------------------------------------------------" << std::endl;
-    std::cout << "Computation time:       " << (delta / 1000) << "." << (delta % 1000) << "s." << std::endl;
-    if (strategy == strategy::iterative_bounded_search)
-        std::cout << "Bound:                  " << stats.m_bound                               << std::endl;
-    std::cout << "Visited states:         " << stats.m_visited_states_no                       << std::endl;
-    std::cout << "Total number of worlds: " << stats.m_visited_worlds_no                       << std::endl;
-    std::cout << "Non revisited states:   " << stats.m_non_revisited_states_no                 << std::endl;
-    std::cout << "Depth of search graph:  " << stats.m_graph_depth                             << std::endl;
+    std::cout << "Computation time:       " << stats.m_computation_time        << "s." << std::endl;
+//    if (strategy == strategy::iterative_bounded_search)
+    std::cout << "Bound:                  " << stats.m_bound                   << std::endl;
+    std::cout << "Visited states:         " << stats.m_visited_states_no       << std::endl;
+    std::cout << "Total number of worlds: " << stats.m_visited_worlds_no       << std::endl;
+    std::cout << "Non revisited states:   " << stats.m_non_revisited_states_no << std::endl;
+    std::cout << "Depth of search graph:  " << stats.m_graph_depth             << std::endl;
     std::cout << "--------------------------------------------------" << std::endl << std::endl;
 
     return {std::move(path), stats};
@@ -111,8 +112,12 @@ node_deque planner::unbounded_search(const planning_task &task, statistics &stat
                                      const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer) {
     node_deque previous_iter_frontier = {};
     unsigned long long id = 0;
+    auto path = bfs(task, strategy::unbounded_search, contraction_type::full, stats, previous_iter_frontier, 0, id, visited_states_ids, storages, printer);
 
-    return bfs(task, strategy::unbounded_search, contraction_type::full, stats, previous_iter_frontier, 0, id, visited_states_ids, storages, printer);
+    for (const auto &n : path)
+        if (n->get_action()) stats.m_bound += n->get_action()->get_maximum_depth();
+
+    return std::move(path);
 }
 
 node_deque planner::iterative_bounded_search(const planning_task &task, contraction_type contraction_type, statistics &stats,
@@ -124,6 +129,7 @@ node_deque planner::iterative_bounded_search(const planning_task &task, contract
 
     while (true) {
         std::cout << "Searching with bound: " << b << " " << std::flush;
+        stats.m_bound = b;
         // If iteration 'b' produces a valid result, we return it. Otherwise, we move to the next iteration
         if (node_deque result = bounded_search(task, contraction_type, stats, previous_iter_frontier, b++, id, visited_states_ids, storages, printer); not result.empty())
             return result;
@@ -236,7 +242,7 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
                 // If n_'s state satisfies the goal, we return the path from the root of the search graph to n_
                 if (n_->get_state()->satisfies(task.get_goal(), storages->l_storage)) {
                     if (printer) print_goal_found(printer, n_);
-                    calculate_final_statistics(stats, non_bisim_nodes_stats, n_);
+                    merge_statistics(stats, non_bisim_nodes_stats);
                     return extract_path(n_);
                 }
 
@@ -267,10 +273,9 @@ planner::update_statistics(search::statistics &stats, search::statistics &non_bi
     }
 }
 
-void planner::calculate_final_statistics(search::statistics &stats, search::statistics &non_bisim_nodes_stats, search::node_ptr &n) {
+void planner::merge_statistics(search::statistics &stats, search::statistics &non_bisim_nodes_stats) {
     stats.m_visited_states_no += non_bisim_nodes_stats.m_visited_states_no;
     stats.m_visited_worlds_no += non_bisim_nodes_stats.m_visited_worlds_no;
-    stats.m_bound = n->get_bound();
 }
 
 node_deque planner::extract_path(node_ptr n) {
@@ -310,7 +315,7 @@ void planner::refresh_node(node_ptr &n, contraction_type contraction_type, const
         auto [is_bisim, s_contr] = kripke::bisimulator::contract(contraction_type, *n->get_original_state(), n->get_bound(), storages);    // We do another refinement step
         n->set_is_bisim(is_bisim);                                  // And we update the value of is_bisim
         n->set_state(std::make_shared<kripke::state>(std::move(s_contr)));
-        if (is_bisim) n->set_original_state(nullptr);
+        if (is_bisim) n->clear_original_state();
     }
 }
 

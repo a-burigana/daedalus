@@ -1,7 +1,5 @@
 #!/bin/bash
 
-DAEDALUS=../../cmake-build-debug/DAEDALUS
-
 DOMAIN=consecutive_numbers
 MIN_N=5
 MAX_N=20
@@ -11,7 +9,7 @@ count=0
 
 print_results() {
     $DAEDALUS --domain $DOMAIN --parameters "$1" --semantics "$2"  --strategy "$3" --contraction "$4" --info
-    timeout 10m $DAEDALUS --domain $DOMAIN --parameters "$1" --semantics "$2"  --strategy "$3" --contraction "$4" --print
+    timeout 10m "$DAEDALUS" --domain $DOMAIN --parameters "$1" --semantics "$2"  --strategy "$3" --contraction "$4" --print
 }
 
 echo "####################################################################################################"

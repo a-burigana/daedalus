@@ -318,7 +318,7 @@ node_ptr planner::init_node(contraction_type contraction_type, const kripke::sta
                             const node_ptr &parent, unsigned long long id, const states_ids_set &visited_states_ids,
                             const del::storages_ptr &storages, unsigned long b) {
     auto [is_bisim, s_contr] = kripke::bisimulator::contract(contraction_type, *s, b, storages);
-    bool already_visited = contraction_type == contraction_type::canonical and visited_states_ids.find(s_contr.get_id()) != visited_states_ids.end();
+    bool already_visited = visited_states_ids.find(s_contr.get_id()) != visited_states_ids.end();
 
     node_ptr n = std::make_shared<node>(id, std::make_shared<kripke::state>(std::move(s_contr)), a, b, is_bisim and was_bisim, already_visited, parent);
 

@@ -364,9 +364,9 @@ action coin_in_the_box::build_walk_in(del::agent ag, const agent_set &fo_ags) {
     atom        looking_ag  = language->get_atom_id("looking_" + ag_name);
     formula_ptr looking     = std::make_shared<atom_formula>(looking_ag);
     formula_ptr not_looking = std::make_shared<not_formula>(looking);
-    formula_ptr B_ag_not_looking = std::make_shared<box_formula>(ag, not_looking);
+//    formula_ptr B_ag_not_looking = std::make_shared<box_formula>(ag, not_looking);
 
-    formula_ptr f_pre  = std::move(B_ag_not_looking);
+    formula_ptr f_pre  = std::move(not_looking);
     event_post e_post;
     e_post[looking_ag] = std::make_shared<true_formula>();
 
@@ -384,9 +384,9 @@ action coin_in_the_box::build_walk_out(del::agent ag, const agent_set &fo_ags) {
 
     atom looking_ag = language->get_atom_id("looking_" + ag_name);
     formula_ptr looking = std::make_shared<atom_formula>(looking_ag);
-    formula_ptr B_ag_looking = std::make_shared<box_formula>(ag, looking);
+//    formula_ptr B_ag_looking = std::make_shared<box_formula>(ag, looking);
 
-    formula_ptr f_pre  = std::move(B_ag_looking);
+    formula_ptr f_pre  = std::move(looking);
     event_post e_post;
     e_post[looking_ag] = std::make_shared<false_formula>();
 

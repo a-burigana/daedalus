@@ -2,7 +2,7 @@
 
 DOMAIN=consecutive_numbers
 MIN_N=5
-MAX_N=40
+MAX_N=60
 
 N_INSTANCES=36
 count=0

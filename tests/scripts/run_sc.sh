@@ -1,9 +1,9 @@
 #!/bin/bash
 
 DOMAIN=selective_communication
-N_MIN_AGS=2
-N_MAX_AGS=4
-N_MAX_ROOMS=5
+N_MIN_AGS=5
+N_MAX_AGS=7
+N_MAX_ROOMS=8
 MIN_GOAL_ID=1
 MAX_GOAL_ID=4
 

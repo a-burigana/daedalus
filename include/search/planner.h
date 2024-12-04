@@ -68,8 +68,8 @@ namespace search {
             states_ids_set &visited_states_ids, const del::storages_ptr &storages,
             const daedalus::tester::printer_ptr &printer);
 
-        static node_deque init_frontier(kripke::state_ptr &s0, contraction_type contraction_type, const unsigned long b,
-                                        node_deque &previous_iter_frontier, const states_ids_set &visited_states_ids,
+        static node_deque init_frontier(kripke::state_ptr &s0, contraction_type contraction_type, unsigned long b,
+                                        node_deque &previous_iter_frontier, states_ids_set &visited_states_ids,
                                         const del::storages_ptr &storages);
 
         static node_deque expand_node(const planning_task &task, strategy strategy, contraction_type contraction_type,
@@ -90,7 +90,7 @@ namespace search {
                                             const states_ids_set &visited_states_ids, const del::storages_ptr &storages,
                                             unsigned long goal_depth = 0);
 
-        static void refresh_node(node_ptr &n, contraction_type contraction_type, const del::storages_ptr &storages);
+        static void refresh_node(node_ptr &n, contraction_type contraction_type, states_ids_set &visited_states_ids, const del::storages_ptr &storages);
 
         static search::node_ptr init_node(contraction_type contraction_type, const kripke::state_ptr &s,
                                           const kripke::action_ptr &a, bool was_bisim, const node_ptr &parent, unsigned long long id,
@@ -101,8 +101,11 @@ namespace search {
         static void print_node_id(const daedalus::tester::printer_ptr &printer, const node_ptr &n);
         static void print_begin_expanding_node(const daedalus::tester::printer_ptr &printer, const node_ptr &n, strategy strategy);
         static void print_goal_found(const daedalus::tester::printer_ptr &printer, const node_ptr &n);
-        static void print_applying_action(const daedalus::tester::printer_ptr &printer, const kripke::action_ptr &a, const node_ptr &n_,
+        static void print_applied_action(const daedalus::tester::printer_ptr &printer, const kripke::action_ptr &a, const node_ptr &n_,
                                           strategy strategy);
+
+        static void print_not_applied_action(const daedalus::tester::printer_ptr &printer, const kripke::action_ptr &a);
+
         static void print_end_expanding_node(const daedalus::tester::printer_ptr &printer, const node_ptr &n, strategy strategy,
                                              bool is_dead_node, bool is_fully_expanded_node);
     };

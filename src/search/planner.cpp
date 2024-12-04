@@ -97,8 +97,10 @@ planner::search(const planning_task &task, const strategy strategy, contraction_
 
     std::cout << "--------------------------------------------------" << std::endl;
     std::cout << "Computation time:       " << stats.m_computation_time        << "s." << std::endl;
-//    if (strategy == strategy::iterative_bounded_search)
-    std::cout << "Bound:                  " << stats.m_bound                   << std::endl;
+    if (strategy == strategy::iterative_bounded_search)
+        std::cout << "Bound:                  " << stats.m_bound               << std::endl;
+    else
+        std::cout << "Bound:                  " << "\u221E"                    << std::endl;
     std::cout << "Visited states:         " << stats.m_visited_states_no       << std::endl;
     std::cout << "Total number of worlds: " << stats.m_visited_worlds_no       << std::endl;
     std::cout << "Non revisited states:   " << stats.m_non_revisited_states_no << std::endl;
@@ -195,20 +197,23 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, cont
 }
 
 node_deque planner::init_frontier(kripke::state_ptr &s0, contraction_type contraction_type, const unsigned long b,
-                                  node_deque &previous_iter_frontier, const states_ids_set &visited_states_ids,
+                                  node_deque &previous_iter_frontier, states_ids_set &visited_states_ids,
                                   const del::storages_ptr &storages) {
     node_deque frontier;
 
     if (previous_iter_frontier.empty()) {   // If this is the first iteration
         node_ptr n0 = init_node(contraction_type, s0, nullptr, true, nullptr, 0, visited_states_ids, storages, b);
-        if (n0)
+
+        if (n0) {
+            visited_states_ids.emplace(n0->get_state()->get_id());
             frontier.push_back(std::move(n0));
+        }
     } else {
         frontier = std::move(previous_iter_frontier);
         previous_iter_frontier.clear();
 
         for (node_ptr &n : frontier)    // The nodes in previous_iter_frontier have to be refreshed
-            refresh_node(n, contraction_type, storages);
+            refresh_node(n, contraction_type, visited_states_ids, storages);
     }
     return frontier;
 }
@@ -226,34 +231,34 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
             to_reapply_actions.push_back(a);
         else if (kripke::updater::is_applicable(*n->get_state(), *a, storages->l_storage)) {      // For all applicable actions. Let n_ be the result of updating node n with 'a'
             node_ptr n_ = update_node(strategy, contraction_type, n, a, id, visited_states_ids, storages, goal_depth);
-            if (printer) print_applying_action(printer, a, n_, strategy);
+            if (printer) print_applied_action(printer, a, n_, strategy);
 
-            if (not n_) {
-                if (strategy != strategy::unbounded_search)             // If the update is unsuccessful, we need to
-                    to_reapply_actions.push_back(a);                    // reapply 'a' to n in the next iteration
-            } else if (n_->is_already_visited())
-                ++stats.m_non_revisited_states_no;
-            else {                                                      // If the update is successful and n_'s state
-                is_dead_node = false;                                   // was not previously visited, then n is not a
-                n->add_child(n_);                                       // dead node and we add n_ to the children of n
-                visited_states_ids.emplace(n_->get_state()->get_id());
-                update_statistics(stats, non_bisim_nodes_stats, n_);
+            if (n_) {
+                if (n_->is_already_visited())
+                    ++stats.m_non_revisited_states_no;
+                else {                                              // If the update is successful and n_'s state
+                    is_dead_node = false;                           // was not previously visited, then n is not a
+                    n->add_child(n_);                               // dead node and we add n_ to the children of n
+                    visited_states_ids.emplace(n_->get_state()->get_id());
+                    update_statistics(stats, non_bisim_nodes_stats, n_);
 
-                // If n_'s state satisfies the goal, we return the path from the root of the search graph to n_
-                if (n_->get_state()->satisfies(task.get_goal(), storages->l_storage)) {
-                    if (printer) print_goal_found(printer, n_);
-                    merge_statistics(stats, non_bisim_nodes_stats);
-                    return extract_path(n_);
+                    // If n_'s state satisfies the goal, we return the path from the root of the search tree to n_
+                    if (n_->get_state()->satisfies(task.get_goal(), storages->l_storage)) {
+                        if (printer) print_goal_found(printer, n_);
+                        merge_statistics(stats, non_bisim_nodes_stats);
+                        return extract_path(n_);
+                    }
+
+                    if (not n_->is_bisim())                         // If n_.is_bisim is false, we need to
+                        to_reapply_actions.push_back(a);            // reapply 'a' to n in the next iteration
+
+                    frontier.push_back(std::move(n_));              // We update the frontier
                 }
-
-                if (not n_->is_bisim())                                 // If n_.is_bisim is false, we need to
-                    to_reapply_actions.push_back(a);                    // reapply 'a' to n in the next iteration
-
-                frontier.push_back(std::move(n_));                      // We update the frontier
-            }
-        }
+            } else if (strategy != strategy::unbounded_search)      // If the update is unsuccessful, we need to
+                to_reapply_actions.push_back(a);                    // reapply 'a' to n in the next iteration
+        } else if (printer) print_not_applied_action(printer, a);
     }
-    n->set_to_apply_action(std::move(to_reapply_actions));              // We set the actions that have to be reapplied
+    n->set_to_apply_action(std::move(to_reapply_actions));          // We set the actions that have to be reapplied
     if (printer) print_end_expanding_node(printer, n, strategy, is_dead_node, n->get_to_apply_actions().empty());
 
     return {};
@@ -307,7 +312,7 @@ node_ptr planner::update_node(const strategy strategy, contraction_type contract
     }
 }
 
-void planner::refresh_node(node_ptr &n, contraction_type contraction_type, const del::storages_ptr &storages) {
+void planner::refresh_node(node_ptr &n, contraction_type contraction_type, states_ids_set &visited_states_ids, const del::storages_ptr &storages) {
     n->increment_bound();           // We increment the bound value. Moreover,  node n might have children n' such that
     n->clear_non_bisim_children();  // n'.is_bisim == false. We have to discard them before we move to the next iteration
 
@@ -315,6 +320,7 @@ void planner::refresh_node(node_ptr &n, contraction_type contraction_type, const
         auto [is_bisim, s_contr] = kripke::bisimulator::contract(contraction_type, *n->get_original_state(), n->get_bound(), storages);    // We do another refinement step
         n->set_is_bisim(is_bisim);                                  // And we update the value of is_bisim
         n->set_state(std::make_shared<kripke::state>(std::move(s_contr)));
+        visited_states_ids.emplace(n->get_state()->get_id());
         if (is_bisim) n->clear_original_state();
     }
 }
@@ -385,7 +391,7 @@ void planner::print_goal_found(const daedalus::tester::printer_ptr &printer, con
     printer->out() << "!" << std::endl;
 }
 
-void planner::print_applying_action(const daedalus::tester::printer_ptr &printer, const kripke::action_ptr &a, const node_ptr &n_,
+void planner::print_applied_action(const daedalus::tester::printer_ptr &printer, const kripke::action_ptr &a, const node_ptr &n_,
                                     const strategy strategy) {
     printer->out() <<"\t~Applying action: " << a->get_name();
 
@@ -394,10 +400,14 @@ void planner::print_applying_action(const daedalus::tester::printer_ptr &printer
         printer->out() << "Generated child node ";   // << n_->get_graph_depth() << ", " << n_->get_id() << ")";
         print_node_id(printer, n_);
         printer->out() << (strategy != strategy::unbounded_search
-            ? (n_->is_bisim() ? " (bisimilar)." : " (not bisimilar).")
+            ? (n_->is_already_visited() ? "(already visited)." : (n_->is_bisim() ? " (bisimilar)." : " (not bisimilar)."))
             : ".") << std::endl;
     } else if (strategy != strategy::unbounded_search)
         printer->out() << " (unsuccessful)." << std::endl;
+}
+
+void planner::print_not_applied_action(const daedalus::tester::printer_ptr &printer, const kripke::action_ptr &a) {
+    printer->out() <<"\t~Action '" << a->get_name() << "' is not applicable" << std::endl;
 }
 
 void planner::print_end_expanding_node(const daedalus::tester::printer_ptr &printer, const node_ptr &n,

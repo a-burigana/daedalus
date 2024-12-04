@@ -32,7 +32,7 @@ namespace del {
 
     class label {
     public:
-        label() : m_id{0} {}
+        label() = default;
 
         explicit label(boost::dynamic_bitset<> bitset);
 
@@ -44,7 +44,6 @@ namespace del {
 
         ~label() = default;
 
-        [[nodiscard]] unsigned long get_id() const;
         [[nodiscard]] boost::dynamic_bitset<> get_bitset() const;
 
         bool operator[](const del::atom &p) const;
@@ -58,7 +57,6 @@ namespace del {
 
     private:
         boost::dynamic_bitset<> m_bitset;
-        unsigned long m_id;
     };
 }
 

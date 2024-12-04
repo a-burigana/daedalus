@@ -26,12 +26,7 @@
 using namespace del;
 
 label::label(boost::dynamic_bitset<> bitset) :
-        m_bitset{std::move(bitset)},
-        m_id{m_bitset.to_ulong()} {}
-
-unsigned long label::get_id() const {
-    return m_id;
-}
+        m_bitset{std::move(bitset)} {}
 
 boost::dynamic_bitset<> label::get_bitset() const {
     return m_bitset;
@@ -42,25 +37,25 @@ bool label::operator[](const del::atom &p) const {
 }
 
 bool label::operator==(const label &rhs) const {
-    return m_id == rhs.m_id;
+    return m_bitset == rhs.m_bitset;
 }
 
 bool label::operator!=(const label &rhs) const {
-    return m_id != rhs.m_id;
+    return m_bitset != rhs.m_bitset;
 }
 
 bool label::operator<(const label &rhs) const {
-    return m_id < rhs.m_id;
+    return m_bitset < rhs.m_bitset;
 }
 
 bool label::operator>(const label &rhs) const {
-    return m_id > rhs.m_id;
+    return m_bitset > rhs.m_bitset;
 }
 
 bool label::operator<=(const label &rhs) const {
-    return m_id <= rhs.m_id;
+    return m_bitset <= rhs.m_bitset;
 }
 
 bool label::operator>=(const label &rhs) const {
-    return m_id >= rhs.m_id;
+    return m_bitset >= rhs.m_bitset;
 }

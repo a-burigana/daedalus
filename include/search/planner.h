@@ -97,6 +97,9 @@ namespace search {
                                           const states_ids_set &visited_states_ids, const del::storages_ptr &storages, unsigned long b = 0);
 
         // Print utilities
+        static void print_info(const planning_task &task, strategy strategy, contraction_type contraction_type);
+        static void print_statistics(statistics &stats, strategy strategy);
+
         static void print_max_graph_depth(const daedalus::tester::printer_ptr &printer, unsigned long long max_graph_depth);
         static void print_node_id(const daedalus::tester::printer_ptr &printer, const node_ptr &n);
         static void print_begin_expanding_node(const daedalus::tester::printer_ptr &printer, const node_ptr &n, strategy strategy);

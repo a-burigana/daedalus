@@ -36,39 +36,7 @@ using namespace search;
 std::pair<node_deque, statistics>
 planner::search(const planning_task &task, const strategy strategy, contraction_type contraction_type,
                 const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer) {
-    std::cout << "==================================================" << std::endl;
-    std::cout << "                     DAEDALUS                     " << std::endl;
-    std::cout << "==================================================" << std::endl << std::endl;
-
-    std::cout << "------------------ CURRENT TASK ------------------" << std::endl;
-    std::cout << " - DOMAIN:  " << task.get_domain_name() << std::endl;
-    std::cout << " - PROBLEM: " << task.get_problem_id() << std::endl;
-    std::cout << " - GOAL:    " << printer::formula_printer::to_string(*task.get_goal(), task.get_language(), false) << std::endl;
-    std::cout << "--------------------------------------------------" << std::endl << std::endl;
-
-    std::cout << "----------------- CONFIGURATION ------------------" << std::endl;
-
-    switch (strategy) {
-        case strategy::unbounded_search:
-            std::cout << " - STRATEGY: Unbounded Search" << std::endl;
-            break;
-        case strategy::iterative_bounded_search:
-            switch (contraction_type) {
-                case contraction_type::full:
-                    break;
-                case contraction_type::rooted:
-                    std::cout << " - STRATEGY: Iterative Bounded graph Search" << std::endl;
-                    break;
-                case contraction_type::canonical:
-                    std::cout << " - STRATEGY: Iterative Bounded Graph Search" << std::endl;
-                    break;
-            }
-    }
-
-    std::cout << " - SEMANTICS: Kripke" << std::endl;
-    std::cout << "--------------------------------------------------" << std::endl << std::endl;
-    std::cout << "-------------------- SOLVING ---------------------" << std::endl;
-
+    print_info(task, strategy, contraction_type);
     node_deque path;
     statistics stats{};
 
@@ -94,18 +62,7 @@ planner::search(const planning_task &task, const strategy strategy, contraction_
 
     stats.m_plan_length = path.size() - 1;
     stats.m_computation_time = static_cast<double>(since(start).count()) / 1000;
-
-    std::cout << "--------------------------------------------------" << std::endl;
-    std::cout << "Computation time:       " << stats.m_computation_time        << "s." << std::endl;
-    if (strategy == strategy::iterative_bounded_search)
-        std::cout << "Bound:                  " << stats.m_bound               << std::endl;
-    else
-        std::cout << "Bound:                  " << "\u221E"                    << std::endl;
-    std::cout << "Visited states:         " << stats.m_visited_states_no       << std::endl;
-    std::cout << "Total number of worlds: " << stats.m_visited_worlds_no       << std::endl;
-    std::cout << "Non revisited states:   " << stats.m_non_revisited_states_no << std::endl;
-    std::cout << "Depth of search graph:  " << stats.m_graph_depth             << std::endl;
-    std::cout << "--------------------------------------------------" << std::endl << std::endl;
+    print_statistics(stats, strategy);
 
     return {std::move(path), stats};
 }
@@ -339,6 +296,56 @@ node_ptr planner::init_node(contraction_type contraction_type, const kripke::sta
 
 
 // Print utilities
+void planner::print_info(const search::planning_task &task, search::strategy strategy,
+                         kripke::contraction_type contraction_type) {
+    std::cout << "==================================================" << std::endl;
+    std::cout << "                     DAEDALUS                     " << std::endl;
+    std::cout << "==================================================" << std::endl << std::endl;
+
+    std::cout << "------------------ CURRENT TASK ------------------" << std::endl;
+    std::cout << " - DOMAIN:  " << task.get_domain_name() << std::endl;
+    std::cout << " - PROBLEM: " << task.get_problem_id() << std::endl;
+    std::cout << " - GOAL:    " << printer::formula_printer::to_string(*task.get_goal(), task.get_language(), false) << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl << std::endl;
+
+    std::cout << "----------------- CONFIGURATION ------------------" << std::endl;
+
+    switch (strategy) {
+        case strategy::unbounded_search:
+            std::cout << " - STRATEGY: Unbounded Search" << std::endl;
+            break;
+        case strategy::iterative_bounded_search:
+            switch (contraction_type) {
+                case contraction_type::full:
+                    break;
+                case contraction_type::rooted:
+                    std::cout << " - STRATEGY: Iterative Bounded graph Search" << std::endl;
+                    break;
+                case contraction_type::canonical:
+                    std::cout << " - STRATEGY: Iterative Bounded Graph Search" << std::endl;
+                    break;
+            }
+    }
+
+    std::cout << " - SEMANTICS: Kripke" << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl << std::endl;
+    std::cout << "-------------------- SOLVING ---------------------" << std::endl;
+}
+
+void planner::print_statistics(search::statistics &stats, search::strategy strategy) {
+    std::cout << "--------------------------------------------------"          << std::endl;
+    std::cout << "Computation time:       " << stats.m_computation_time        << "s." << std::endl;
+    if (strategy == strategy::iterative_bounded_search)
+        std::cout << "Bound:                  " << stats.m_bound               << std::endl;
+    else
+        std::cout << "Bound:                  " << "\u221E"                    << std::endl;
+    std::cout << "Visited states:         " << stats.m_visited_states_no       << std::endl;
+    std::cout << "Total number of worlds: " << stats.m_visited_worlds_no       << std::endl;
+    std::cout << "Non revisited states:   " << stats.m_non_revisited_states_no << std::endl;
+    std::cout << "Depth of search graph:  " << stats.m_graph_depth             << std::endl;
+    std::cout << "--------------------------------------------------"          << std::endl << std::endl;
+}
+
 void planner::print_plan(const node_deque &path) {
     if (path.empty())
         std::cout << std::endl << std::endl << "No plan was found" << std::endl;

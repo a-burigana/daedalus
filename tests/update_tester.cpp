@@ -46,7 +46,7 @@ state update_tester::test_CB_1(const std::string &out_path, const del::label_sto
     action act = action_builder::build_public_announcement("shout_heads", l, heads);
 
     state s_cb_heads = updater::product_update(s0, act, l_storage);
-    printer::print_state(s_cb_heads, out_path + cb_dir, "cb_heads");
+    printer::print_state(s_cb_heads, l_storage, out_path + cb_dir, "cb_heads");
 
     return s_cb_heads;
 }
@@ -71,7 +71,7 @@ state update_tester::test_CB_2(const std::string &out_path, const del::label_sto
     action act = coin_in_the_box::build_open(a, fo_ags);
 
     state s_cb_open = updater::product_update(s0, act, l_storage);
-    printer::print_state(s_cb_open, out_path + cb_dir, "cb_open");
+    printer::print_state(s_cb_open, l_storage, out_path + cb_dir, "cb_open");
 
     return s_cb_open;
 }
@@ -94,7 +94,7 @@ state update_tester::test_CB_3(const std::string &out_path, const del::label_sto
     action act = action_builder::build_semi_private_sensing("peek_a", l, K_a_opened, heads, fo_ags, po_ags);
 
     state s_cb_open_peek = kripke::updater::product_update(s_open, act, l_storage);
-    printer::print_state(s_cb_open_peek, out_path + cb_dir, "cb_open_peek");
+    printer::print_state(s_cb_open_peek, l_storage, out_path + cb_dir, "cb_open_peek");
 
     return s_cb_open_peek;
 }

@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 }*/
 
 void run(int argc, char *argv[]) {
-    std::string semantics = "kripke", strategy = "unbounded", contraction_type = "full";
+    std::string semantics = "kripke", strategy = "unbounded", contraction_type = "full", bound;
     std::string domain;
     std::vector<std::string> parameters, actions;
     bool print_results = false, print_info = false, debug = false;
@@ -109,6 +109,7 @@ void run(int argc, char *argv[]) {
             option("-t", "--strategy" ) & value("strategy", strategy).doc("Selects the search strategy ('unbounded' or 'bounded')"),
             option("-c", "--contraction" ) & value("contraction type", contraction_type).doc("Selects the type of bisimulation contraction to perform ('full', 'rooted' or 'canonical')"),
             option("-a", "--actions" ) & values("actions", actions).doc("Actions to execute"),
+            option("-b", "--bound" ) & values("bound", bound).doc("Initial bound"),
             option("--print").set(print_results).doc("Print time results"),
             option("--info").set(print_info),
             option("--debug").set(debug)
@@ -161,7 +162,8 @@ void run(int argc, char *argv[]) {
                 kripke::action_deque as = task->get_actions(actions);
 //                daedalus::tester::printer::print_state(*task->get_initial_state(), OUT_PATH + path, "s0");
                 state_deque ss = {task->get_initial_state()};
-                daedalus::tester::printer::print_states(ss, as, storages, task->get_goal(), OUT_PATH + path, "s0", true, type);
+                unsigned long b = bound.empty() ? task->get_goal()->get_modal_depth() : std::stoul(bound);
+                daedalus::tester::printer::print_states(ss, as, storages, task->get_goal(), OUT_PATH + path, "s0", true, type, b);
             } else if (semantics == "delphic") {
 //                delphic::action_deque as = task_.get_actions(actions);
 //                daedalus::tester::printer::print_state(*task_.get_initial_state(), OUT_PATH + path, "W0");

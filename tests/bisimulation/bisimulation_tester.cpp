@@ -37,49 +37,49 @@ void bisimulation_tester::test_bisim_1(const std::string &out_path, unsigned lon
     std::string s1_dir = "s1/";
 
     state s1 = state_builder::build_test_state1(storages->l_storage);
-    printer::print_state(s1, out_path + BISIM_PATH + s1_dir, "s1");
+    printer::print_state(s1, storages->l_storage, out_path + BISIM_PATH + s1_dir, "s1");
 
     auto [is_bisim, s1_contr] = bisimulator::contract(contraction_type::full, s1);
-    printer::print_state(s1_contr, out_path + BISIM_PATH + s1_dir, "s1_contr");
+    printer::print_state(s1_contr, storages->l_storage, out_path + BISIM_PATH + s1_dir, "s1_contr");
 
     auto [is_s1_bisim, s1_k_contr] = bisimulator::contract(contraction_type::rooted, s1, k);
 //    assert(is_s1_bisim);
-    printer::print_state(s1_k_contr, out_path + BISIM_PATH + s1_dir, "s1_" + std::to_string(k) + "_contr");
+    printer::print_state(s1_k_contr, storages->l_storage, out_path + BISIM_PATH + s1_dir, "s1_" + std::to_string(k) + "_contr");
 
     auto [is_s1_bisim_id, s1_k_contr_id] = bisimulator::contract(contraction_type::canonical, s1, k, storages);
-    printer::print_state(s1_k_contr_id, out_path + BISIM_PATH + s1_dir, "s1_" + std::to_string(k) + "_can_contr");
+    printer::print_state(s1_k_contr_id, storages->l_storage, out_path + BISIM_PATH + s1_dir, "s1_" + std::to_string(k) + "_can_contr");
 }
 
 void bisimulation_tester::test_bisim_singleton(const std::string &out_path, unsigned long k, const del::storages_ptr &storages) {
     std::string singleton_dir = "singleton/";
 
     state singleton = state_builder::build_singleton(true, storages->l_storage);
-    printer::print_state(singleton, out_path + BISIM_PATH + singleton_dir, "singleton");
+    printer::print_state(singleton, storages->l_storage, out_path + BISIM_PATH + singleton_dir, "singleton");
 
     state singleton_contr = bisimulation_tester::test_full_bisim_singleton(true, storages->l_storage);
-    printer::print_state(singleton_contr, out_path + BISIM_PATH + singleton_dir, "singleton_contr");
+    printer::print_state(singleton_contr, storages->l_storage, out_path + BISIM_PATH + singleton_dir, "singleton_contr");
 
     auto [is_singleton_bisim, singleton_k_contr] = bisimulation_tester::test_bounded_bisim_singleton(k, true, storages->l_storage);
-    printer::print_state(singleton_k_contr, out_path + BISIM_PATH + singleton_dir, "singleton_" + std::to_string(k) + "_contr");
+    printer::print_state(singleton_k_contr, storages->l_storage, out_path + BISIM_PATH + singleton_dir, "singleton_" + std::to_string(k) + "_contr");
 
     auto [is_singleton_bisim_id, singleton_k_contr_id] = bisimulator::contract(contraction_type::canonical, singleton, k, storages);
-    printer::print_state(singleton_k_contr_id, out_path + BISIM_PATH + singleton_dir, "singleton_" + std::to_string(k) + "_can_contr");
+    printer::print_state(singleton_k_contr_id, storages->l_storage, out_path + BISIM_PATH + singleton_dir, "singleton_" + std::to_string(k) + "_can_contr");
 }
 
 void bisimulation_tester::test_bisim_singleton_no_loop(const std::string &out_path, unsigned long k, const del::storages_ptr &storages) {
     std::string singleton_no_loop_dir = "singleton_no_loop/";
 
     state singleton_no_loop = state_builder::build_singleton(false, storages->l_storage);
-    printer::print_state(singleton_no_loop, out_path + BISIM_PATH + singleton_no_loop_dir, "singleton_no_loop");
+    printer::print_state(singleton_no_loop, storages->l_storage, out_path + BISIM_PATH + singleton_no_loop_dir, "singleton_no_loop");
 
     state singleton_no_loop_contr = bisimulation_tester::test_full_bisim_singleton(false, storages->l_storage);
-    printer::print_state(singleton_no_loop_contr, out_path + BISIM_PATH + singleton_no_loop_dir, "singleton_no_loop_contr");
+    printer::print_state(singleton_no_loop_contr, storages->l_storage, out_path + BISIM_PATH + singleton_no_loop_dir, "singleton_no_loop_contr");
 
     auto [is_singleton_no_loop_bisim, singleton_no_loop_k_contr] = bisimulation_tester::test_bounded_bisim_singleton(k, false, storages->l_storage);
-    printer::print_state(singleton_no_loop_k_contr, out_path + BISIM_PATH + singleton_no_loop_dir, "singleton_no_loop_" + std::to_string(k) + "_contr");
+    printer::print_state(singleton_no_loop_k_contr, storages->l_storage, out_path + BISIM_PATH + singleton_no_loop_dir, "singleton_no_loop_" + std::to_string(k) + "_contr");
 
     auto [is_singleton_no_loop_bisim_id, singleton_no_loop_k_contr_id] = bisimulator::contract(contraction_type::canonical, singleton_no_loop, k, storages);
-    printer::print_state(singleton_no_loop_k_contr_id, out_path + BISIM_PATH + singleton_no_loop_dir, "singleton_no_loop_" + std::to_string(k) + "_can_contr");
+    printer::print_state(singleton_no_loop_k_contr_id, storages->l_storage, out_path + BISIM_PATH + singleton_no_loop_dir, "singleton_no_loop_" + std::to_string(k) + "_can_contr");
 }
 
 void bisimulation_tester::test_bisim_chain(const std::string &out_path, unsigned long k, unsigned long length,
@@ -87,16 +87,16 @@ void bisimulation_tester::test_bisim_chain(const std::string &out_path, unsigned
     std::string chain_dir = all_designated ? "chain_des/" : "chain/";
 
     state chain = state_builder::build_chain(length, storages->l_storage, true, all_designated);
-    printer::print_state(chain, out_path + BISIM_PATH + chain_dir, "chain");
+    printer::print_state(chain, storages->l_storage, out_path + BISIM_PATH + chain_dir, "chain");
 
     state chain_contr = bisimulation_tester::test_full_bisim_chain(length, storages->l_storage, true, all_designated);
-    printer::print_state(chain_contr, out_path + BISIM_PATH + chain_dir, "chain_contr");
+    printer::print_state(chain_contr, storages->l_storage, out_path + BISIM_PATH + chain_dir, "chain_contr");
 
     auto [is_chain_bisim, chain_k_contr] = bisimulation_tester::test_bounded_bisim_chain(k, storages->l_storage, length, true, all_designated);
-    printer::print_state(chain_k_contr, out_path + BISIM_PATH + chain_dir, "chain_" + std::to_string(k) + "_contr");
+    printer::print_state(chain_k_contr, storages->l_storage, out_path + BISIM_PATH + chain_dir, "chain_" + std::to_string(k) + "_contr");
 
     auto [is_chain_bisim_id, chain_k_contr_id] = bisimulator::contract(contraction_type::canonical, chain, k, storages);
-    printer::print_state(chain_k_contr_id, out_path + BISIM_PATH + chain_dir, "chain_" + std::to_string(k) + "_can_contr");
+    printer::print_state(chain_k_contr_id, storages->l_storage, out_path + BISIM_PATH + chain_dir, "chain_" + std::to_string(k) + "_can_contr");
 }
 
 void bisimulation_tester::test_bisim_chain_no_loop(const std::string &out_path, unsigned long k, unsigned long length, const del::storages_ptr &storages,
@@ -104,48 +104,48 @@ void bisimulation_tester::test_bisim_chain_no_loop(const std::string &out_path, 
     std::string chain_no_loop_dir = all_designated ? "chain_no_loop_des/" : "chain_no_loop/";
 
     state chain_no_loop = state_builder::build_chain(k, storages->l_storage, false, all_designated);
-    printer::print_state(chain_no_loop, out_path + BISIM_PATH + chain_no_loop_dir, "chain_no_loop");
+    printer::print_state(chain_no_loop, storages->l_storage, out_path + BISIM_PATH + chain_no_loop_dir, "chain_no_loop");
 
     state chain_no_loop_contr = bisimulation_tester::test_full_bisim_chain(k, storages->l_storage, false, all_designated);
-    printer::print_state(chain_no_loop_contr, out_path + BISIM_PATH + chain_no_loop_dir, "chain_no_loop_contr");
+    printer::print_state(chain_no_loop_contr, storages->l_storage, out_path + BISIM_PATH + chain_no_loop_dir, "chain_no_loop_contr");
 
     auto [is_chain_no_loop_bisim, chain_no_loop_k_contr] = bisimulation_tester::test_bounded_bisim_chain(k, storages->l_storage, length, false, all_designated);
-    printer::print_state(chain_no_loop_k_contr, out_path + BISIM_PATH + chain_no_loop_dir, "chain_no_loop_" + std::to_string(k) + "_contr");
+    printer::print_state(chain_no_loop_k_contr, storages->l_storage, out_path + BISIM_PATH + chain_no_loop_dir, "chain_no_loop_" + std::to_string(k) + "_contr");
 
     auto [is_chain_no_loop_bisim_id, chain_no_loop_k_contr_id] = bisimulator::contract(contraction_type::canonical, chain_no_loop, k, storages);
-    printer::print_state(chain_no_loop_k_contr_id, out_path + BISIM_PATH + chain_no_loop_dir, "chain_no_loop_" + std::to_string(k) + "_can_contr");
+    printer::print_state(chain_no_loop_k_contr_id, storages->l_storage, out_path + BISIM_PATH + chain_no_loop_dir, "chain_no_loop_" + std::to_string(k) + "_can_contr");
 }
 
 void bisimulation_tester::test_bisim_k_tree(const std::string &out_path, unsigned long k, const del::storages_ptr &storages) {
     std::string tree_dir = "k_tree/" + std::to_string(k) + "/";
 
     state tree = state_builder::build_k_tree(k, storages->l_storage);
-    printer::print_state(tree, out_path + BISIM_PATH + tree_dir, "tree");
+    printer::print_state(tree, storages->l_storage, out_path + BISIM_PATH + tree_dir, "tree");
 
     state tree_contr = bisimulation_tester::test_full_bisim_k_tree(k, storages->l_storage);
-    printer::print_state(tree_contr, out_path + BISIM_PATH + tree_dir, "tree_contr");
+    printer::print_state(tree_contr, storages->l_storage, out_path + BISIM_PATH + tree_dir, "tree_contr");
 
     auto [is_tree_bisim, tree_k_contr] = bisimulation_tester::test_bounded_bisim_k_tree(k, storages->l_storage);
-    printer::print_state(tree_k_contr, out_path + BISIM_PATH + tree_dir, "tree_" + std::to_string(k) + "_contr");
+    printer::print_state(tree_k_contr, storages->l_storage, out_path + BISIM_PATH + tree_dir, "tree_" + std::to_string(k) + "_contr");
 
     auto [is_tree_bisim_id, tree_k_contr_id] = bisimulator::contract(contraction_type::canonical, tree, k, storages);
-    printer::print_state(tree_k_contr_id, out_path + BISIM_PATH + tree_dir, "tree_" + std::to_string(k) + "_can_contr");
+    printer::print_state(tree_k_contr_id, storages->l_storage, out_path + BISIM_PATH + tree_dir, "tree_" + std::to_string(k) + "_can_contr");
 }
 
 void bisimulation_tester::test_bisim_cn(const std::string &out_path, unsigned long n, unsigned long k, const del::storages_ptr &storages) {
     std::string cn_dir = "consecutive_numbers/" + std::to_string(n) + "/";
 
     state cn = consecutive_numbers::build_initial_state(n, storages->l_storage);
-    printer::print_state(cn, out_path + BISIM_PATH + cn_dir, "cn");
+    printer::print_state(cn, storages->l_storage, out_path + BISIM_PATH + cn_dir, "cn");
 
     state cn_contr = bisimulation_tester::test_full_bisim_cn(n, k, storages->l_storage);
-    printer::print_state(cn_contr, out_path + BISIM_PATH + cn_dir, "cn_contr");
+    printer::print_state(cn_contr, storages->l_storage, out_path + BISIM_PATH + cn_dir, "cn_contr");
 
     auto [is_cn_bisim, cn_k_contr] = bisimulation_tester::test_bounded_bisim_cn(n, k, storages->l_storage);
-    printer::print_state(cn_k_contr, out_path + BISIM_PATH + cn_dir, "cn_" + std::to_string(k) + "_contr");
+    printer::print_state(cn_k_contr, storages->l_storage, out_path + BISIM_PATH + cn_dir, "cn_" + std::to_string(k) + "_contr");
 
     auto [is_cn_bisim_id, cn_k_contr_id] = bisimulator::contract(contraction_type::canonical, cn, k, storages);
-    printer::print_state(cn_k_contr_id, out_path + BISIM_PATH + cn_dir, "cn_" + std::to_string(k) + "_can_contr");
+    printer::print_state(cn_k_contr_id, storages->l_storage, out_path + BISIM_PATH + cn_dir, "cn_" + std::to_string(k) + "_can_contr");
 }
 
 

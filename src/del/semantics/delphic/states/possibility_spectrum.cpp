@@ -102,7 +102,8 @@ unsigned long long possibility_spectrum::get_max_depth() const {
 
 std::ostream &delphic::operator<<(std::ostream &os, const possibility_spectrum &W) {
     kripke::state s = delphic_utils::convert(W);
-    os << s;
+    // TODO: UNCOMMENT AND FIX
+//    os << s;
 
     return os;
 }

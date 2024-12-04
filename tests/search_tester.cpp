@@ -77,7 +77,7 @@ void search_tester::run_actions_tests() {
 void search_tester::run_product_update_tests(const del::label_storage_ptr &l_storage) {
     const state s_cb = coin_in_the_box::build_initial_state(l_storage);
     std::string cb_dir = "Coin_in_the_Box/";
-    printer::print_state(s_cb, OUT_PATH + "product_update/" + cb_dir, "coin_in_the_box");
+    printer::print_state(s_cb, l_storage, OUT_PATH + "product_update/" + cb_dir, "coin_in_the_box");
 
     update_tester::test_CB_1(OUT_PATH + "product_update/", l_storage);
     update_tester::test_CB_2(OUT_PATH + "product_update/", l_storage);

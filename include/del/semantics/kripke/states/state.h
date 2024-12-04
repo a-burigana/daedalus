@@ -67,8 +67,6 @@ namespace kripke {
         bool operator==(const state &rhs) const;
         bool operator!=(const state &rhs) const;
 
-        friend std::ostream &operator<<(std::ostream &os, const state &s);
-
     private:
         del::language_ptr m_language;
         unsigned long long m_worlds_number;

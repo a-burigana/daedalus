@@ -64,7 +64,145 @@ void printer::set_out_to_file(bool out_to_file) {
     m_out_to_file = out_to_file;
 }
 
-void printer::print_state(const kripke::state &s, const std::string &path, const std::string &name) {
+void printer::to_string(std::ofstream &os, const kripke::state &s, const del::label_storage_ptr &l_storage) {
+    using edges_map = std::map<std::pair<world_id, world_id>, std::vector<del::agent>>;
+    const std::string font = std::string{"\"Helvetica,Arial,sans-serif\""};
+
+    os
+        << "digraph {" << std::endl
+        << "\tfontname=" << font << ";" << std::endl
+        << "\tnode [fontname=" << font << "];" << std::endl
+        << "\tedge [fontname=" << font << "];" << std::endl
+        << "\tlabeljust=l;" << std::endl
+        << "\trankdir=BT;" << std::endl
+        << "\tranksep=0.5;" << std::endl
+        << "\tnewrank=true;" << std::endl
+        << "\tcompound=true;" << std::endl;
+
+    os << std::endl << "\t{ node[shape=doublecircle] ";
+
+    for (const world_id wd : s.get_designated_worlds())
+        os << "w" << wd << "; ";
+
+    os << "}" << std::endl << std::endl;
+
+    // Map: <accessible_worlds_hash> -> <list_of_worlds>
+    try {
+        std::map<unsigned long, std::deque<world_id>> ranks;
+
+        for (world_id w = 0; w < s.get_worlds_number(); ++w) {
+            boost::dynamic_bitset<> out(s.get_worlds_number());
+
+            for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
+                out |= *s.get_agent_possible_worlds(ag, w);
+
+            ranks[out.to_ulong()].emplace_back(w);
+        }
+
+        for (const auto &[hash, ws]: ranks) {
+            os << "\t{ rank = same; ";
+
+            for (const world_id w_id: ws)
+                os << "w" << w_id << "; ";
+
+            os << "}" << std::endl;
+        }
+
+        os << std::endl;
+    } catch (boost::wrapexcept<std::overflow_error> &e) {}
+
+    edges_map edges;
+
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
+        for (world_id w = 0; w < s.get_worlds_number(); ++w)
+            for (const world_id v : s.get_agent_possible_worlds(ag, w))
+//            for (world_id v = 0; v < state.get_worlds_number(); ++v)
+                if (edges.find({w, v}) == edges.end())      // state.has_edge(ag, w, v) and
+                    edges[{w, v}] = {ag};
+                else
+                    edges[{w, v}].emplace_back(ag);
+
+    auto print_ags = [&s](const std::vector<del::agent> &ags) {
+        std::string ags_string;
+        for (const del::agent &ag: ags)
+            ags_string += std::string{s.get_language()->get_agent_name(ag)} + ", ";
+        return ags_string.substr(0, ags_string.size() - 2);
+    };
+
+    for (auto &[t, ags]: edges) {
+        const world_id from = t.first, to = t.second;
+        auto it = edges.find({to, from});
+        if (it == edges.end())
+            os << "\tw" << from << " -> w" << to << " [label=\"" << print_ags(ags) << "\"];" << std::endl;
+        else {
+            std::vector<del::agent> ags2 = it->second;
+            auto size = std::max(ags.size(), ags2.size());
+            std::vector<del::agent> ags_intersection = std::vector<del::agent>(size), ags_difference = std::vector<del::agent>(size);
+
+            std::sort(ags.begin(), ags.end());
+            std::sort(ags2.begin(), ags2.end());
+
+            auto it1 = std::set_intersection(ags.begin(), ags.end(), ags2.begin(), ags2.end(), ags_intersection.begin());
+            auto it2 = std::set_difference(ags.begin(), ags.end(), ags2.begin(), ags2.end(), ags_difference.begin());
+
+            ags_intersection.resize(it1 - ags_intersection.begin());
+            ags_difference.resize(it2 - ags_difference.begin());
+
+            if (not ags_intersection.empty()) {
+                if (from < to)
+                    os << "\tw" << from << " -> w" << to << " [label=\"" << print_ags(ags_intersection) << "\" dir=both];" << std::endl;
+                else if (from == to)
+                    os << "\tw" << from << " -> w" << to << " [label=\"" << print_ags(ags_intersection) << "\"];" << std::endl;
+            }
+
+            if (not ags_difference.empty())
+                os << "\tw" << from << " -> w" << to << " [label=\"" << print_ags(ags_difference) << "\"];" << std::endl;
+        }
+    }
+
+    os
+        << "\tnode [] val_table [shape=none label=<"                                       << std::endl
+        << "\t\t<TABLE border=\"0\" cellspacing=\"0\" cellborder=\"1\" cellpadding=\"2\">" << std::endl;
+
+    os
+        << "\t\t\t<TR>"             << std::endl
+        << "\t\t\t\t<TD>World</TD>" << std::endl
+        << "\t\t\t\t<TD>Depth</TD>" << std::endl
+        << "\t\t\t\t<TD>Label</TD>" << std::endl
+        << "\t\t\t</TR>"            << std::endl;
+
+    for (world_id w = 0; w < s.get_worlds_number(); ++w) {
+        os
+            << "\t\t\t<TR>"                          << std::endl
+            << "\t\t\t\t<TD>" << "w" << w << "</TD>" << std::endl;
+
+        os
+            << "\t\t\t\t<TD>" << s.get_depth(w) << "</TD>" << std::endl;
+
+        os << "\t\t\t\t<TD>" << std::endl;
+
+        for (del::atom p = 0; p < s.get_language()->get_atoms_number(); ++p) {
+            if ((*l_storage->get(s.get_label_id(w)))[p]) {
+                std::string_view color = "blue";        // s.get_label(w)[p] ? "blue" : "red";
+                std::string_view sep   = " ";           // p < s.get_language()->get_atoms_number() - 1 ? ", " : "";
+
+                os << "\t\t\t\t\t<font color=\"" << color << "\">" << s.get_language()->get_atom_name(p) << "</font>"
+                   << sep << std::endl;
+            }
+        }
+
+        os
+            << "\t\t\t\t</TD>" << std::endl
+            << "\t\t\t</TR>"   << std::endl;
+    }
+
+    os
+        << "\t\t</TABLE>" << std::endl
+        << "\t>];"        << std::endl
+        << "}";
+}
+
+void printer::print_state(const kripke::state &s, const del::label_storage_ptr &l_storage, const std::string &path, const std::string &name) {
     if (not std::filesystem::exists(path))
         std::filesystem::create_directories(path);
 
@@ -72,7 +210,7 @@ void printer::print_state(const kripke::state &s, const std::string &path, const
     std::string pdf_file_name = path + name + ".pdf";
     std::ofstream dot_file = std::ofstream{dot_file_name};
 
-    dot_file << s;
+    to_string(dot_file, s, l_storage);
     dot_file.close();
 
     std::string command = "dot -Tpdf " + dot_file_name + " > " + pdf_file_name;
@@ -85,7 +223,7 @@ void printer::print_state(const kripke::state &s, const std::string &path, const
 
 void printer::print_state(const delphic::possibility_spectrum &W, const std::string &path, const std::string &name) {
     const state s = delphic_utils::convert(W);
-    print_state(s, path, name);
+    print_state(s, nullptr, path, name);
 }
 
 void printer::print_action(const kripke::action &a, const std::string &path) {
@@ -109,32 +247,39 @@ void printer::print_action(const kripke::action &a, const std::string &path) {
 
 state_deque printer::print_states(kripke::state_deque &ss, kripke::action_deque &as, const del::storages_ptr &storages,
                                   const del::formula_ptr &goal, const std::string &path, const std::string &name,
-                                  bool apply_contraction, kripke::contraction_type type) {
+                                  bool apply_contraction, kripke::contraction_type type, const unsigned long b) {
     kripke::state &s = *ss.back();
 
     if (apply_contraction)
-        s = kripke::bisimulator::contract(type, s, goal->get_modal_depth(), storages).second;
+        s = kripke::bisimulator::contract(type, s, b, storages).second;
 
-    print_state(s, path, name);
+    print_state(s, storages->l_storage, path, name);
 
     if (as.empty())
         return ss;
 
-    if (not kripke::updater::is_applicable(s, *as.front(), storages->l_storage)) {
-        std::cout << "Action '" << as.front()->get_name() << "' is not applicable" << std::endl;
+    kripke::action &a = *as.front();
+
+    if (type != contraction_type::full and b < a.get_maximum_depth() + goal->get_modal_depth()) {
+        std::cout << "Bound too low for action '" << a.get_name() << "'" << std::endl;
         return ss;
     }
 
-    kripke::state s_ = kripke::updater::product_update(s, *as.front(), storages->l_storage);
+    if (not kripke::updater::is_applicable(s, a, storages->l_storage)) {
+        std::cout << "Action '" << a.get_name() << "' is not applicable" << std::endl;
+        return ss;
+    }
+
+    kripke::state s_ = kripke::updater::product_update(s, a, storages->l_storage);
 
     if (s_.satisfies(goal, storages->l_storage))
-        std::cout << "Goal found after applying '" << as.front()->get_name() << "'" << std::endl;
+        std::cout << "Goal found after applying '" << a.get_name() << "'" << std::endl;
 
-    std::string new_name = name + "_" + as.front()->get_name();
+    std::string new_name = name + "_" + a.get_name();
     ss.emplace_back(std::make_shared<kripke::state>(std::move(s_)));
     as.pop_front();
 
-    return print_states(ss, as, storages, goal, path, new_name, apply_contraction, type);
+    return print_states(ss, as, storages, goal, path, new_name, apply_contraction, type, b - a.get_maximum_depth());
 }
 
 void
@@ -149,7 +294,7 @@ printer::print_states(const delphic::possibility_spectrum_ptr &W, const delphic:
     auto W_ = delphic::union_updater::update(W, as.front());
     std::string new_name = name + "_" + as.front()->get_name();
 
-    print_state(delphic::delphic_utils::convert(*W_), path, new_name);
+    print_state(delphic::delphic_utils::convert(*W_), nullptr,  path, new_name);
     delphic::action_deque as_ = as;
     as_.pop_front();
 
@@ -174,10 +319,10 @@ void printer::print_states(const search::delphic_planning_task &task, const delp
 //    print_states(task.get_initial_state(), as, path, "W0");
 }
 
-void printer::print_task(const search::planning_task &task, const std::string &path) {
+void printer::print_task(const search::planning_task &task, const del::storages_ptr &storages, const std::string &path) {
     std::string task_path = path + task.get_domain_name() + "/" + task.get_problem_id() + "/";
 
-    print_state(*task.get_initial_state(), task_path + "initial_state/", "s0");
+    print_state(*task.get_initial_state(), storages->l_storage, task_path + "initial_state/", "s0");
 
     for (const action_ptr &a : task.get_actions())
         printer::print_action(*a,task_path + "actions/");
@@ -200,7 +345,7 @@ void printer::print_results(const search::planning_task &task, search::strategy 
             state_name += "_" + node->get_action()->get_name();
 
         if (not out_path.empty())
-            daedalus::tester::printer::print_state(*node->get_state(), out_task_path + strategy_str, state_name);
+            daedalus::tester::printer::print_state(*node->get_state(), storages->l_storage, out_task_path + strategy_str, state_name);
     }
 }
 

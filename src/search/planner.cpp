@@ -222,7 +222,7 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
     bool is_dead_node = true;
 
     for (const kripke::action_ptr &a : actions) {
-        if (strategy == strategy::iterative_bounded_search and a->get_maximum_depth() > n->get_bound())     // If the modal depth of 'a' is too big
+        if (strategy == strategy::iterative_bounded_search and n->get_bound() < a->get_maximum_depth())     // If the modal depth of 'a' is too big
             to_reapply_actions.push_back(a);
         else if (kripke::updater::is_applicable(*n->get_state(), *a, storages->l_storage)) {      // For all applicable actions. Let n_ be the result of updating node n with 'a'
             node_ptr n_ = update_node(strategy, contraction_type, n, a, id, visited_states_ids, storages, goal_depth);
@@ -300,7 +300,7 @@ node_ptr planner::update_node(const strategy strategy, contraction_type contract
 
                 if (n->is_bisim())
                     return init_node(contraction_type, s_, a, true, n, ++id, visited_states_ids, storages, n->get_bound());
-                if (n->get_bound() - a->get_maximum_depth() >= goal_depth)
+                if (n->get_bound() >= a->get_maximum_depth() + goal_depth)
                     return init_node(contraction_type, s_, a, false, n, ++id, visited_states_ids, storages, n->get_bound() - a->get_maximum_depth());
             }
             return nullptr;

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DOMAIN=active_muddy_children
-N_MIN_CHILDREN=9
+N_MIN_CHILDREN=5
 N_MAX_CHILDREN=12
 N_MIN_MUDDY=2
 

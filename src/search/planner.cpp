@@ -111,7 +111,6 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, cont
 
     unsigned long goal_depth = task.get_goal()->get_modal_depth();
     unsigned long long max_graph_depth = 0, is_bisim_graph_depth = 0;     // is_bisim_graph_depth: deepest level of the search graph such that all nodes in the previous levels have is_bisim = true
-    statistics non_bisim_nodes_stats{};
 
     if (not previous_iter_frontier.empty())
         for (const node_ptr &n : previous_iter_frontier)
@@ -139,8 +138,8 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, cont
         //      attribute 'm_to_apply_actions' of the class 'node'.
         //   2. Otherwise, we reached n for the first time. We then expand it wrt the entire set of actions of our task.
         const kripke::action_deque &actions = n->get_to_apply_actions().empty() ? task.get_actions() : n->get_to_apply_actions();
-        node_deque path = expand_node(task, strategy, contraction_type, stats, non_bisim_nodes_stats, n, actions,
-                                      frontier, goal_depth, id, visited_states_ids, storages, printer);
+        node_deque path = expand_node(task, strategy, contraction_type, stats, n, actions, frontier, goal_depth, id,
+                                      visited_states_ids, storages, printer);
 
         if (not path.empty()) return path;
 
@@ -163,6 +162,7 @@ node_deque planner::init_frontier(kripke::state_ptr &s0, contraction_type contra
 
         if (n0) {
             visited_states_ids.emplace(n0->get_state()->get_id());
+            update_statistics(stats, n0);
             frontier.push_back(std::move(n0));
         }
     } else {
@@ -176,10 +176,10 @@ node_deque planner::init_frontier(kripke::state_ptr &s0, contraction_type contra
 }
 
 node_deque planner::expand_node(const planning_task &task, const strategy strategy, contraction_type contraction_type,
-                                statistics &stats, statistics &non_bisim_nodes_stats, node_ptr &n,
-                                const kripke::action_deque &actions, node_deque &frontier, const unsigned long goal_depth,
-                                unsigned long long &id, states_ids_set &visited_states_ids,
-                                const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer) {
+                                statistics &stats, node_ptr &n, const kripke::action_deque &actions,
+                                node_deque &frontier, const unsigned long goal_depth, unsigned long long &id,
+                                states_ids_set &visited_states_ids, const del::storages_ptr &storages,
+                                const daedalus::tester::printer_ptr &printer) {
     kripke::action_deque to_reapply_actions;
     bool is_dead_node = true;
 
@@ -197,12 +197,11 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
                     is_dead_node = false;                           // was not previously visited, then n is not a
                     n->add_child(n_);                               // dead node and we add n_ to the children of n
                     visited_states_ids.emplace(n_->get_state()->get_id());
-                    update_statistics(stats, non_bisim_nodes_stats, n_);
+                    update_statistics(stats, n_);
 
                     // If n_'s state satisfies the goal, we return the path from the root of the search tree to n_
                     if (n_->get_state()->satisfies(task.get_goal(), storages->l_storage)) {
                         if (printer) print_goal_found(printer, n_);
-                        merge_statistics(stats, non_bisim_nodes_stats);
                         return extract_path(n_);
                     }
 
@@ -221,23 +220,13 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
     return {};
 }
 
-void
-planner::update_statistics(search::statistics &stats, search::statistics &non_bisim_nodes_stats, search::node_ptr &n) {
+void planner::update_statistics(search::statistics &stats, search::node_ptr &n) {
     if (n->is_already_visited())
         ++stats.m_non_revisited_states_no;
-
-    if (n->is_bisim()) {
+    else {
         ++stats.m_visited_states_no;
         stats.m_visited_worlds_no += n->get_state()->get_worlds_number();
-    } else {
-        ++non_bisim_nodes_stats.m_visited_states_no;
-        non_bisim_nodes_stats.m_visited_worlds_no += n->get_state()->get_worlds_number();
     }
-}
-
-void planner::merge_statistics(search::statistics &stats, search::statistics &non_bisim_nodes_stats) {
-    stats.m_visited_states_no += non_bisim_nodes_stats.m_visited_states_no;
-    stats.m_visited_worlds_no += non_bisim_nodes_stats.m_visited_worlds_no;
 }
 
 node_deque planner::extract_path(node_ptr n) {
@@ -279,8 +268,7 @@ void planner::refresh_node(node_ptr &n, contraction_type contraction_type, stati
         n->set_is_bisim(is_bisim);                                  // And we update the value of is_bisim
         n->set_state(std::make_shared<kripke::state>(std::move(s_contr)));
         visited_states_ids.emplace(n->get_state()->get_id());
-        ++stats.m_visited_states_no;
-        stats.m_visited_worlds_no += n->get_state()->get_worlds_number();
+        update_statistics(stats, n);
         if (is_bisim) n->clear_original_state();
     }
 }

@@ -73,15 +73,12 @@ namespace search {
                                         states_ids_set &visited_states_ids, const del::storages_ptr &storages);
 
         static node_deque expand_node(const planning_task &task, strategy strategy, contraction_type contraction_type,
-                                      statistics &stats, statistics &non_bisim_nodes_stats, node_ptr &n,
-                                      const kripke::action_deque &actions, node_deque &frontier,
+                                      statistics &stats, node_ptr &n, const kripke::action_deque &actions, node_deque &frontier,
                                       unsigned long goal_depth, unsigned long long &id, states_ids_set &visited_states_ids,
                                       const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer);
 
         static void
-        update_statistics(search::statistics &stats, search::statistics &non_bisim_nodes_stats, search::node_ptr &n);
-
-        static void merge_statistics(statistics &stats, statistics &non_bisim_nodes_stats);
+        update_statistics(search::statistics &stats, search::node_ptr &n);
 
         static node_deque extract_path(node_ptr n);
 

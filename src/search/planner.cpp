@@ -107,7 +107,7 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, cont
                         node_deque &previous_iter_frontier, const unsigned long b, unsigned long long &id,
                         states_ids_set &visited_states_ids, const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer) {
     kripke::state_ptr s0 = task.get_initial_state();
-    node_deque frontier = init_frontier(s0, contraction_type, b, previous_iter_frontier, visited_states_ids, storages);
+    node_deque frontier = init_frontier(s0, contraction_type, b, previous_iter_frontier, stats, visited_states_ids, storages);
 
     unsigned long goal_depth = task.get_goal()->get_modal_depth();
     unsigned long long max_graph_depth = 0, is_bisim_graph_depth = 0;     // is_bisim_graph_depth: deepest level of the search graph such that all nodes in the previous levels have is_bisim = true
@@ -154,7 +154,7 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, cont
 }
 
 node_deque planner::init_frontier(kripke::state_ptr &s0, contraction_type contraction_type, const unsigned long b,
-                                  node_deque &previous_iter_frontier, states_ids_set &visited_states_ids,
+                                  node_deque &previous_iter_frontier, statistics &stats, states_ids_set &visited_states_ids,
                                   const del::storages_ptr &storages) {
     node_deque frontier;
 
@@ -170,7 +170,7 @@ node_deque planner::init_frontier(kripke::state_ptr &s0, contraction_type contra
         previous_iter_frontier.clear();
 
         for (node_ptr &n : frontier)    // The nodes in previous_iter_frontier have to be refreshed
-            refresh_node(n, contraction_type, visited_states_ids, storages);
+            refresh_node(n, contraction_type, stats, visited_states_ids, storages);
     }
     return frontier;
 }
@@ -269,7 +269,8 @@ node_ptr planner::update_node(const strategy strategy, contraction_type contract
     }
 }
 
-void planner::refresh_node(node_ptr &n, contraction_type contraction_type, states_ids_set &visited_states_ids, const del::storages_ptr &storages) {
+void planner::refresh_node(node_ptr &n, contraction_type contraction_type, statistics &stats,
+                           states_ids_set &visited_states_ids, const del::storages_ptr &storages) {
     n->increment_bound();           // We increment the bound value. Moreover,  node n might have children n' such that
     n->clear_non_bisim_children();  // n'.is_bisim == false. We have to discard them before we move to the next iteration
 
@@ -278,6 +279,8 @@ void planner::refresh_node(node_ptr &n, contraction_type contraction_type, state
         n->set_is_bisim(is_bisim);                                  // And we update the value of is_bisim
         n->set_state(std::make_shared<kripke::state>(std::move(s_contr)));
         visited_states_ids.emplace(n->get_state()->get_id());
+        ++stats.m_visited_states_no;
+        stats.m_visited_worlds_no += n->get_state()->get_worlds_number();
         if (is_bisim) n->clear_original_state();
     }
 }

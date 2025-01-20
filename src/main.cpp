@@ -43,6 +43,7 @@
 #include "../include/del/semantics/delphic/update/union_updater.h"
 #include "../include/search/delphic/delphic_planner.h"
 #include "../tests/builder/domains/selective_communication.h"
+#include "../tests/builder/domains/eavesdropping.h"
 #include <memory>
 #include <string>
 #include <filesystem>
@@ -135,6 +136,8 @@ void run(int argc, char *argv[]) {
         task = std::make_unique<search::planning_task>(collaboration_communication::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), std::stoul(parameters[3]), storages->l_storage));
     else if (domain == "consecutive_numbers" or domain == "cn")
         task = std::make_unique<search::planning_task>(consecutive_numbers::build_task(std::stoul(parameters[0]), storages->l_storage));
+    else if (domain == "eavesdropping" or domain == "eav")
+        task = std::make_unique<search::planning_task>(eavesdropping::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), storages->l_storage));
     else if (domain == "gossip" or domain == "gos")
         task = std::make_unique<search::planning_task>(gossip::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), storages->l_storage));
     else if (domain == "grapevine" or domain == "gra")

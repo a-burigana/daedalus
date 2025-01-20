@@ -21,29 +21,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef DAEDALUS_ACTION_TESTER_H
-#define DAEDALUS_ACTION_TESTER_H
+#ifndef DAEDALUS_EAVESDROPPING_H
+#define DAEDALUS_EAVESDROPPING_H
 
-#include <string>
-#include "printer.h"
+#include "../../../include/del/language/language.h"
+#include "../../../include/del/semantics/kripke/states/state.h"
+#include "../../../include/search/planning_task.h"
 
-namespace daedalus::tester {
-    class action_tester {
-    public:
-        template<class domain, typename ...args>
-        static void test_actions(const std::string &out_path, args... params) {
-            auto actions = domain::build_actions(params...);
+class eavesdropping {
+public:
+    static std::string get_name();
+    static std::string get_id(unsigned long agents_no, unsigned long steps_no);
 
-            for (const kripke::action_ptr &a: actions)
-                printer::print_action(*a, out_path + "actions/" + domain::get_name() + "/" + domain::get_id(params...) + "/");
-        }
+    static del::language_ptr build_language(unsigned long agents_no, unsigned long steps_no);
+    static kripke::state build_initial_state(unsigned long agents_no, unsigned long steps_no, const del::label_storage_ptr &l_storage);
 
-        static void test_coin_in_the_box_actions(const std::string &out_path);
-        static void test_consecutive_numbers_actions(unsigned long n, const std::string &out_path);
-        static void test_switches_actions(unsigned long n, const std::string &out_path);
-        static void test_selective_communication_actions(unsigned long agents_no, unsigned long rooms_no, const std::string &out_path);
-        static void test_collaboration_communication_actions(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no, const std::string &out_path);
-    };
-}
+    static kripke::action_deque build_actions(unsigned long agents_no, unsigned long steps_no);
+    static search::planning_task build_task(unsigned long agents_no, unsigned long steps_no, const del::label_storage_ptr &l_storage);
+    static std::vector<search::planning_task> build_tasks(const del::label_storage_ptr &l_storage);
 
-#endif //DAEDALUS_ACTION_TESTER_H
+private:
+    static kripke::action build_move(unsigned long agents_no, unsigned long steps_no, del::agent ag);
+    static kripke::action build_shout(unsigned long agents_no, unsigned long steps_no, del::agent ag);
+};
+
+
+#endif //DAEDALUS_EAVESDROPPING_H

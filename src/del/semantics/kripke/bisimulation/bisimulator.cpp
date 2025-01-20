@@ -31,7 +31,7 @@ std::pair<bool, state> bisimulator::contract(contraction_type type, state &s, un
     switch (type) {
         case contraction_type::full:
             return bounded_contraction_builder::calculate_rooted_contraction(s, s.get_max_depth() + 1, true, storages);           // Classic Paige and Tarjan algorithm
-        case contraction_type::rooted:
+        case contraction_type::rooted:  // todo: use min(s.get_depth, k)
             return bounded_contraction_builder::calculate_rooted_contraction(s, k);
         case contraction_type::canonical:
             return bounded_contraction_builder::calculate_rooted_contraction(s, k, true, storages);

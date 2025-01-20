@@ -28,7 +28,6 @@
 #include "builder/domains/selective_communication.h"
 #include "builder/domains/switches.h"
 #include "builder/language_builder.h"
-#include "printer.h"
 #include <string>
 
 using namespace daedalus::tester;

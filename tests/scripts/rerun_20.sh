@@ -2,9 +2,9 @@
 
 DAEDALUS=../../cmake-build-debug/DAEDALUS
 
-print_acm() {
-    $DAEDALUS --domain acm --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --info
-    timeout 10m "$DAEDALUS" --domain acm --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
+print_amc() {
+    $DAEDALUS --domain amc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --info
+    timeout 10m "$DAEDALUS" --domain amc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
 }
 
 print_cc() {
@@ -34,16 +34,16 @@ print_sc() {
 
 echo "####################################################################################################"
 echo
-echo "                                         acm"
+echo "                                         amc"
 echo
 echo "####################################################################################################"
 
-acm_param_1=(9 9 9 9 9 9 9 9 9 9 10 10 10 10 10 11 11 11 11 11 11)
-acm_param_2=(3 4 5 5 6 6 7 7 8 8  4  5  6  7  8  2  3  4  5  6  7)
-acm_param_3=(0 0 0 1 0 1 0 1 0 1  1  1  1  1  1  1  1  1  1  1  1)
+amc_param_1=(9 9 9 9 9 9 9 9 9 9 10 10 10 10 10 11 11 11 11 11 11)
+amc_param_2=(3 4 5 5 6 6 7 7 8 8  4  5  6  7  8  2  3  4  5  6  7)
+amc_param_3=(0 0 0 1 0 1 0 1 0 1  1  1  1  1  1  1  1  1  1  1  1)
 
 for i in {0..20}; do
-    print_acm "${acm_param_1[$i]}" "${acm_param_2[$i]}" "${acm_param_3[$i]}" kripke  unbounded full
+    print_amc "${amc_param_1[$i]}" "${amc_param_2[$i]}" "${amc_param_3[$i]}" kripke  unbounded full
 done
 
 

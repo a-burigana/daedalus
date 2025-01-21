@@ -174,7 +174,7 @@ void run(int argc, char *argv[]) {
             }
         }
     } else {
-        std::string out_file_path = "ijcai/time_results/" + task->get_domain_name() + "/";
+        std::string out_file_path = "ijcai/time_results_20/" + task->get_domain_name() + "/";
 
         if (not std::filesystem::exists(out_file_path))
             std::filesystem::create_directories(out_file_path);

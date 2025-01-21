@@ -2,49 +2,49 @@
 
 DAEDALUS=../../cmake-build-debug/DAEDALUS
 
-# print_amc() {
-#     $DAEDALUS --domain amc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --info
-#     timeout 10m "$DAEDALUS" --domain amc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
-# }
+print_amc() {
+    $DAEDALUS --domain amc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --info
+    timeout 20m "$DAEDALUS" --domain amc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
+}
 
 print_cc() {
     $DAEDALUS --domain cc --parameters "$1" "$2" "$3" "$4" --semantics "$5"  --strategy "$6" --contraction "$7" --info
-    timeout 10m "$DAEDALUS" --domain cc --parameters "$1" "$2" "$3" "$4" --semantics "$5"  --strategy "$6" --contraction "$7" --print
+    timeout 20m "$DAEDALUS" --domain cc --parameters "$1" "$2" "$3" "$4" --semantics "$5"  --strategy "$6" --contraction "$7" --print
 }
 
 print_eav() {
     $DAEDALUS --domain eav --parameters "$1" "$2" --semantics "$3"  --strategy "$4" --contraction "$5" --info
-    timeout 10m "$DAEDALUS" --domain eav --parameters "$1" "$2" --semantics "$3"  --strategy "$4" --contraction "$5" --print
+    timeout 20m "$DAEDALUS" --domain eav --parameters "$1" "$2" --semantics "$3"  --strategy "$4" --contraction "$5" --print
 }
 
 print_gos() {
     $DAEDALUS --domain gos --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --info
-    timeout 10m "$DAEDALUS" --domain gos --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
+    timeout 20m "$DAEDALUS" --domain gos --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
 }
 
 print_gra() {
     $DAEDALUS --domain gra --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --info
-    timeout 10m "$DAEDALUS" --domain gra --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
+    timeout 20m "$DAEDALUS" --domain gra --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
 }
 
 print_sc() {
     $DAEDALUS --domain sc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --info
-    timeout 10m "$DAEDALUS" --domain sc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
+    timeout 20m "$DAEDALUS" --domain sc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
 }
 
-# echo "####################################################################################################"
-# echo
-# echo "                                         amc"
-# echo
-# echo "####################################################################################################"
+echo "####################################################################################################"
+echo
+echo "                                         amc"
+echo
+echo "####################################################################################################"
 
-# amc_param_1=(9 9 9 9 9 9 9 9 9 9 10 10 10 10 10 11 11 11 11 11 11)
-# amc_param_2=(3 4 5 5 6 6 7 7 8 8  4  5  6  7  8  2  3  4  5  6  7)
-# amc_param_3=(0 0 0 1 0 1 0 1 0 1  1  1  1  1  1  1  1  1  1  1  1)
+amc_param_1=(9 9 9 9 9 9 9 9 9 9 10 10 10 10 10 11 11 11 11 11 11)
+amc_param_2=(3 4 5 5 6 6 7 7 8 8  4  5  6  7  8  2  3  4  5  6  7)
+amc_param_3=(0 0 0 1 0 1 0 1 0 1  1  1  1  1  1  1  1  1  1  1  1)
 
-# for i in {0..20}; do
-#     print_amc "${amc_param_1[$i]}" "${amc_param_2[$i]}" "${amc_param_3[$i]}" kripke  unbounded full
-# done
+for i in {0..20}; do
+    print_amc "${amc_param_1[$i]}" "${amc_param_2[$i]}" "${amc_param_3[$i]}" kripke  unbounded full
+done
 
 
 

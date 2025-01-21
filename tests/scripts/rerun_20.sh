@@ -2,10 +2,10 @@
 
 DAEDALUS=../../cmake-build-debug/DAEDALUS
 
-print_amc() {
-    $DAEDALUS --domain amc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --info
-    timeout 10m "$DAEDALUS" --domain amc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
-}
+# print_amc() {
+#     $DAEDALUS --domain amc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --info
+#     timeout 10m "$DAEDALUS" --domain amc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
+# }
 
 print_cc() {
     $DAEDALUS --domain cc --parameters "$1" "$2" "$3" "$4" --semantics "$5"  --strategy "$6" --contraction "$7" --info
@@ -32,19 +32,19 @@ print_sc() {
     timeout 10m "$DAEDALUS" --domain sc --parameters "$1" "$2" "$3" --semantics "$4"  --strategy "$5" --contraction "$6" --print
 }
 
-echo "####################################################################################################"
-echo
-echo "                                         amc"
-echo
-echo "####################################################################################################"
+# echo "####################################################################################################"
+# echo
+# echo "                                         amc"
+# echo
+# echo "####################################################################################################"
 
-amc_param_1=(9 9 9 9 9 9 9 9 9 9 10 10 10 10 10 11 11 11 11 11 11)
-amc_param_2=(3 4 5 5 6 6 7 7 8 8  4  5  6  7  8  2  3  4  5  6  7)
-amc_param_3=(0 0 0 1 0 1 0 1 0 1  1  1  1  1  1  1  1  1  1  1  1)
+# amc_param_1=(9 9 9 9 9 9 9 9 9 9 10 10 10 10 10 11 11 11 11 11 11)
+# amc_param_2=(3 4 5 5 6 6 7 7 8 8  4  5  6  7  8  2  3  4  5  6  7)
+# amc_param_3=(0 0 0 1 0 1 0 1 0 1  1  1  1  1  1  1  1  1  1  1  1)
 
-for i in {0..20}; do
-    print_amc "${amc_param_1[$i]}" "${amc_param_2[$i]}" "${amc_param_3[$i]}" kripke  unbounded full
-done
+# for i in {0..20}; do
+#     print_amc "${amc_param_1[$i]}" "${amc_param_2[$i]}" "${amc_param_3[$i]}" kripke  unbounded full
+# done
 
 
 
@@ -61,21 +61,6 @@ cc_param_4=(4 2 2 4 2 3)
 
 for i in {0..5}; do
     print_cc "${cc_param_1[$i]}" "${cc_param_2[$i]}" "${cc_param_3[$i]}" "${cc_param_4[$i]}" kripke  unbounded full
-done
-
-
-
-echo "####################################################################################################"
-echo
-echo "                                         eav"
-echo
-echo "####################################################################################################"
-
-eav_param_1=(5 5 5 6 6 6 6 7 7 7 7 7 8 8 8 8)
-eav_param_2=(5 6 7 4 5 6 7 3 4 5 6 7 3 4 5 6)
-
-for i in {0..15}; do
-    print_eav "${eav_param_1[$i]}" "${eav_param_2[$i]}" kripke  unbounded full
 done
 
 
@@ -126,4 +111,19 @@ sc_param_3=(2 2 2)
 
 for i in {0..2}; do
     print_sc "${sc_param_1[$i]}" "${sc_param_2[$i]}" "${sc_param_3[$i]}" kripke  unbounded full
+done
+
+
+
+echo "####################################################################################################"
+echo
+echo "                                         eav"
+echo
+echo "####################################################################################################"
+
+eav_param_1=(5 5 5 6 6 6 6 7 7 7 7 7 8 8 8 8)
+eav_param_2=(5 6 7 4 5 6 7 3 4 5 6 7 3 4 5 6)
+
+for i in {0..15}; do
+    print_eav "${eav_param_1[$i]}" "${eav_param_2[$i]}" kripke  unbounded full
 done

@@ -24,7 +24,7 @@
 #include "../../../../../include/del/semantics/kripke/bisimulation/bounded_contraction_builder.h"
 #include "../../../../../include/del/semantics/kripke/bisimulation/bounded_partition_refinement.h"
 #include "../../../../../include/del/semantics/kripke/states/state.h"
-#include "../../../../utils/storage.cpp"
+#include "../../../../../include/utils/storage.h"
 #include "../../../../../include/del/semantics/kripke/bisimulation/bounded_identification.h"
 
 using namespace kripke;

@@ -50,6 +50,7 @@ delphic_node_deque delphic_planner::search(const delphic_planning_task &task, co
             std::cout << " - STRATEGY: Unbounded Search" << std::endl;
             break;
         case strategy::iterative_bounded_search:
+        case strategy::approx_iterative_bounded_search:
             std::cout << " - STRATEGY: Iterative Bounded Search" << std::endl;
             break;
     }
@@ -73,6 +74,7 @@ delphic_node_deque delphic_planner::search(const delphic_planning_task &task, co
             path = unbounded_search(task, storages, printer);
             break;
         case strategy::iterative_bounded_search:
+        case strategy::approx_iterative_bounded_search:
             path = iterative_bounded_search(task, printer);
             break;
     }

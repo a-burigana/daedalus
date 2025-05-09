@@ -29,7 +29,8 @@
 namespace search {
     enum class strategy : uint8_t {
         unbounded_search,
-        iterative_bounded_search
+        iterative_bounded_search,
+        approx_iterative_bounded_search
     };
 }
 

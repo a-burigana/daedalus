@@ -36,9 +36,15 @@ namespace del {
         using Elem_id = unsigned long long;
 
     public:
-        storage();
+        storage() {
+            m_elements.emplace_back(nullptr);
+            m_count = 1;
+        }
 
-        explicit storage(Elem &&null);
+        explicit storage(Elem &&null) {
+            m_count = 0;
+            emplace(std::move(null));
+        }
 
         storage(const storage &) = default;
         storage &operator=(const storage &) = default;
@@ -48,9 +54,22 @@ namespace del {
 
         ~storage() = default;
 
-        Elem_id emplace(Elem &&elem);
-        Elem_ptr get(Elem_id id) const;
-        [[nodiscard]] bool is_null(Elem_id id) const;
+        typename storage<Elem>::Elem_id emplace(Elem &&elem) {
+            if (m_elements_ids.find(elem) != m_elements_ids.end())          // If the element is already stored, then we simply
+                return m_elements_ids.at(elem);                             // return its id
+
+            const auto &[it, _] = m_elements_ids.emplace(std::move(elem), m_count);
+            m_elements.emplace_back(std::make_shared<Elem>(it->first));     // Otherwise, we assign the new element a fresh id,
+            return m_count++;                                               // we add it to the deque to ensure constant time
+        }                                                                   // retrieval from id and we return its id
+
+        typename storage<Elem>::Elem_ptr get(Elem_id id) const {
+            return m_elements[id];
+        }
+
+        [[nodiscard]] bool is_null(Elem_id id) const {
+            return id == 0;
+        }
 
     private:
         std::map<Elem, Elem_id> m_elements_ids;

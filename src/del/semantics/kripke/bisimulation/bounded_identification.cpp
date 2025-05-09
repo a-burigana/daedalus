@@ -23,7 +23,7 @@
 
 #include "../../../../../include/del/semantics/kripke/bisimulation/bounded_identification.h"
 #include "../../../../../include/del/semantics/kripke/states/state.h"
-#include "../../../../utils/storage.cpp"
+#include "../../../../../include/utils/storage.h"
 
 using namespace kripke;
 

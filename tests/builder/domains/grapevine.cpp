@@ -42,13 +42,14 @@ std::string grapevine::get_name() {
 }
 
 del::language_ptr grapevine::build_language(unsigned long agents_no, unsigned long secrets_no) {
-    name_vector atom_names(secrets_no + agents_no), agent_names(agents_no);
+    name_vector atom_names(secrets_no + 2 * agents_no), agent_names(agents_no);
 
     for (unsigned long i = 0; i < secrets_no; ++i)
         atom_names[i] = "s_" + std::to_string(i);
 
     for (unsigned long i = 0; i < agents_no; ++i) {
         atom_names[secrets_no + i] = "in_room_1_ag_" + std::to_string(i);
+        atom_names[secrets_no + agents_no + i] = "in_room_2_ag_" + std::to_string(i);
 
         agent_names[i] = "ag_" + std::to_string(i);
     }
@@ -66,8 +67,11 @@ kripke::state grapevine::build_initial_state(unsigned long agents_no, unsigned l
     auto secrets_combinations = domain_utils::all_combinations(secrets_no);
 
     for (auto &combination: secrets_combinations) {
-        for (unsigned long bit = 0; bit < agents_no; ++bit)
+        for (unsigned long bit = 0; bit < agents_no; ++bit)     // All agents are initially in room 1
             combination.push_back(true);
+
+//        for (unsigned long bit = 0; bit < agents_no; ++bit)     // All agents are initially NOT in room 2
+//            combination.push_back(false);
 
         label l = label{combination};
         ls[count++] = l_storage->emplace(std::move(l));
@@ -216,6 +220,7 @@ kripke::action grapevine::build_left(unsigned long agents_no, unsigned long secr
 
     event_post e_post;
     e_post[language->get_atom_id("in_room_1_" + ag_name)] = std::make_shared<true_formula>();
+//    e_post[language->get_atom_id("in_room_2_" + ag_name)] = std::make_shared<false_formula>();
 
     std::string name = "left_" + std::to_string(ag);
 
@@ -231,6 +236,7 @@ kripke::action grapevine::build_right(unsigned long agents_no, unsigned long sec
 
     event_post e_post;
     e_post[language->get_atom_id("in_room_1_" + ag_name)] = std::make_shared<false_formula>();
+//    e_post[language->get_atom_id("in_room_2_" + ag_name)] = std::make_shared<true_formula>();
 
     std::string name = "right_" + std::to_string(ag);
 

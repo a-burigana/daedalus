@@ -27,7 +27,7 @@
 #include "../../../../../include/del/semantics/kripke/update/updater.h"
 #include "../../../../../include/del/semantics/kripke/model_checker.h"
 #include "../../../../../include/del/semantics/kripke/bisimulation/bisimulator.h"
-#include "../../../../utils/storage.cpp"
+#include "../../../../../include/utils/storage.h"
 
 using namespace kripke;
 

@@ -25,7 +25,7 @@
 #include "../../../../../include/del/semantics/delphic/states/possibility.h"
 #include "../../../../../include/del/semantics/delphic/model_checker.h"
 #include "../../../../../include/del/semantics/delphic/delphic_utils.h"
-#include "../../../../utils/storage.cpp"
+#include "../../../../../include/utils/storage.h"
 
 using namespace del;
 using namespace delphic;

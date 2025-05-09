@@ -22,7 +22,7 @@
 // SOFTWARE.
 
 #include "../../../../include/del/semantics/delphic/model_checker.h"
-#include "../../../utils/storage.cpp"
+#include "../../../../include/utils/storage.h"
 
 using namespace delphic;
 

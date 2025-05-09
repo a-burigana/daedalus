@@ -49,19 +49,24 @@ planner::search(const planning_task &task, const strategy strategy, contraction_
         if (printer) print_goal_found(printer, n0);
         path = extract_path(n0);
         stats = statistics{0, 0, n0->get_state()->get_worlds_number(), 0, 0, n0->get_bound()};
-    } else {
-        switch (strategy) {
-            case strategy::unbounded_search:
-                path = unbounded_search(task, stats, visited_states_ids, storages, printer);
-                break;
-            case strategy::iterative_bounded_search:
-                path = iterative_bounded_search(task, contraction_type, stats, visited_states_ids, storages, printer);
-                break;
-        }
-    }
+    } else
+        path = strategy == strategy::unbounded_search ?
+                unbounded_search(task, stats, visited_states_ids, storages, printer) :
+                iterative_bounded_search(task, strategy, contraction_type, stats, visited_states_ids, storages, printer);
+//        switch (strategy) {
+//            case strategy::unbounded_search:
+//                path = unbounded_search(task, stats, visited_states_ids, storages, printer);
+//                break;
+//            case strategy::iterative_bounded_search:
+//            case strategy::approx_iterative_bounded_search:
+//                path = iterative_bounded_search(task, strategy, contraction_type, stats, visited_states_ids, storages, printer);
+//                break;
+//        }
 
     stats.m_plan_length = path.size() - 1;
     stats.m_computation_time = static_cast<double>(since(start).count()) / 1000;
+
+    validate(task, path, storages);
     print_statistics(stats, strategy);
 
     return {std::move(path), stats};
@@ -79,7 +84,7 @@ node_deque planner::unbounded_search(const planning_task &task, statistics &stat
     return std::move(path);
 }
 
-node_deque planner::iterative_bounded_search(const planning_task &task, contraction_type contraction_type, statistics &stats,
+node_deque planner::iterative_bounded_search(const planning_task &task, const strategy strategy, contraction_type contraction_type, statistics &stats,
                                              states_ids_set &visited_states_ids, const del::storages_ptr &storages,
                                              const daedalus::tester::printer_ptr &printer) {
     unsigned long b = task.get_goal()->get_modal_depth();
@@ -90,24 +95,25 @@ node_deque planner::iterative_bounded_search(const planning_task &task, contract
         std::cout << "Searching with bound: " << b << " " << std::flush;
         stats.m_bound = b;
         // If iteration 'b' produces a valid result, we return it. Otherwise, we move to the next iteration
-        if (node_deque result = bounded_search(task, contraction_type, stats, previous_iter_frontier, b++, id, visited_states_ids, storages, printer); not result.empty())
+        if (node_deque result = bounded_search(task, strategy, contraction_type, stats, previous_iter_frontier, b++, id, visited_states_ids, storages, printer); not result.empty())
             return result;
         std::cout << "(no plan found, going to next iteration)" << std::endl;
     }
 }
 
-node_deque planner::bounded_search(const planning_task &task, contraction_type contraction_type, statistics &stats,
+node_deque planner::bounded_search(const planning_task &task, const strategy strategy, contraction_type contraction_type, statistics &stats,
                                    node_deque &previous_iter_frontier, const unsigned long b, unsigned long long &id,
                                    states_ids_set &visited_states_ids, const del::storages_ptr &storages,
                                    const daedalus::tester::printer_ptr &printer) {
-    return bfs(task, strategy::iterative_bounded_search, contraction_type, stats, previous_iter_frontier, b, id, visited_states_ids, storages, printer);
+    return bfs(task, strategy, contraction_type, stats, previous_iter_frontier, b, id, visited_states_ids, storages, printer);
 }
 
 node_deque planner::bfs(const planning_task &task, const strategy strategy, contraction_type contraction_type, statistics &stats,
                         node_deque &previous_iter_frontier, const unsigned long b, unsigned long long &id,
                         states_ids_set &visited_states_ids, const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer) {
     kripke::state_ptr s0 = task.get_initial_state();
-    node_deque frontier = init_frontier(s0, contraction_type, b, previous_iter_frontier, stats, visited_states_ids, storages);
+    node_deque frontier = init_frontier(s0, strategy, contraction_type, b, previous_iter_frontier, stats, visited_states_ids, storages);
+    assert(strategy != strategy::approx_iterative_bounded_search or frontier.size() == 1);
 
     unsigned long goal_depth = task.get_goal()->get_modal_depth();
     unsigned long long max_graph_depth = 0, is_bisim_graph_depth = 0;     // is_bisim_graph_depth: deepest level of the search graph such that all nodes in the previous levels have is_bisim = true
@@ -143,7 +149,7 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, cont
 
         if (not path.empty()) return path;
 
-        if (strategy != strategy::unbounded_search and not n->get_to_apply_actions().empty()    // If there exists a node n_ calculated above such that n_.is_bisim
+        if (strategy == strategy::iterative_bounded_search and not n->get_to_apply_actions().empty()    // If there exists a node n_ calculated above such that n_.is_bisim
             and n->get_graph_depth() == is_bisim_graph_depth)
             previous_iter_frontier.push_back(n);                                                // is false, then we need to expand it in the next iteration
 
@@ -152,12 +158,12 @@ node_deque planner::bfs(const planning_task &task, const strategy strategy, cont
     return {};
 }
 
-node_deque planner::init_frontier(kripke::state_ptr &s0, contraction_type contraction_type, const unsigned long b,
-                                  node_deque &previous_iter_frontier, statistics &stats, states_ids_set &visited_states_ids,
-                                  const del::storages_ptr &storages) {
+node_deque planner::init_frontier(kripke::state_ptr &s0, const strategy strategy, contraction_type contraction_type,
+                                  const unsigned long b, node_deque &previous_iter_frontier, statistics &stats,
+                                  states_ids_set &visited_states_ids, const del::storages_ptr &storages) {
     node_deque frontier;
 
-    if (previous_iter_frontier.empty()) {   // If this is the first iteration
+    if (previous_iter_frontier.empty() or strategy == strategy::approx_iterative_bounded_search) {   // If this is the first iteration or if we are using approximated search
         node_ptr n0 = init_node(contraction_type, s0, nullptr, true, nullptr, 0, visited_states_ids, storages, b);
 
         if (n0) {
@@ -205,15 +211,16 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
                         return extract_path(n_);
                     }
 
-                    if (not n_->is_bisim())                         // If n_.is_bisim is false, we need to
+                    if (not n_->is_bisim() and strategy == strategy::iterative_bounded_search)                         // If n_.is_bisim is false, we need to
                         to_reapply_actions.push_back(a);            // reapply 'a' to n in the next iteration
 
                     frontier.push_back(std::move(n_));              // We update the frontier
                 }
-            } else if (strategy != strategy::unbounded_search)      // If the update is unsuccessful, we need to
+            } else if (strategy == strategy::iterative_bounded_search)      // If the update is unsuccessful, we need to
                 to_reapply_actions.push_back(a);                    // reapply 'a' to n in the next iteration
         } else if (printer) print_not_applied_action(printer, a);
     }
+    assert(strategy != strategy::approx_iterative_bounded_search or to_reapply_actions.empty());
     n->set_to_apply_action(std::move(to_reapply_actions));          // We set the actions that have to be reapplied
     if (printer) print_end_expanding_node(printer, n, strategy, is_dead_node, n->get_to_apply_actions().empty());
 
@@ -239,22 +246,49 @@ node_deque planner::extract_path(node_ptr n) {
     return path;
 }
 
+bool planner::validate(const search::planning_task &task, const search::node_deque &path, const del::storages_ptr &storages) {
+    kripke::state_ptr s = task.get_initial_state();
+    bool valid = true;
+    auto n = path.begin();
+    unsigned long count = 0;
+
+    if (path.size() > 1)
+        do {
+            ++n;
+            ++count;
+            valid = updater::is_applicable(*s, *(*n)->get_action(), storages->l_storage);
+
+            if (valid)
+                s = std::make_shared<kripke::state>(updater::product_update(*s, *(*n)->get_action(), storages->l_storage));
+            else
+                std::cout << "\n\nWARNING! Action '" << count << ". " << (*n)->get_action()->get_name() << "' is not applicable.\n\n";
+        } while (valid and count < path.size() - 1);
+
+    if (valid) {
+        valid = s->satisfies(task.get_goal(), storages->l_storage);
+
+        if (not valid)
+            std::cout << "\n\nWARNING! Action sequence is NOT a solution.\n\n";
+    }
+
+    return valid;
+}
+
 node_ptr planner::update_node(const strategy strategy, contraction_type contraction_type, const node_ptr &n, const kripke::action_ptr &a,
                               unsigned long long &id, const states_ids_set &visited_states_ids, const del::storages_ptr &storages, unsigned long goal_depth) {
-    switch (strategy) {
-        case strategy::unbounded_search: {
+    if (strategy == strategy::unbounded_search) {
+        kripke::state_ptr s_ = std::make_shared<kripke::state>(kripke::updater::product_update(*n->get_state(), *a, storages->l_storage));
+        return init_node(contraction_type, s_, a, true, n, ++id, visited_states_ids, storages);
+    } else {
+        if (n->is_bisim() or n->get_bound() >= a->get_maximum_depth() + goal_depth) {
             kripke::state_ptr s_ = std::make_shared<kripke::state>(kripke::updater::product_update(*n->get_state(), *a, storages->l_storage));
-            return init_node(contraction_type, s_, a, true, n, ++id, visited_states_ids, storages);
-        } case strategy::iterative_bounded_search:
-            if (n->is_bisim() or n->get_bound() - a->get_maximum_depth() >= goal_depth) {
-                kripke::state_ptr s_ = std::make_shared<kripke::state>(kripke::updater::product_update(*n->get_state(), *a, storages->l_storage));
 
-                if (n->is_bisim())
-                    return init_node(contraction_type, s_, a, true, n, ++id, visited_states_ids, storages, n->get_bound());
-                if (n->get_bound() >= a->get_maximum_depth() + goal_depth)
-                    return init_node(contraction_type, s_, a, false, n, ++id, visited_states_ids, storages, n->get_bound() - a->get_maximum_depth());
-            }
-            return nullptr;
+            if (strategy != strategy::approx_iterative_bounded_search and n->is_bisim())
+                return init_node(contraction_type, s_, a, true, n, ++id, visited_states_ids, storages, n->get_bound());
+            if (n->get_bound() >= a->get_maximum_depth() + goal_depth)
+                return init_node(contraction_type, s_, a, false, n, ++id, visited_states_ids, storages, n->get_bound() - a->get_maximum_depth());
+        }
+        return nullptr;
     }
 }
 
@@ -306,6 +340,7 @@ void planner::print_info(const search::planning_task &task, search::strategy str
             std::cout << " - STRATEGY: Unbounded Search" << std::endl;
             break;
         case strategy::iterative_bounded_search:
+        case strategy::approx_iterative_bounded_search:
             switch (contraction_type) {
                 case contraction_type::full:
                     break;

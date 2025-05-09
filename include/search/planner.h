@@ -52,12 +52,12 @@ namespace search {
                          const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer);
 
         static node_deque
-        iterative_bounded_search(const planning_task &task, contraction_type contraction_type, statistics &stats,
+        iterative_bounded_search(const planning_task &task, const strategy strategy, contraction_type contraction_type, statistics &stats,
                                  states_ids_set &visited_states_ids, const del::storages_ptr &storages,
                                  const daedalus::tester::printer_ptr &printer);
 
         static node_deque
-        bounded_search(const planning_task &task, contraction_type contraction_type, statistics &stats,
+        bounded_search(const planning_task &task, const strategy strategy, contraction_type contraction_type, statistics &stats,
                        node_deque &previous_iter_frontier, unsigned long b,
                        unsigned long long &id, states_ids_set &visited_states_ids,
                        const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer);
@@ -68,8 +68,8 @@ namespace search {
             states_ids_set &visited_states_ids, const del::storages_ptr &storages,
             const daedalus::tester::printer_ptr &printer);
 
-        static node_deque init_frontier(kripke::state_ptr &s0, contraction_type contraction_type, unsigned long b,
-                                        node_deque &previous_iter_frontier, statistics &stats,
+        static node_deque init_frontier(kripke::state_ptr &s0, const strategy strategy, contraction_type contraction_type,
+                                        unsigned long b, node_deque &previous_iter_frontier, statistics &stats,
                                         states_ids_set &visited_states_ids, const del::storages_ptr &storages);
 
         static node_deque expand_node(const planning_task &task, strategy strategy, contraction_type contraction_type,
@@ -81,6 +81,8 @@ namespace search {
         update_statistics(search::statistics &stats, search::node_ptr &n);
 
         static node_deque extract_path(node_ptr n);
+
+        static bool validate(const planning_task &task, const node_deque &path, const del::storages_ptr &storages);
 
         static search::node_ptr update_node(strategy strategy, contraction_type contraction_type, const node_ptr &n,
                                             const kripke::action_ptr &a, unsigned long long &id,

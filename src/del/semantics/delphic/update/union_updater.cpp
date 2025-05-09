@@ -26,7 +26,7 @@
 #include "../../../../../include/del/semantics/delphic/states/possibility.h"
 #include "../../../../../include/del/semantics/delphic/actions/eventuality.h"
 #include "../../../../../include/del/semantics/delphic/model_checker.h"
-#include "../../../../utils/storage.cpp"
+#include "../../../../../include/utils/storage.h"
 #include <iterator>
 #include <memory>
 #include <unordered_map>

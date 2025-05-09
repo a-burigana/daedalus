@@ -32,7 +32,7 @@
 #include "../tests/bisimulation/bisimulation_tester.h"
 #include "../tests/builder/state_builder.h"
 #include "../include/del/semantics/kripke/bisimulation/bounded_identification.h"
-#include "utils/storage.cpp"
+#include "../include/utils/storage.h"
 #include "../tests/builder/domains/tiger.h"
 #include "../tests/builder/domains/gossip.h"
 #include "../include/utils/printer/formula_printer.h"
@@ -122,11 +122,11 @@ void run(int argc, char *argv[]) {
     }
 
     search::planning_task_ptr task;
-    del::label_storage_ptr l_storage = std::make_shared<storage<label>>();
-    del::signature_storage_ptr s_storage = std::make_shared<storage<signature>>();
-    del::information_state_storage_ptr is_storage = std::make_shared<storage<information_state>>(information_state{});
+    del::label_storage_ptr l_storage = std::make_shared<del::storage<del::label>>();
+    del::signature_storage_ptr s_storage = std::make_shared<del::storage<signature>>();
+    del::information_state_storage_ptr is_storage = std::make_shared<del::storage<information_state>>(information_state{});
 
-    storages_ptr storages = std::make_shared<del::storages>(del::storages{std::move(l_storage), std::move(s_storage), std::move(is_storage)});
+    del::storages_ptr storages = std::make_shared<del::storages>(del::storages{std::move(l_storage), std::move(s_storage), std::move(is_storage)});
 
     if (domain == "active_muddy_children" or domain == "amc")
         task = std::make_unique<search::planning_task>(active_muddy_children::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), storages->l_storage));
@@ -149,7 +149,8 @@ void run(int argc, char *argv[]) {
 
 //    search::delphic_planning_task task_ = delphic_utils::convert(*task);
 
-    search::strategy t = strategy == "unbounded" ? search::strategy::unbounded_search : search::strategy::iterative_bounded_search;
+    search::strategy t = strategy == "unbounded" ? search::strategy::unbounded_search :
+            (strategy == "bounded" ? search::strategy::iterative_bounded_search : search::strategy::approx_iterative_bounded_search);
     enum contraction_type type = contraction_type == "full" ? contraction_type::full : (contraction_type == "rooted" ? contraction_type::rooted : contraction_type::canonical);
 
     if (debug) {
@@ -193,6 +194,7 @@ void run(int argc, char *argv[]) {
                              << std::endl;
                     break;
                 case search::strategy::iterative_bounded_search:
+                case search::strategy::approx_iterative_bounded_search:
                     out_file << "Domain;Problem ID;#Atoms;#Agents;|W0|;#Actions;Goal depth;Bound;Plan length;#Nodes;#Worlds;Time"
                              << std::endl;
                     break;

@@ -12,7 +12,7 @@ count=0
 
 print_results() {
     $DAEDALUS --domain $DOMAIN --parameters "$1" "$2" "$3" "$4" --semantics "$5"  --strategy "$6" --contraction "$7" --info
-    timeout 10m "$DAEDALUS" --domain $DOMAIN --parameters "$1" "$2" "$3" "$4" --semantics "$5"  --strategy "$6" --contraction "$7" --print
+    timeout 20m "$DAEDALUS" --domain $DOMAIN --parameters "$1" "$2" "$3" "$4" --semantics "$5"  --strategy "$6" --contraction "$7" --print
 }
 
 echo "####################################################################################################"
@@ -29,9 +29,8 @@ for (( agents_no = N_MIN_AGS; agents_no <= N_MAX_AGS; agents_no++ )); do
 
             boxes_no=$((rooms_no-1))
 
-            print_results "$agents_no" "$rooms_no" "$boxes_no" "$goal_id" kripke  bounded canonical
-#            print_results "$agents_no" "$rooms_no" "$boxes_no" "$goal_id" delphic unbounded
-            print_results "$agents_no" "$rooms_no" "$boxes_no" "$goal_id" kripke  unbounded full
+            print_results "$agents_no" "$rooms_no" "$boxes_no" "$goal_id" kripke approx_bounded canonical
+            print_results "$agents_no" "$rooms_no" "$boxes_no" "$goal_id" kripke bounded rooted
         done
     done
 done

@@ -392,7 +392,7 @@ void printer::print_time_results(const search::planning_task &task, search::stra
     const auto &[_, stats] = search::planner::search(task, strategy, contraction_type, storages);
 
     if (strategy == search::strategy::iterative_bounded_search)
-        table << std::to_string(stats.m_bound) << ";";
+        table << std::to_string(stats.m_plan_bound) << ";";
 
     table
         << stats.m_plan_length << ";"

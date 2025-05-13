@@ -51,7 +51,8 @@ namespace search {
         unsigned long long m_visited_worlds_no{};
         unsigned long long m_graph_depth{};
         unsigned long long m_non_revisited_states_no{};       // Number of computed states that are discarded because already visited
-        unsigned long m_bound{};
+        unsigned long m_iterations_no{};
+        unsigned long m_plan_bound{};
     };
 }
 #endif //DAEDALUS_SEARCH_TYPES_H

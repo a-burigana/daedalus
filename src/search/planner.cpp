@@ -41,9 +41,8 @@ planner::search(const planning_task &task, const strategy strategy, contraction_
                 const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer) {
     print_info(task, strategy, contraction_type);
     node_deque path;
-    statistics stats{};
-
     visited_states visited_states;
+    statistics stats{};
 
     if (contraction_type != kripke::contraction_type::rooted) visited_states = states_ids_set();
     else visited_states = kripke::state_set();
@@ -55,8 +54,8 @@ planner::search(const planning_task &task, const strategy strategy, contraction_
         node_ptr n0 = init_node(contraction_type, task.get_initial_state(), nullptr, true, nullptr, 0,
                                 visited_states, storages, task.get_goal()->get_modal_depth());
         if (printer) print_goal_found(printer, n0);
-        path = extract_path(n0);
-        stats = statistics{0, 0, n0->get_state()->get_worlds_number(), 0, 0, n0->get_bound()};
+        path = extract_path(n0, stats);
+        stats = statistics{0, 0, n0->get_state()->get_worlds_number(), 0, 0, 0, 0};
     } else
         path = strategy == strategy::unbounded_search ?
                unbounded_search(task, stats, visited_states, storages, printer) :
@@ -78,8 +77,8 @@ node_deque planner::unbounded_search(const planning_task &task, statistics &stat
     auto path = bfs(task, strategy::unbounded_search, contraction_type::full, stats, previous_iter_frontier, 0, id,
                     visited_states, storages, printer);
 
-    for (const auto &n: path)
-        if (n->get_action()) stats.m_bound += n->get_action()->get_maximum_depth();
+//    for (const auto &n: path)
+//        if (n->get_action()) stats.m_plan_bound += n->get_action()->get_maximum_depth();
 
     return std::move(path);
 }
@@ -88,18 +87,18 @@ node_deque
 planner::iterative_bounded_search(const planning_task &task, const strategy strategy, contraction_type contraction_type,
                                   statistics &stats, visited_states &visited_states, const del::storages_ptr &storages,
                                   const daedalus::tester::printer_ptr &printer) {
-    unsigned long b = task.get_goal()->get_modal_depth();
+    unsigned long b = task.get_goal()->get_modal_depth(), iterations = 0;
     node_deque previous_iter_frontier;
     unsigned long long id = 0;
 
     while (true) {
         std::cout << "Searching with bound: " << b << " " << std::flush;
-        stats.m_bound = b;
+        stats.m_iterations_no = iterations++;
         // If iteration 'b' produces a valid result, we return it. Otherwise, we move to the next iteration
         if (node_deque result = bounded_search(task, strategy, contraction_type, stats, previous_iter_frontier, b++, id,
                                                visited_states, storages, printer); not result.empty())
             return result;
-        std::cout << "(no plan found, going to next iteration)" << std::endl;
+        std::cout << "- No plan found, going to next iteration." << std::endl;
     }
 }
 
@@ -109,8 +108,7 @@ planner::bounded_search(const planning_task &task, const strategy strategy, cont
                         unsigned long long &id,
                         visited_states &visited_states, const del::storages_ptr &storages,
                         const daedalus::tester::printer_ptr &printer) {
-    return bfs(task, strategy, contraction_type, stats, previous_iter_frontier, b, id, visited_states, storages,
-               printer);
+    return bfs(task, strategy, contraction_type, stats, previous_iter_frontier, b, id, visited_states, storages, printer);
 }
 
 node_deque
@@ -161,8 +159,7 @@ planner::bfs(const planning_task &task, const strategy strategy, contraction_typ
         if (strategy == strategy::iterative_bounded_search and
             not n->get_to_apply_actions().empty()    // If there exists a node n_ calculated above such that n_.is_bisim
             and n->get_graph_depth() == is_bisim_graph_depth)
-            previous_iter_frontier.push_back(
-                    n);                                                // is false, then we need to expand it in the next iteration
+            previous_iter_frontier.push_back(n);     // is false, then we need to expand it in the next iteration
 
         frontier.pop_front();
     }
@@ -173,14 +170,13 @@ node_deque planner::init_frontier(kripke::state_ptr &s0, const strategy strategy
                                   const unsigned long b, node_deque &previous_iter_frontier, statistics &stats,
                                   visited_states &visited_states, const del::storages_ptr &storages) {
     node_deque frontier;
+    bool fresh_frontier = previous_iter_frontier.empty() or strategy == strategy::approx_iterative_bounded_search;
 
-    if (previous_iter_frontier.empty() or strategy ==
-                                          strategy::approx_iterative_bounded_search) {   // If this is the first iteration or if we are using approximated search
+    if (fresh_frontier) {       // If this is the first iteration or if we are using approximated search
         node_ptr n0 = init_node(contraction_type, s0, nullptr, true, nullptr, 0, visited_states, storages, b);
 
         if (n0) {
             update_visited_states(n0->get_state(), visited_states);
-//            visited_states.emplace(n0->get_state()->get_id());
             update_statistics(stats, n0);
             frontier.push_back(std::move(n0));
         }
@@ -218,7 +214,7 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
                     // If n_'s state satisfies the goal, we return the path from the root of the search tree to n_
                     if (n_->get_state()->satisfies(task.get_goal(), storages->l_storage)) {
                         if (printer) print_goal_found(printer, n_);
-                        return extract_path(n_);
+                        return extract_path(n_, stats);
                     }
 
                     if (strategy == strategy::iterative_bounded_search and not n_->is_bisim())  // If n_.is_bisim is false, we need to
@@ -229,35 +225,6 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
             } else if (printer) print_not_applied_action(printer, a);
         } else if (strategy == strategy::iterative_bounded_search)
             to_reapply_actions.push_back(a);
-        /*if (strategy == strategy::iterative_bounded_search and not is_node_bound_good)
-            to_reapply_actions.push_back(a);
-        else if (kripke::updater::is_applicable(*n->get_state(), *a, storages->l_storage)) {      // For all applicable actions. Let n_ be the result of updating node n with 'a'
-            node_ptr n_ = update_node(strategy, contraction_type, n, a, id, visited_states, storages, goal_depth);
-            if (printer) print_applied_action(printer, a, n_, strategy);
-
-            if (n_) {
-                if (n_->is_already_visited())
-                    ++stats.m_non_revisited_states_no;
-                else {                                              // If the update is successful and n_'s state
-                    is_dead_node = false;                           // was not previously visited, then n is not a
-                    n->add_child(n_);                               // dead node and we add n_ to the children of n
-                    visited_states.emplace(n_->get_state()->get_id());
-                    update_statistics(stats, n_);
-
-                    // If n_'s state satisfies the goal, we return the path from the root of the search tree to n_
-                    if (n_->get_state()->satisfies(task.get_goal(), storages->l_storage)) {
-                        if (printer) print_goal_found(printer, n_);
-                        return extract_path(n_);
-                    }
-
-                    if (not n_->is_bisim() and strategy == strategy::iterative_bounded_search)                         // If n_.is_bisim is false, we need to
-                        to_reapply_actions.push_back(a);            // reapply 'a' to n in the next iteration
-
-                    frontier.push_back(std::move(n_));              // We update the frontier
-                }
-            } else if (strategy == strategy::iterative_bounded_search)      // If the update is unsuccessful, we need to
-                to_reapply_actions.push_back(a);                    // reapply 'a' to n in the next iteration
-        } else if (printer) print_not_applied_action(printer, a);*/
     }
     assert(strategy != strategy::approx_iterative_bounded_search or to_reapply_actions.empty());
     n->set_to_apply_action(std::move(to_reapply_actions));          // We set the actions that have to be reapplied
@@ -275,9 +242,11 @@ void planner::update_statistics(search::statistics &stats, search::node_ptr &n) 
     }
 }
 
-node_deque planner::extract_path(node_ptr n) {
+node_deque planner::extract_path(node_ptr n, statistics &stats) {
     node_deque path;
     do {
+        if (n->get_action())
+            stats.m_plan_bound += n->get_action()->get_maximum_depth();
         path.push_front(n);
         n = n->get_parent();
     } while (n);
@@ -351,14 +320,11 @@ void planner::refresh_node(node_ptr &n, contraction_type contraction_type, stati
         stats.m_visited_worlds_no -= n->get_state()->get_worlds_number();
 
 //        auto [is_bisim, s_contr, structures] = kripke::bisimulator::resume_contraction(contraction_type, *n->get_original_state(), n->get_bound(), n->get_bpr_structures(), storages);    // We do another refinement step
-        auto [is_bisim, s_contr] = kripke::bisimulator::contract(contraction_type, *n->get_original_state(),
-                                                                 n->get_bound(),
-                                                                 storages);    // We do another refinement step
+        auto [is_bisim, s_contr] = kripke::bisimulator::contract(contraction_type, *n->get_original_state(), n->get_bound(), storages);    // We do another refinement step
 
         n->set_is_bisim(is_bisim);                                  // And we update the value of is_bisim
         n->set_state(std::make_shared<kripke::state>(std::move(s_contr)));
         update_visited_states(n->get_state(), visited_states);
-//        visited_states.emplace(n->get_state()->get_id());
         update_statistics(stats, n);
 
         if (is_bisim) n->clear_original_state();
@@ -409,53 +375,42 @@ bool planner::is_already_visited(const kripke::state &s, unsigned long b, const 
 // Print utilities
 void planner::print_info(const search::planning_task &task, search::strategy strategy,
                          kripke::contraction_type contraction_type) {
-    std::cout << "==================================================" << std::endl;
-    std::cout << "                     DAEDALUS                     " << std::endl;
-    std::cout << "==================================================" << std::endl << std::endl;
+//    std::string strategy_str =
+//            strategy == strategy::unbounded_search ? "BFS" :
+//            (strategy == strategy::iterative_bounded_search ? "IBDS" : "Approx-IBDS");
+//
+//    std::string contraction_str =
+//            contraction_type == contraction_type::full ? "Standard" :
+//            (contraction_type == contraction_type::rooted ? "Rooted" : "Canonical");
 
-    std::cout << "------------------ CURRENT TASK ------------------" << std::endl;
-    std::cout << " - DOMAIN:  " << task.get_domain_name() << std::endl;
-    std::cout << " - PROBLEM: " << task.get_problem_id() << std::endl;
-    std::cout << " - GOAL:    " << printer::formula_printer::to_string(*task.get_goal(), task.get_language(), false) << std::endl;
-    std::cout << "--------------------------------------------------" << std::endl << std::endl;
+    std::cout << "DAEDALUS" << std::endl;
 
-    std::cout << "----------------- CONFIGURATION ------------------" << std::endl;
+//    std::cout << "Domain: " << task.get_domain_name()
+//              << "   Problem: " << task.get_problem_id()
+//              << "   Goal: " << printer::formula_printer::to_string(*task.get_goal(), task.get_language(), false)
+//              << "" << std::endl;
+//
+//    std::cout
+//        << "Strategy: " << strategy_str
+//        << "   Contraction type: " << contraction_str
+//        << "" << std::endl << std::endl;
 
-    switch (strategy) {
-        case strategy::unbounded_search:
-            std::cout << " - STRATEGY: Unbounded Search" << std::endl;
-            break;
-        case strategy::iterative_bounded_search:
-        case strategy::approx_iterative_bounded_search:
-            switch (contraction_type) {
-                case contraction_type::full:
-                    break;
-                case contraction_type::rooted:
-                    std::cout << " - STRATEGY: Iterative Bounded graph Search" << std::endl;
-                    break;
-                case contraction_type::canonical:
-                    std::cout << " - STRATEGY: Iterative Bounded Graph Search" << std::endl;
-                    break;
-            }
-    }
-
-    std::cout << " - SEMANTICS: Kripke" << std::endl;
-    std::cout << "--------------------------------------------------" << std::endl << std::endl;
-    std::cout << "-------------------- SOLVING ---------------------" << std::endl;
+    std::cout << "Solving..." << std::endl;
 }
 
 void planner::print_statistics(search::statistics &stats, search::strategy strategy) {
     std::cout << "--------------------------------------------------"          << std::endl;
     std::cout << "Computation time:       " << stats.m_computation_time        << "s." << std::endl;
-    if (strategy == strategy::iterative_bounded_search)
-        std::cout << "Bound:                  " << stats.m_bound               << std::endl;
-    else
+    if (strategy != strategy::unbounded_search) {
+        std::cout << "Iterations:             " << stats.m_iterations_no << std::endl;
+        std::cout << "Reasoning depth:        " << stats.m_plan_bound << std::endl;
+    } else
         std::cout << "Bound:                  " << "\u221E"                    << std::endl;
     std::cout << "Visited states:         " << stats.m_visited_states_no       << std::endl;
     std::cout << "Total number of worlds: " << stats.m_visited_worlds_no       << std::endl;
     std::cout << "Non revisited states:   " << stats.m_non_revisited_states_no << std::endl;
-    std::cout << "Depth of search graph:  " << stats.m_graph_depth             << std::endl;
-    std::cout << "--------------------------------------------------"          << std::endl << std::endl;
+//    std::cout << "Depth of search graph:  " << stats.m_graph_depth             << std::endl;
+    std::cout << "--------------------------------------------------";
 }
 
 void planner::print_plan(const node_deque &path) {
@@ -464,12 +419,12 @@ void planner::print_plan(const node_deque &path) {
     else if (path.size() == 1)
         std::cout << "Goal found in initial state!" << std::endl;
     else {
-        std::cout << std::endl << std::endl << "Found plan of length " << (path.size() - 1) << ":" << std::endl;
+        std::cout << "- Found plan of length " << (path.size() - 1) << "!" << std::endl << std::endl;
         unsigned long count = 0;
 
         for (const auto &node : path)
             if (node->get_action())
-                std::cout << "  " << ++count << ". " << node->get_action()->get_name();
+                std::cout << ++count << ". " << node->get_action()->get_name() << "  ";
         std::cout << std::endl;
     }
     std::cout << std::endl;

@@ -76,7 +76,7 @@ namespace search {
 
         static void update_statistics(search::statistics &stats, search::node_ptr &n);
 
-        static node_deque extract_path(node_ptr n);
+        static node_deque extract_path(node_ptr n, statistics &stats);
 
         static bool validate(const planning_task &task, const node_deque &path, const del::storages_ptr &storages);
 

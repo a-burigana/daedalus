@@ -29,29 +29,52 @@
 
 using namespace kripke;
 
-std::pair<bool, block_matrix> bounded_partition_refinement::do_refinement_steps(const state &s, unsigned long k) {
+std::pair<bool, bpr_structures> bounded_partition_refinement::do_refinement_steps(const state &s, unsigned long k) {
     bpr_structures structures = init_structures(s, k);
 
-    partition &Q = structures.Q;
-    block_matrix &worlds_blocks = structures.worlds_blocks;
-    relations &r_1 = structures.r_1;      // The preimage of r
-    block_id &count = structures.count;
+    refinement_step_helper(s, k, structures);
+    bool is_bisim = do_extra_refinement_step(s, structures);
+
+    return {is_bisim, std::move(structures)};
+}
+
+bool bounded_partition_refinement::do_extra_refinement_step(const state &s, bpr_structures &structures) {
+    unsigned long k = structures.Q.size();
+
+    structures.Q.emplace_back();
+
+    for (world_id x = 0; x < s.get_worlds_number(); ++x)
+        structures.worlds_blocks[x].emplace_back();
+
+    do_refinement_step(s, k, k-1, structures);
+
+    return structures.Q[k].size() == structures.Q[k-1].size() and s.get_max_depth() < k-1;
+}
+
+bpr_structures bounded_partition_refinement::do_all_refinement_steps(const state &s) {
+    unsigned long k = s.get_max_depth() + 1;
+    bpr_structures structures = init_structures(s, k);
+
+    refinement_step_helper(s, k, structures);
+    return std::move(structures);
+}
+
+void bounded_partition_refinement::refinement_step_helper(const state &s, unsigned long k, bpr_structures &structures) {
     unsigned long h = 0;
 
-    do {
-        copy_partition(s, k, h, Q, worlds_blocks, count);
-
-        for (const block_ptr &B: Q[h])                      // We refine Q[h] wrt. all of its blocks
-            refine(s, k, h, Q, B, r_1, worlds_blocks, count);
-
-        ++h;
-    } while (h < k and Q[h].size() != Q[h-1].size());     // If no block was split, then we are done
+    do do_refinement_step(s, k, h, structures);
+    while (++h < k and structures.Q[h].size() != structures.Q[h-1].size());   // If no block was split, then we are done
 
     while (h < k)
-        copy_partition(s, k, h++, Q, worlds_blocks, count);
+        copy_partition(s, k, h++, structures.Q, structures.worlds_blocks, structures.count);
+}
 
-    bool is_bisim = Q[k].size() == Q[k-1].size() and s.get_max_depth() < k-1;
-    return {is_bisim, std::move(worlds_blocks)};
+void bounded_partition_refinement::do_refinement_step(const state &s, unsigned long k, unsigned long h,
+                                                      bpr_structures &structures) {
+    copy_partition(s, k, h, structures.Q, structures.worlds_blocks, structures.count);
+
+    for (const block_ptr &B: structures.Q[h])                      // We refine Q[h] wrt. all of its blocks
+        refine(s, k, h, structures.Q, B, structures.r_1, structures.worlds_blocks, structures.count);
 }
 
 void bounded_partition_refinement::copy_partition(const state &s, const unsigned long k, const unsigned long h,

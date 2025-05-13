@@ -52,6 +52,8 @@ namespace kripke {
         block_id count;
     };
 
+    using bpr_structures_ptr = std::shared_ptr<bpr_structures>;
+
     // CANONICAL BOUNDED CONTRACTIONS
     using signature = delphic::possibility;
     using signature_ptr = std::shared_ptr<signature>;

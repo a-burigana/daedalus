@@ -28,6 +28,7 @@
 #include <queue>
 #include "bounded_bisimulation_types.h"
 #include "../../../../utils/storage.h"
+#include "../../../../search/search_space.h"
 
 namespace kripke {
     class state;
@@ -37,11 +38,15 @@ namespace kripke {
         static std::pair<bool, state> calculate_rooted_contraction(const state &s, unsigned long k, bool canonical = false,
                                                                    const del::storages_ptr &storages = nullptr);
 
-        /*static std::pair<bool, state> calculate_canonical_contraction(const state &s, unsigned long k,
-                                                                      const del::signature_storage_ptr &s_storage,
-                                                                      const del::information_state_storage_ptr &is_storage);*/
+        /*static std::tuple<bool, state, bpr_structures> update_rooted_contraction(const state &s, unsigned long k, bpr_structures &structures,
+                                                                bool canonical = false, const del::storages_ptr &storages = nullptr);*/
+
+        static std::pair<bool, state> calculate_standard_contraction(const state &n, const del::storages_ptr &storages = nullptr);
 
     private:
+        static std::pair<bool, state> rooted_contraction_helper(const state &s, unsigned long k, bool is_bisim,
+                                                                                 bpr_structures &structures, bool canonical = false,
+                                                                const del::storages_ptr &storages = nullptr);
 
         static std::vector<world_id> calculate_max_representatives(const state &s, unsigned long k,
                                                                    const block_matrix &worlds_blocks);

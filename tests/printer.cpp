@@ -251,7 +251,7 @@ state_deque printer::print_states(kripke::state_deque &ss, kripke::action_deque 
     kripke::state &s = *ss.back();
 
     if (apply_contraction)
-        s = kripke::bisimulator::contract(type, s, b, storages).second;
+        s = std::get<1>(kripke::bisimulator::contract(type, s, b, storages));
 
     print_state(s, storages->l_storage, path, name);
 

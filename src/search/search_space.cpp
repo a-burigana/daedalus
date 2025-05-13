@@ -84,9 +84,9 @@ const kripke::action_deque &node::get_to_apply_actions() const {
     return m_to_apply_actions;
 }
 
-//del::bpr_structures &node::get_bpr_structures() {
-//    return *m_structures;
-//}
+/*kripke::bpr_structures &node::get_bpr_structures() {
+    return *m_structures;
+}*/
 
 void node::set_state(kripke::state_ptr s) {
     m_state = std::move(s);
@@ -122,3 +122,11 @@ void node::set_original_state(kripke::state_ptr s) {
 void node::clear_original_state() {
     m_original_state = nullptr;
 }
+
+/*void node::set_bpr_structures(kripke::bpr_structures structures) {
+    m_structures = std::make_shared<kripke::bpr_structures>(std::move(structures));
+}
+
+void node::clear_bpr_structures() {
+    m_structures = nullptr;
+}*/

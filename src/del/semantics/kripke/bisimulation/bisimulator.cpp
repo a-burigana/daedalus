@@ -24,13 +24,16 @@
 #include "../../../../../include/del/semantics/kripke/bisimulation/bisimulator.h"
 #include "../../../../../include/del/semantics/kripke/bisimulation/partition_refinement.h"
 #include "../../../../../include/del/semantics/kripke/bisimulation/bounded_contraction_builder.h"
+#include "../../../../../include/del/semantics/kripke/bisimulation/bounded_partition_refinement.h"
+#include <algorithm>
 
 using namespace kripke;
 
-std::pair<bool, state> bisimulator::contract(contraction_type type, state &s, unsigned long k, const del::storages_ptr &storages) {
+std::pair<bool, state>
+bisimulator::contract(contraction_type type, const state &s, unsigned long k, const del::storages_ptr &storages) {
     switch (type) {
         case contraction_type::full:
-            return bounded_contraction_builder::calculate_rooted_contraction(s, s.get_max_depth() + 1, true, storages);           // Classic Paige and Tarjan algorithm
+            return bounded_contraction_builder::calculate_standard_contraction(s, storages);
         case contraction_type::rooted:  // todo: use min(s.get_depth, k)
             return bounded_contraction_builder::calculate_rooted_contraction(s, k);
         case contraction_type::canonical:
@@ -38,15 +41,85 @@ std::pair<bool, state> bisimulator::contract(contraction_type type, state &s, un
     }
 }
 
-//bool bisimulator::contract(bisimulation_type type, search::node_ptr &n) {
-//    switch (type) {
-//        case bisimulation_type::full:
-//            return partition_refinement::contract(n);           // Classic Paige and Tarjan algorithm
-//        case bisimulation_type::bounded:
-//            return bounded_partition_refinement::contract(n);
-//    }
-//}
+bool bisimulator::are_bisimilar(const state &s, const state &t, unsigned long k) {
+    state u = disjoint_union(s, t);
 
-//bool bisimulator::repeat_contraction(search::node_ptr &n) {
-//    return bounded_partition_refinement::repeat_contraction(n);
-//}
+    auto [is_bisim, structures] = bounded_partition_refinement::do_refinement_steps(u, k);
+    auto worlds_blocks = structures.worlds_blocks;
+
+    for (auto wd: s.get_designated_worlds())
+        if (std::all_of(t.get_designated_worlds().begin(), t.get_designated_worlds().end(),
+                    [&](world_id vd) -> bool {
+                        auto block_wd = worlds_blocks[wd][k];
+                        return std::find(block_wd->begin(), block_wd->end(), s.get_worlds_number() + vd) == block_wd->end();}))
+            return false;
+
+    for (auto vd: t.get_designated_worlds())
+        if (std::all_of(s.get_designated_worlds().begin(), s.get_designated_worlds().end(),
+                        [&](world_id wd) -> bool {
+                            auto block_vd = worlds_blocks[s.get_worlds_number() + vd][k];
+                            return std::find(block_vd->begin(), block_vd->end(), wd) == block_vd->end();}))
+            return false;
+/*
+        for (auto vd: t.get_designated_worlds())
+            if (auto block_wd = structures.worlds_blocks[wd][k],
+                     block_vd = structures.worlds_blocks[s.get_worlds_number() + vd][k];
+                std::find(block_wd->begin(), block_wd->end(), s.get_worlds_number() + vd) == block_wd->end())
+                return false;
+
+    for (auto vd: t.get_designated_worlds())
+        for (auto wd: s.get_designated_worlds())
+            if (auto block_wd = structures.worlds_blocks[wd][k],
+                     block_vd = structures.worlds_blocks[s.get_worlds_number() + vd][k];
+                std::find(block_vd->begin(), block_vd->end(), wd) == block_vd->end())
+                return false;*/
+
+    return true;
+}
+
+/*std::tuple<bool, state, bpr_structures> bisimulator::resume_contraction(contraction_type type, const state &s, unsigned long k,
+                                                       bpr_structures &structures, const del::storages_ptr &storages) {
+    return bounded_contraction_builder::update_rooted_contraction(s, k, structures, type == contraction_type::canonical, storages);
+}*/
+
+state bisimulator::disjoint_union(const kripke::state &s, const kripke::state &t) {
+    unsigned long worlds_number = s.get_worlds_number() + t.get_worlds_number();
+
+    relations r = relations(s.get_language()->get_agents_number());
+
+    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
+        r[ag] = agent_relation(worlds_number);
+
+        for (world_id w = 0; w < s.get_worlds_number(); ++w) {
+            r[ag][w] = world_bitset(worlds_number);
+
+            for (auto v: s.get_agent_possible_worlds(ag, w))
+                r[ag][w].push_back(v);
+        }
+
+        for (world_id w = 0; w < t.get_worlds_number(); ++w) {
+            r[ag][s.get_worlds_number() + w] = world_bitset(worlds_number);
+
+            for (auto v: t.get_agent_possible_worlds(ag, w))
+                r[ag][s.get_worlds_number() + w].push_back(s.get_worlds_number() + v);
+        }
+    }
+
+    label_vector ls = label_vector(worlds_number);
+
+    for (world_id w = 0; w < s.get_worlds_number(); ++w)
+        ls[w] = s.get_label_id(w);
+
+    for (world_id w = 0; w < t.get_worlds_number(); ++w)
+        ls[s.get_worlds_number() + w] = t.get_label_id(w);
+
+    world_bitset designated = world_bitset(worlds_number);
+
+    for (auto w : s.get_designated_worlds())
+        designated.push_back(w);
+
+    for (auto w : t.get_designated_worlds())
+        designated.push_back(s.get_worlds_number() + w);
+
+    return state{s.get_language(), worlds_number, std::move(r), std::move(ls), std::move(designated)};
+}

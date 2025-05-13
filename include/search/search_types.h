@@ -27,15 +27,18 @@
 #include <memory>
 #include <chrono>
 #include <deque>
+#include <list>
 #include <unordered_set>
+#include <variant>
 #include "../del/semantics/kripke/states/states_types.h"
 
 namespace search {
     class node;
     using node_ptr   = std::shared_ptr<node>;
-    using node_deque = std::deque<node_ptr>;
+    using node_deque = std::list<node_ptr>;
 
     using states_ids_set = std::unordered_set<kripke::state_id>;
+    using visited_states = std::variant<states_ids_set, kripke::state_set>;
 
     class delphic_node;
     using delphic_node_ptr   = std::shared_ptr<delphic_node>;

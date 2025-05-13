@@ -26,6 +26,7 @@
 
 #include <vector>
 #include <deque>
+#include <set>
 #include <unordered_set>
 #include <boost/dynamic_bitset.hpp>
 #include "../../../language/label.h"
@@ -38,6 +39,7 @@ namespace kripke {
 
     using state_id          = unsigned long long;
     using state_deque       = std::deque<state_ptr>;
+    using state_set         = std::set<state_ptr>;
 
     using world_id          = unsigned long long;
     using world_bitset      = bit_deque;

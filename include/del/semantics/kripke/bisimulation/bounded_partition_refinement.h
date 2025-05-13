@@ -34,17 +34,21 @@
 #include "bounded_bisimulation_types.h"
 #include "../../../del_types.h"
 #include "../states/states_types.h"
-#include "../../../../search/search_types.h"
+#include "../../../../search/search_space.h"
 
 namespace kripke {
     class state;
 
     class bounded_partition_refinement {
     public:
-        static std::pair<bool, block_matrix> do_refinement_steps(const state &s, unsigned long k);
+        static std::pair<bool, bpr_structures> do_refinement_steps(const state &s, unsigned long k);
+        static bool do_extra_refinement_step(const state &s, bpr_structures &structures);
+        static bpr_structures do_all_refinement_steps(const state &s);
 
     private:
-        static bool contraction_helper(search::node_ptr &n);
+        static void refinement_step_helper(const state &s, unsigned long k, bpr_structures &structures);
+
+        static void do_refinement_step(const state &s, unsigned long k, unsigned long h, bpr_structures &structures);
 
         static void copy_partition(const state &s, unsigned long k, unsigned long h, partition &Q,
                                    block_matrix &worlds_blocks, block_id &count);

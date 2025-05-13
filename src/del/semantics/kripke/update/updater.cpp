@@ -46,7 +46,7 @@ state updater::product_update(const state &s, const action_deque &as, const del:
     state s_ = product_update(s, *as.front(), storages->l_storage);
 
     if (apply_contraction)
-        s_ = bisimulator::contract(type, s_, k, storages).second;
+        s_ = std::get<1>(bisimulator::contract(type, s_, k, storages));
 
     action_deque as_ = as;
     as_.pop_front();

@@ -58,7 +58,7 @@ namespace search {
         [[nodiscard]] const node_deque &get_children() const;
         [[nodiscard]] const kripke::action_deque &get_to_apply_actions() const;
 
-//        [[nodiscard]] del::bpr_structures &get_bpr_structures();
+//        [[nodiscard]] kripke::bpr_structures &get_bpr_structures();
 
         void set_state(kripke::state_ptr s);
         void increment_bound();
@@ -66,6 +66,8 @@ namespace search {
         void add_child(const node_ptr &child);
         void clear_non_bisim_children();
         void set_to_apply_action(kripke::action_deque actions);
+        /*void set_bpr_structures(kripke::bpr_structures structures);
+        void clear_bpr_structures();*/
 
         void set_original_state(kripke::state_ptr s);
         void clear_original_state();
@@ -81,6 +83,7 @@ namespace search {
         node_ptr m_parent;
         node_deque m_children, m_non_bisim_children;
         kripke::action_deque m_to_apply_actions;
+        kripke::bpr_structures_ptr m_structures;
     };
 }
 

@@ -35,9 +35,9 @@
 #include "../../tests/printer.h"
 #include "search_types.h"
 #include "strategies.h"
+#include "frontier.h"
 
 namespace search {
-
     class planner {
     public:
         static std::pair<node_deque, statistics>
@@ -51,26 +51,26 @@ namespace search {
                          const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer);
 
         static node_deque
-        iterative_bounded_search(const planning_task &task, const strategy strategy, contraction_type contraction_type, statistics &stats,
+        iterative_bounded_search(const planning_task &task, strategy strategy, contraction_type contraction_type, statistics &stats,
                                  visited_states &visited_states, const del::storages_ptr &storages,
                                  const daedalus::tester::printer_ptr &printer);
 
-        static node_deque bounded_search(const planning_task &task, const strategy strategy, contraction_type contraction_type, statistics &stats,
-                       node_deque &previous_iter_frontier, unsigned long b,
-                       unsigned long long &id, visited_states &visited_states,
-                       const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer);
+        static node_deque bounded_search(const planning_task &task, strategy strategy, contraction_type contraction_type, statistics &stats,
+                                         frontier &previous_iter_frontier, unsigned long b,
+                                         unsigned long long &id, visited_states &visited_states,
+                                         const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer);
 
         static node_deque bfs(const planning_task &task, strategy strategy, contraction_type contraction_type, statistics &stats,
-            node_deque &previous_iter_frontier, unsigned long b, unsigned long long &id,
-            visited_states &visited_states, const del::storages_ptr &storages,
-            const daedalus::tester::printer_ptr &printer);
+                              frontier &previous_iter_frontier, unsigned long b, unsigned long long &id,
+                              visited_states &visited_states, const del::storages_ptr &storages,
+                              const daedalus::tester::printer_ptr &printer);
 
-        static node_deque init_frontier(kripke::state_ptr &s0, const strategy strategy, contraction_type contraction_type,
-                                        unsigned long b, node_deque &previous_iter_frontier, statistics &stats,
+        static frontier init_frontier(kripke::state_ptr &s0, strategy strategy, contraction_type contraction_type,
+                                        unsigned long b, frontier &previous_iter_frontier, statistics &stats,
                                         visited_states &visited_states, const del::storages_ptr &storages);
 
         static node_deque expand_node(const planning_task &task, strategy strategy, contraction_type contraction_type,
-                                      statistics &stats, node_ptr &n, const kripke::action_deque &actions, node_deque &frontier,
+                                      statistics &stats, node_ptr &n, const kripke::action_deque &actions, frontier &frontier,
                                       unsigned long goal_depth, unsigned long long &id, visited_states &visited_states,
                                       const del::storages_ptr &storages, const daedalus::tester::printer_ptr &printer);
 
@@ -94,7 +94,7 @@ namespace search {
 
         static void update_visited_states(const kripke::state_ptr &s, visited_states &visited_states);
 
-        static bool is_already_visited(const kripke::state &s, unsigned long b, const visited_states &visited_states);
+        static bool is_already_visited(const kripke::state &s, unsigned long b, const visited_states &visited_states, const del::storages_ptr &storages);
 
         // Print utilities
         static void print_info(const planning_task &task, strategy strategy, contraction_type contraction_type);
@@ -107,6 +107,7 @@ namespace search {
         static void print_applied_action(const daedalus::tester::printer_ptr &printer, const kripke::action_ptr &a, const node_ptr &n_,
                                           strategy strategy);
 
+        static void print_bound_too_large_action(const daedalus::tester::printer_ptr &printer, const kripke::action_ptr &a);
         static void print_not_applied_action(const daedalus::tester::printer_ptr &printer, const kripke::action_ptr &a);
 
         static void print_end_expanding_node(const daedalus::tester::printer_ptr &printer, const node_ptr &n, strategy strategy,

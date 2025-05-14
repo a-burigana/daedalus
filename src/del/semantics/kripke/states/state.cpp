@@ -76,11 +76,11 @@ language_ptr state::get_language() const {
     return m_language;
 }
 
-unsigned long long state::get_depth(const world_id w) const {
+unsigned long state::get_depth(const world_id w) const {
     return m_worlds_depth[w];
 }
 
-unsigned long long state::get_max_depth() const {
+unsigned long state::get_max_depth() const {
     return m_max_depth;
 }
 
@@ -90,7 +90,7 @@ bool state::satisfies(const formula_ptr &f, const del::label_storage_ptr &l_stor
 }
 
 void state::calculate_worlds_depth() {
-    m_worlds_depth = std::vector<unsigned long long>(m_worlds_number);
+    m_worlds_depth = std::vector<unsigned long>(m_worlds_number);
     m_max_depth = 0;
 
     std::queue<world_id> to_visit;

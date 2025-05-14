@@ -56,8 +56,8 @@ namespace kripke {
         [[nodiscard]] bool is_designated(world_id w) const;
 
         [[nodiscard]] del::language_ptr get_language() const;
-        [[nodiscard]] unsigned long long get_depth(world_id w) const;
-        [[nodiscard]] unsigned long long get_max_depth() const;
+        [[nodiscard]] unsigned long get_depth(world_id w) const;
+        [[nodiscard]] unsigned long get_max_depth() const;
         [[nodiscard]] bool satisfies(const del::formula_ptr &f, const del::label_storage_ptr &l_storage) const;
 
         bool operator< (const state &rhs) const;
@@ -74,8 +74,8 @@ namespace kripke {
         label_vector m_labels;
         world_bitset m_designated_worlds;
         unsigned long long m_state_id;
-        std::vector<unsigned long long> m_worlds_depth;
-        unsigned long long m_max_depth;
+        std::vector<unsigned long> m_worlds_depth;
+        unsigned long m_max_depth;
 
         void calculate_worlds_depth();
     };

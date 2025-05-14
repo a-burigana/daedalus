@@ -25,6 +25,7 @@
 #include "../../../../../include/del/semantics/kripke/bisimulation/partition_refinement.h"
 #include "../../../../../include/del/semantics/kripke/bisimulation/bounded_contraction_builder.h"
 #include "../../../../../include/del/semantics/kripke/bisimulation/bounded_partition_refinement.h"
+#include "../../../../../include/del/semantics/kripke/bisimulation/bounded_identification.h"
 #include <algorithm>
 
 using namespace kripke;
@@ -34,32 +35,34 @@ bisimulator::contract(contraction_type type, const state &s, unsigned long k, co
     switch (type) {
         case contraction_type::full:
             return bounded_contraction_builder::calculate_standard_contraction(s, storages);
-        case contraction_type::rooted:  // todo: use min(s.get_depth, k)
+        case contraction_type::rooted:  // todo: std::min(k, s.get_max_depth()+1)
             return bounded_contraction_builder::calculate_rooted_contraction(s, k);
         case contraction_type::canonical:
             return bounded_contraction_builder::calculate_rooted_contraction(s, k, true, storages);
     }
 }
 
-bool bisimulator::are_bisimilar(const state &s, const state &t, unsigned long k) {
+bool bisimulator::are_bisimilar(const state &s, const state &t, unsigned long k, const del::storages_ptr &storages) {
     state u = disjoint_union(s, t);
+    unsigned long offset = s.get_worlds_number();
 
     auto [is_bisim, structures] = bounded_partition_refinement::do_refinement_steps(u, k);
     auto worlds_blocks = structures.worlds_blocks;
+    bool are_bisimilar, same_id;
 
     for (auto wd: s.get_designated_worlds())
         if (std::all_of(t.get_designated_worlds().begin(), t.get_designated_worlds().end(),
                     [&](world_id vd) -> bool {
                         auto block_wd = worlds_blocks[wd][k];
-                        return std::find(block_wd->begin(), block_wd->end(), s.get_worlds_number() + vd) == block_wd->end();}))
-            return false;
+                        return std::find(block_wd->begin(), block_wd->end(), offset + vd) == block_wd->end();}))
+            are_bisimilar = false;
 
     for (auto vd: t.get_designated_worlds())
         if (std::all_of(s.get_designated_worlds().begin(), s.get_designated_worlds().end(),
                         [&](world_id wd) -> bool {
-                            auto block_vd = worlds_blocks[s.get_worlds_number() + vd][k];
+                            auto block_vd = worlds_blocks[offset + vd][k];
                             return std::find(block_vd->begin(), block_vd->end(), wd) == block_vd->end();}))
-            return false;
+            are_bisimilar = false;
 /*
         for (auto vd: t.get_designated_worlds())
             if (auto block_wd = structures.worlds_blocks[wd][k],
@@ -74,7 +77,11 @@ bool bisimulator::are_bisimilar(const state &s, const state &t, unsigned long k)
                 std::find(block_vd->begin(), block_vd->end(), wd) == block_vd->end())
                 return false;*/
 
-    return true;
+    are_bisimilar = true;
+    same_id = bounded_identification::calculate_state_id(s, k, storages) == bounded_identification::calculate_state_id(t, k, storages);
+
+    assert(are_bisimilar == same_id);
+    return are_bisimilar;
 }
 
 /*std::tuple<bool, state, bpr_structures> bisimulator::resume_contraction(contraction_type type, const state &s, unsigned long k,
@@ -83,7 +90,7 @@ bool bisimulator::are_bisimilar(const state &s, const state &t, unsigned long k)
 }*/
 
 state bisimulator::disjoint_union(const kripke::state &s, const kripke::state &t) {
-    unsigned long worlds_number = s.get_worlds_number() + t.get_worlds_number();
+    unsigned long worlds_number = s.get_worlds_number() + t.get_worlds_number(), offset = s.get_worlds_number();
 
     relations r = relations(s.get_language()->get_agents_number());
 
@@ -98,10 +105,10 @@ state bisimulator::disjoint_union(const kripke::state &s, const kripke::state &t
         }
 
         for (world_id w = 0; w < t.get_worlds_number(); ++w) {
-            r[ag][s.get_worlds_number() + w] = world_bitset(worlds_number);
+            r[ag][offset + w] = world_bitset(worlds_number);
 
             for (auto v: t.get_agent_possible_worlds(ag, w))
-                r[ag][s.get_worlds_number() + w].push_back(s.get_worlds_number() + v);
+                r[ag][offset + w].push_back(offset + v);
         }
     }
 
@@ -111,7 +118,7 @@ state bisimulator::disjoint_union(const kripke::state &s, const kripke::state &t
         ls[w] = s.get_label_id(w);
 
     for (world_id w = 0; w < t.get_worlds_number(); ++w)
-        ls[s.get_worlds_number() + w] = t.get_label_id(w);
+        ls[offset + w] = t.get_label_id(w);
 
     world_bitset designated = world_bitset(worlds_number);
 
@@ -119,7 +126,7 @@ state bisimulator::disjoint_union(const kripke::state &s, const kripke::state &t
         designated.push_back(w);
 
     for (auto w : t.get_designated_worlds())
-        designated.push_back(s.get_worlds_number() + w);
+        designated.push_back(offset + w);
 
     return state{s.get_language(), worlds_number, std::move(r), std::move(ls), std::move(designated)};
 }

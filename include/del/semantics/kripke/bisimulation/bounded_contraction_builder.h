@@ -51,20 +51,20 @@ namespace kripke {
         static std::vector<world_id> calculate_max_representatives(const state &s, unsigned long k,
                                                                    const block_matrix &worlds_blocks);
 
-        static std::tuple<signature_matrix, signature_vector, signature_map, std::vector<world_id>>
-            calculate_max_signatures(const state &s, unsigned long k, const del::storages_ptr &storages);
+//        static std::tuple<signature_matrix, signature_vector, signature_map, std::vector<world_id>>
+//            calculate_max_signatures(const state &s, unsigned long k, const del::storages_ptr &storages);
 
         static world_id get_block_max_representative(const state &s, const block_ptr &block);
 
         static void update_block_max_representative(const state &s, const block_ptr &block, world_id max_representative,
                                                     boost::dynamic_bitset<> &represented, std::vector<world_id> &worlds_max_reprs);
 
-        static world_id get_max_representative_sign(const state &s, const world_bitset &worlds);
+//        static world_id get_max_representative_sign(const state &s, const world_bitset &worlds);
 
-        static void update_max_representative_sign(const state &s, unsigned long k, const world_bitset &worlds,
-                                                   world_id max_representative, boost::dynamic_bitset<> &represented,
-                                                   const signature_matrix &worlds_signatures, signature_vector &worlds_max_signs,
-                                                   std::vector<world_id> &worlds_max_reprs);
+//        static void update_max_representative_sign(const state &s, unsigned long k, const world_bitset &worlds,
+//                                                   world_id max_representative, boost::dynamic_bitset<> &represented,
+//                                                   const signature_matrix &worlds_signatures, signature_vector &worlds_max_signs,
+//                                                   std::vector<world_id> &worlds_max_reprs);
 
         static void update_to_visit_worlds(const state &s, unsigned long k, std::queue<world_id> &to_visit,
                                            world_id current, boost::dynamic_bitset<> &represented);

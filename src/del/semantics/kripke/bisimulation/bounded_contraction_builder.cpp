@@ -200,7 +200,7 @@ std::vector<world_id> bounded_contraction_builder::calculate_max_representatives
     return worlds_max_reprs;
 }
 
-std::tuple<signature_matrix, signature_vector, signature_map, std::vector<world_id>>
+/*std::tuple<signature_matrix, signature_vector, signature_map, std::vector<world_id>>
 bounded_contraction_builder::calculate_max_signatures(const state &s, unsigned long k, const del::storages_ptr &storages) {
     auto worlds_max_signs = signature_vector(s.get_worlds_number());
     auto worlds_max_reprs = std::vector<world_id>(s.get_worlds_number());
@@ -229,7 +229,7 @@ bounded_contraction_builder::calculate_max_signatures(const state &s, unsigned l
         update_to_visit_worlds(s, k, to_visit, current, represented);                                                                           // We add the next worlds to process into the to_visit queue
     }
     return {std::move(worlds_signatures), std::move(worlds_max_signs), std::move(sign_map), std::move(worlds_max_reprs)};
-}
+}*/
 
 world_id bounded_contraction_builder::get_block_max_representative(const state &s, const block_ptr &block) {
     world_id max_representative = *block->begin();
@@ -262,7 +262,7 @@ void bounded_contraction_builder::update_block_max_representative(const state &s
     return max_representative;
 }*/
 
-void bounded_contraction_builder::update_max_representative_sign(const state &s, const unsigned long k, const world_bitset &worlds,
+/*void bounded_contraction_builder::update_max_representative_sign(const state &s, const unsigned long k, const world_bitset &worlds,
                                                                  world_id max_representative, boost::dynamic_bitset<> &represented,
                                                                  const signature_matrix &worlds_signatures, signature_vector &worlds_max_signs,
                                                                  std::vector<world_id> &worlds_max_reprs) {
@@ -274,7 +274,7 @@ void bounded_contraction_builder::update_max_representative_sign(const state &s,
             represented[w] = true;
         }
     }
-}
+}*/
 
 void bounded_contraction_builder::update_to_visit_worlds(const state &s, unsigned long k, std::queue<world_id> &to_visit,
                                                          world_id current, boost::dynamic_bitset<> &represented) {

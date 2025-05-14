@@ -27,6 +27,7 @@
 #include <memory>
 #include <chrono>
 #include <deque>
+#include <queue>
 #include <list>
 #include <unordered_set>
 #include <variant>
@@ -34,8 +35,9 @@
 
 namespace search {
     class node;
-    using node_ptr   = std::shared_ptr<node>;
-    using node_deque = std::list<node_ptr>;
+    using node_ptr            = std::shared_ptr<node>;
+    using node_deque          = std::deque<node_ptr>;
+    using node_priority_queue = std::priority_queue<node_ptr>;
 
     using states_ids_set = std::unordered_set<kripke::state_id>;
     using visited_states = std::variant<states_ids_set, kripke::state_set>;

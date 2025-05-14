@@ -38,7 +38,7 @@ namespace kripke {
         static std::pair<bool, state> contract(contraction_type type, const state &s, unsigned long k,
                                                const del::storages_ptr &storages = nullptr);
 
-        static bool are_bisimilar(const state &s, const state &t, unsigned long k);
+        static bool are_bisimilar(const state &s, const state &t, unsigned long k, const del::storages_ptr &storages);
 
         /*static std::tuple<bool, state, bpr_structures> resume_contraction(contraction_type type, const state &s, unsigned long k,
                                                          bpr_structures &structures, const del::storages_ptr &storages = nullptr);*/

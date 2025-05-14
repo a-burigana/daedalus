@@ -343,7 +343,7 @@ kripke::action coin_in_the_box::build_shout(const agent ag, const agent_set &fo_
     language_ptr language = coin_in_the_box::build_language();
 
     formula_ptr announced         = std::make_shared<atom_formula>(language->get_atom_id("heads"));
-    formula_ptr D_a_announced     = std::make_shared<diamond_formula>(ag, announced);
+    formula_ptr D_a_announced     = std::make_shared<box_formula>(ag, announced);
 
     formula_deque fs = looking_agents(language, fo_ags);
     fs.push_back(D_a_announced);

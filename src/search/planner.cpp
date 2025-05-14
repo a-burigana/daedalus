@@ -200,9 +200,6 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
     kripke::action_deque to_reapply_actions;
     bool is_dead_node = true;
 
-    if (n->get_graph_depth() == 2 and n->get_id() == 44)
-        int x;
-
     for (const kripke::action_ptr &a: actions) {
         if (strategy == strategy::unbounded_search or n->get_bound() >= a->get_maximum_depth() + task.get_goal()->get_modal_depth()) {
             if (kripke::updater::is_applicable(*n->get_state(), *a, handler->get_label_storage())) {

@@ -64,7 +64,7 @@ void printer::set_out_to_file(bool out_to_file) {
     m_out_to_file = out_to_file;
 }
 
-void printer::to_string(std::ofstream &os, const kripke::state &s, const del::label_storage_ptr &l_storage) {
+void printer::to_string(std::ofstream &os, const kripke::state &s, const del::label_storage &l_storage) {
     using edges_map = std::map<std::pair<world_id, world_id>, std::vector<del::agent>>;
     const std::string font = std::string{"\"Helvetica,Arial,sans-serif\""};
 
@@ -182,7 +182,7 @@ void printer::to_string(std::ofstream &os, const kripke::state &s, const del::la
         os << "\t\t\t\t<TD>" << std::endl;
 
         for (del::atom p = 0; p < s.get_language()->get_atoms_number(); ++p) {
-            if ((*l_storage->get(s.get_label_id(w)))[p]) {
+            if ((*l_storage.get(s.get_label_id(w)))[p]) {
                 std::string_view color = "blue";        // s.get_label(w)[p] ? "blue" : "red";
                 std::string_view sep   = " ";           // p < s.get_language()->get_atoms_number() - 1 ? ", " : "";
 
@@ -202,7 +202,7 @@ void printer::to_string(std::ofstream &os, const kripke::state &s, const del::la
         << "}";
 }
 
-void printer::print_state(const kripke::state &s, const del::label_storage_ptr &l_storage, const std::string &path, const std::string &name) {
+void printer::print_state(const kripke::state &s, const del::label_storage &l_storage, const std::string &path, const std::string &name) {
     if (not std::filesystem::exists(path))
         std::filesystem::create_directories(path);
 
@@ -223,7 +223,7 @@ void printer::print_state(const kripke::state &s, const del::label_storage_ptr &
 
 void printer::print_state(const delphic::possibility_spectrum &W, const std::string &path, const std::string &name) {
     const state s = delphic_utils::convert(W);
-    print_state(s, nullptr, path, name);
+    print_state(s, del::label_storage{}, path, name);
 }
 
 void printer::print_action(const kripke::action &a, const std::string &path) {
@@ -245,15 +245,15 @@ void printer::print_action(const kripke::action &a, const std::string &path) {
     dot_file.close();
 }
 
-state_deque printer::print_states(kripke::state_deque &ss, kripke::action_deque &as, const del::storages_ptr &storages,
+state_deque printer::print_states(kripke::state_deque &ss, kripke::action_deque &as, del::storages_handler_ptr handler,
                                   const del::formula_ptr &goal, const std::string &path, const std::string &name,
                                   bool apply_contraction, kripke::contraction_type type, const unsigned long b) {
     kripke::state &s = *ss.back();
 
     if (apply_contraction)
-        s = std::get<1>(kripke::bisimulator::contract(type, s, b, storages));
+        s = std::get<1>(kripke::bisimulator::contract(type, s, b, handler));
 
-    print_state(s, storages->l_storage, path, name);
+    print_state(s, handler->get_label_storage(), path, name);
 
     if (as.empty())
         return ss;
@@ -265,21 +265,21 @@ state_deque printer::print_states(kripke::state_deque &ss, kripke::action_deque 
         return ss;
     }
 
-    if (not kripke::updater::is_applicable(s, a, storages->l_storage)) {
+    if (not kripke::updater::is_applicable(s, a, handler->get_label_storage())) {
         std::cout << "Action '" << a.get_name() << "' is not applicable" << std::endl;
         return ss;
     }
 
-    kripke::state s_ = kripke::updater::product_update(s, a, storages->l_storage);
+    kripke::state s_ = kripke::updater::product_update(s, a, handler->get_label_storage());
 
-    if (s_.satisfies(goal, storages->l_storage))
+    if (s_.satisfies(goal, handler->get_label_storage()))
         std::cout << "Goal found after applying '" << a.get_name() << "'" << std::endl;
 
     std::string new_name = name + "_" + a.get_name();
     ss.emplace_back(std::make_shared<kripke::state>(std::move(s_)));
     as.pop_front();
 
-    return print_states(ss, as, storages, goal, path, new_name, apply_contraction, type, b - a.get_maximum_depth());
+    return print_states(ss, as, handler, goal, path, new_name, apply_contraction, type, b - a.get_maximum_depth());
 }
 
 void
@@ -294,7 +294,7 @@ printer::print_states(const delphic::possibility_spectrum_ptr &W, const delphic:
     auto W_ = delphic::union_updater::update(W, as.front());
     std::string new_name = name + "_" + as.front()->get_name();
 
-    print_state(delphic::delphic_utils::convert(*W_), nullptr,  path, new_name);
+    print_state(delphic::delphic_utils::convert(*W_), del::label_storage{}, path, new_name);
     delphic::action_deque as_ = as;
     as_.pop_front();
 
@@ -319,16 +319,16 @@ void printer::print_states(const search::delphic_planning_task &task, const delp
 //    print_states(task.get_initial_state(), as, path, "W0");
 }
 
-void printer::print_task(const search::planning_task &task, const del::storages_ptr &storages, const std::string &path) {
+void printer::print_task(const search::planning_task &task, del::storages_handler_ptr handler, const std::string &path) {
     std::string task_path = path + task.get_domain_name() + "/" + task.get_problem_id() + "/";
 
-    print_state(*task.get_initial_state(), storages->l_storage, task_path + "initial_state/", "s0");
+    print_state(*task.get_initial_state(), handler->get_label_storage(), task_path + "initial_state/", "s0");
 
     for (const action_ptr &a : task.get_actions())
         printer::print_action(*a,task_path + "actions/");
 }
 
-void printer::print_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, const del::storages_ptr &storages, const std::string &out_path) {
+void printer::print_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, del::storages_handler_ptr handler, const std::string &out_path) {
     std::string out_task_path =
             out_path + "search/" + task.get_domain_name() + "/problem_" + task.get_problem_id() + "/";
     std::string strategy_str = strategy == search::strategy::unbounded_search
@@ -336,7 +336,7 @@ void printer::print_results(const search::planning_task &task, search::strategy 
                                : "iter_bounded/";
 
     printer search_printer(true, out_task_path + strategy_str, "search_tree.txt");
-    search::node_deque path = search::planner::search(task, strategy, contraction_type, storages,
+    search::node_deque path = search::planner::search(task, strategy, contraction_type, handler,
                                                       std::make_unique<printer>(std::move(search_printer))).first;
     std::string state_name = "s0";
 
@@ -345,7 +345,7 @@ void printer::print_results(const search::planning_task &task, search::strategy 
             state_name += "_" + node->get_action()->get_name();
 
         if (not out_path.empty())
-            daedalus::tester::printer::print_state(*node->get_state(), storages->l_storage, out_task_path + strategy_str, state_name);
+            daedalus::tester::printer::print_state(*node->get_state(), handler->get_label_storage(), out_task_path + strategy_str, state_name);
     }
 }
 
@@ -388,8 +388,8 @@ void printer::print_domain_info(const search::planning_task &task, std::ofstream
         << goal_depth << ";";
 }
 
-void printer::print_time_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, const del::storages_ptr &storages, std::ofstream &table) {
-    const auto &[_, stats] = search::planner::search(task, strategy, contraction_type, storages);
+void printer::print_time_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, del::storages_handler_ptr handler, std::ofstream &table) {
+    const auto &[_, stats] = search::planner::search(task, strategy, contraction_type, handler);
 
     if (strategy == search::strategy::iterative_bounded_search)
         table << std::to_string(stats.m_plan_bound) << ";";

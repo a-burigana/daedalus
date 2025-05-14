@@ -35,11 +35,13 @@ namespace daedalus::tester {
         static std::string get_name();
 
         static del::language_ptr build_language(unsigned long agents_no, unsigned long secrets_no);
-        static kripke::state build_initial_state(unsigned long agents_no, unsigned long secrets_no, const del::label_storage_ptr &l_storage);
+        static kripke::state build_initial_state(unsigned long agents_no, unsigned long secrets_no, del::label_storage &l_storage);
 
         static kripke::action_deque build_actions(unsigned long agents_no, unsigned long secrets_no);
-        static search::planning_task build_task(unsigned long agents_no, unsigned long secrets_no, unsigned long learning_ags_no, const del::label_storage_ptr &l_storage);
-        static std::vector<search::planning_task> build_tasks(const del::label_storage_ptr &l_storage);
+        static search::planning_task build_task(unsigned long agents_no, unsigned long secrets_no, unsigned long learning_ags_no, del::label_storage &l_storage);
+        static std::vector<search::planning_task> build_tasks(del::label_storage &l_storage);
+
+        static void write_ma_star_problem(unsigned long agents_no, unsigned long secrets_no, unsigned long learning_ags_no, del::label_storage &l_storage);
 
     private:
         static kripke::action build_tell(unsigned long agents_no, unsigned long secrets_no, del::agent ag_1,

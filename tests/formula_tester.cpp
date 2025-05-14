@@ -35,7 +35,7 @@
 using namespace daedalus::tester;
 using namespace kripke;
 
-void formula_tester::test_CB_1(const del::label_storage_ptr &l_storage) {
+void formula_tester::test_CB_1(del::label_storage &l_storage) {
     const state s = coin_in_the_box::build_initial_state(l_storage);
     const del::language_ptr l = s.get_language();
 
@@ -52,7 +52,7 @@ void formula_tester::test_CB_1(const del::label_storage_ptr &l_storage) {
 //    assert(not f->holds_in(s, 1));
 }
 
-void formula_tester::test_CB_2(const del::label_storage_ptr &l_storage) {
+void formula_tester::test_CB_2(del::label_storage &l_storage) {
     const state s = coin_in_the_box::build_initial_state(l_storage);
     const del::language_ptr l = s.get_language();
     const del::agent a = l->get_agent_id("a");
@@ -68,7 +68,7 @@ void formula_tester::test_CB_2(const del::label_storage_ptr &l_storage) {
 //    assert(K_a_not_opened->holds_in(s, 1));
 }
 
-void formula_tester::test_CB_3(const del::label_storage_ptr &l_storage) {
+void formula_tester::test_CB_3(del::label_storage &l_storage) {
     const state s = coin_in_the_box::build_initial_state(l_storage);
     const del::language_ptr l = s.get_language();
     const del::agent a = l->get_agent_id("a"), b = l->get_agent_id("b"), c = l->get_agent_id("c");

@@ -30,7 +30,7 @@ using namespace daedalus::tester;
 using namespace del;
 using namespace kripke;
 
-state state_builder::build_test_state1(const del::label_storage_ptr &l_storage) {
+state state_builder::build_test_state1(del::label_storage &l_storage) {
     language_ptr language = language_builder::build_language1();
     const agent a = language->get_agent_id("a");
     unsigned long atoms_number = language->get_atoms_number();
@@ -67,18 +67,18 @@ state state_builder::build_test_state1(const del::label_storage_ptr &l_storage) 
     r[a][w6] = world_bitset(worlds_number);
 
     label_vector v = label_vector{worlds_number};
-    v[w0] = l_storage->emplace(label{bs0});
-    v[w1] = l_storage->emplace(label{bs0});
-    v[w2] = l_storage->emplace(label{bs0});
-    v[w3] = l_storage->emplace(label{bs1});
-    v[w4] = l_storage->emplace(label{bs1});
-    v[w5] = l_storage->emplace(label{bs1});
-    v[w6] = l_storage->emplace(label{bs2});
+    v[w0] = l_storage.emplace(label{bs0});
+    v[w1] = l_storage.emplace(label{bs0});
+    v[w2] = l_storage.emplace(label{bs0});
+    v[w3] = l_storage.emplace(label{bs1});
+    v[w4] = l_storage.emplace(label{bs1});
+    v[w5] = l_storage.emplace(label{bs1});
+    v[w6] = l_storage.emplace(label{bs2});
 
     return state{language, worlds_number, std::move(r), std::move(v), world_bitset{worlds_number, world_set{w0}}};
 }
 
-state state_builder::build_singleton(bool has_loop, const del::label_storage_ptr &l_storage) {
+state state_builder::build_singleton(bool has_loop, del::label_storage &l_storage) {
     language_ptr language = language_builder::build_language3();
     const agent a = language->get_agent_id("a");
 
@@ -101,12 +101,12 @@ state state_builder::build_singleton(bool has_loop, const del::label_storage_ptr
         r[a][0] = world_bitset{worlds_number, world_set{0}};
 
     label_vector v = label_vector{worlds_number};
-    v[0] = l_storage->emplace(label{std::move(bs0)});
+    v[0] = l_storage.emplace(label{std::move(bs0)});
 
     return state{language, worlds_number, std::move(r), std::move(v), world_bitset{worlds_number, world_set{0}}};
 }
 
-state state_builder::build_chain(unsigned long length, const del::label_storage_ptr &l_storage, bool has_final_loop, bool all_designated) {
+state state_builder::build_chain(unsigned long length, del::label_storage &l_storage, bool has_final_loop, bool all_designated) {
     language_ptr language = language_builder::build_language2();
     agent ag_number = language->get_agents_number();
     atom atom_number = language->get_atoms_number();
@@ -135,7 +135,7 @@ state state_builder::build_chain(unsigned long length, const del::label_storage_
         else if (w < worlds_number - 1)
             r[w % ag_number][w].push_back(w+1);                     // = block{w + 1};
 
-        v[w] = l_storage->emplace(label{bs0});
+        v[w] = l_storage.emplace(label{bs0});
     }
 
     world_set designated_worlds = {0};
@@ -147,7 +147,7 @@ state state_builder::build_chain(unsigned long length, const del::label_storage_
     return state{language, worlds_number, std::move(r), std::move(v), world_bitset{worlds_number, std::move(designated_worlds)}};
 }
 
-state state_builder::build_k_tree(const unsigned long k, const del::label_storage_ptr &l_storage) {
+state state_builder::build_k_tree(const unsigned long k, del::label_storage &l_storage) {
     language_ptr language = language_builder::build_language3();
     const agent a = language->get_agent_id("a");
 
@@ -187,7 +187,7 @@ state state_builder::build_k_tree(const unsigned long k, const del::label_storag
             for (const auto& t_ : t.children)
                 r[0][t.w].push_back(t_->w);
 
-            v[t.w] = l_storage->emplace(label{bs0});
+            v[t.w] = l_storage.emplace(label{bs0});
             return t;
         };
         build_tree_helper(k_);

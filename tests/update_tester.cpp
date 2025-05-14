@@ -36,7 +36,7 @@
 using namespace daedalus::tester;
 using namespace kripke;
 
-state update_tester::test_CB_1(const std::string &out_path, const del::label_storage_ptr &l_storage, bool print) {
+state update_tester::test_CB_1(const std::string &out_path, del::label_storage &l_storage, bool print) {
     std::string cb_dir = "coin_in_the_box/";
 
     state s0 = coin_in_the_box::build_initial_state(l_storage);
@@ -51,7 +51,7 @@ state update_tester::test_CB_1(const std::string &out_path, const del::label_sto
     return s_cb_heads;
 }
 
-state update_tester::test_CB_2(const std::string &out_path, const del::label_storage_ptr &l_storage, bool print) {
+state update_tester::test_CB_2(const std::string &out_path, del::label_storage &l_storage, bool print) {
     std::string cb_dir = "coin_in_the_box/";
 
     state s0 = coin_in_the_box::build_initial_state(l_storage);
@@ -76,7 +76,7 @@ state update_tester::test_CB_2(const std::string &out_path, const del::label_sto
     return s_cb_open;
 }
 
-state update_tester::test_CB_3(const std::string &out_path, const del::label_storage_ptr &l_storage, bool print) {
+state update_tester::test_CB_3(const std::string &out_path, del::label_storage &l_storage, bool print) {
     std::string cb_dir = "coin_in_the_box/";
 
     state s_open = daedalus::tester::update_tester::test_CB_2(out_path, l_storage, false);

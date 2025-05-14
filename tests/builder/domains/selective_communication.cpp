@@ -58,7 +58,7 @@ del::language_ptr selective_communication::build_language(const unsigned long ag
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-kripke::state selective_communication::build_initial_state(unsigned long agents_no, unsigned long rooms_no, const label_storage_ptr &l_storage) {
+kripke::state selective_communication::build_initial_state(unsigned long agents_no, unsigned long rooms_no, label_storage &l_storage) {
     language_ptr language = selective_communication::build_language(agents_no, rooms_no);
 
     const world_id worlds_number = 2;
@@ -92,8 +92,8 @@ kripke::state selective_communication::build_initial_state(unsigned long agents_
     }
 
     label l0 = label{std::move(b0)}, l1 = label{std::move(b1)};
-    ls[0] = l_storage->emplace(std::move(l0));
-    ls[1] = l_storage->emplace(std::move(l1));
+    ls[0] = l_storage.emplace(std::move(l0));
+    ls[1] = l_storage.emplace(std::move(l1));
 
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
 }
@@ -185,7 +185,7 @@ del::formula_ptr selective_communication::build_goal(const language_ptr &languag
     return goal;
 }
 
-search::planning_task selective_communication::build_task(unsigned long agents_no, unsigned long rooms_no, unsigned long goal_id, const del::label_storage_ptr &l_storage) {
+search::planning_task selective_communication::build_task(unsigned long agents_no, unsigned long rooms_no, unsigned long goal_id, del::label_storage &l_storage) {
     std::string name = selective_communication::get_name();
     std::string id = std::to_string(agents_no) + "_" + std::to_string(rooms_no) + "_g" + std::to_string(goal_id);
 
@@ -198,7 +198,7 @@ search::planning_task selective_communication::build_task(unsigned long agents_n
     return search::planning_task{std::move(name), std::move(id), language, std::move(s0), std::move(actions), std::move(goal)};
 }
 
-std::vector<search::planning_task> selective_communication::build_tasks(const del::label_storage_ptr &l_storage) {
+std::vector<search::planning_task> selective_communication::build_tasks(del::label_storage &l_storage) {
     const unsigned long N_MIN_AGS = 2, N_MAX_AGS = 3, N_MIN_ROOMS = 5, N_MAX_ROOMS = 5, MIN_GOAL_ID = 3, MAX_GOAL_ID = 4;
     std::vector<search::planning_task> tasks;
 

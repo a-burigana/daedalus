@@ -50,7 +50,7 @@ del::language_ptr coin_in_the_box::build_language() {
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-kripke::state coin_in_the_box::build_initial_state(const label_storage_ptr &l_storage) {
+kripke::state coin_in_the_box::build_initial_state(label_storage &l_storage) {
     language_ptr language = coin_in_the_box::build_language();
 
     const world_id worlds_number = 2;
@@ -79,8 +79,8 @@ kripke::state coin_in_the_box::build_initial_state(const label_storage_ptr &l_st
     b1.set(language->get_atom_id("looking_a"));
 
     label l0 = label{std::move(b0)}, l1 = label{std::move(b1)};
-    ls[0] = l_storage->emplace(std::move(l0));
-    ls[1] = l_storage->emplace(std::move(l1));
+    ls[0] = l_storage.emplace(std::move(l0));
+    ls[1] = l_storage.emplace(std::move(l1));
 
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
 }
@@ -117,7 +117,7 @@ kripke::action_deque coin_in_the_box::build_actions() {
     return actions;
 }
 
-search::planning_task coin_in_the_box::build_task(unsigned long id, const label_storage_ptr &l_storage) {
+search::planning_task coin_in_the_box::build_task(unsigned long id, label_storage &l_storage) {
     if (id == 1) return build_task_1(l_storage);
     else if (id == 2) return build_task_2(l_storage);
     else if (id == 3) return build_task_3(l_storage);
@@ -127,7 +127,7 @@ search::planning_task coin_in_the_box::build_task(unsigned long id, const label_
     return build_task_1(l_storage);
 }
 
-std::vector<search::planning_task> coin_in_the_box::build_tasks(const label_storage_ptr &l_storage) {
+std::vector<search::planning_task> coin_in_the_box::build_tasks(label_storage &l_storage) {
     const unsigned long N_TASKS = 5;
     std::vector<search::planning_task> tasks;
     tasks.reserve(N_TASKS);
@@ -138,7 +138,7 @@ std::vector<search::planning_task> coin_in_the_box::build_tasks(const label_stor
     return tasks;
 }
 
-search::planning_task coin_in_the_box::build_task_1(const label_storage_ptr &l_storage) {
+search::planning_task coin_in_the_box::build_task_1(label_storage &l_storage) {
     std::string domain_name = coin_in_the_box::get_name();
     unsigned long problem_id = 1;
 
@@ -152,7 +152,7 @@ search::planning_task coin_in_the_box::build_task_1(const label_storage_ptr &l_s
     return search::planning_task{std::move(domain_name), "cb_" + std::to_string(problem_id), language, std::move(s0), std::move(actions), std::move(B_a_heads)};
 }
 
-search::planning_task coin_in_the_box::build_task_2(const label_storage_ptr &l_storage) {
+search::planning_task coin_in_the_box::build_task_2(label_storage &l_storage) {
     std::string domain_name = coin_in_the_box::get_name();
     unsigned long problem_id = 2;
 
@@ -166,7 +166,7 @@ search::planning_task coin_in_the_box::build_task_2(const label_storage_ptr &l_s
     return search::planning_task{std::move(domain_name), "cb_" + std::to_string(problem_id), language, std::move(s0), std::move(actions), std::move(B_b_heads)};
 }
 
-search::planning_task coin_in_the_box::build_task_3(const label_storage_ptr &l_storage) {
+search::planning_task coin_in_the_box::build_task_3(label_storage &l_storage) {
     std::string domain_name = coin_in_the_box::get_name();
     unsigned long problem_id = 3;
 
@@ -185,7 +185,7 @@ search::planning_task coin_in_the_box::build_task_3(const label_storage_ptr &l_s
     return search::planning_task{std::move(domain_name), "cb_" + std::to_string(problem_id), language, std::move(s0), std::move(actions), std::move(goal)};
 }
 
-search::planning_task coin_in_the_box::build_task_4(const label_storage_ptr &l_storage) {
+search::planning_task coin_in_the_box::build_task_4(label_storage &l_storage) {
     std::string domain_name = coin_in_the_box::get_name();
     unsigned long problem_id = 4;
 
@@ -218,7 +218,7 @@ search::planning_task coin_in_the_box::build_task_4(const label_storage_ptr &l_s
     return search::planning_task{std::move(domain_name), "cb_" + std::to_string(problem_id), language, std::move(s0), std::move(actions), std::move(goal)};
 }
 
-search::planning_task coin_in_the_box::build_task_5(const label_storage_ptr &l_storage) {
+search::planning_task coin_in_the_box::build_task_5(label_storage &l_storage) {
     std::string domain_name = coin_in_the_box::get_name();
     unsigned long problem_id = 5;
 
@@ -249,7 +249,7 @@ search::planning_task coin_in_the_box::build_task_5(const label_storage_ptr &l_s
     return search::planning_task{std::move(domain_name), "cb_" + std::to_string(problem_id), language, std::move(s0), std::move(actions), std::move(goal)};
 }
 
-search::planning_task coin_in_the_box::build_task_6(const label_storage_ptr &l_storage) {
+search::planning_task coin_in_the_box::build_task_6(label_storage &l_storage) {
     std::string domain_name = coin_in_the_box::get_name();
     unsigned long problem_id = 6;
 

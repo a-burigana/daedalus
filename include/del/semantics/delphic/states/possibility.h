@@ -37,7 +37,7 @@
 namespace delphic {
     class possibility {
     public:
-        possibility(del::language_ptr language, del::storages_ptr storages,
+        possibility(del::language_ptr language, del::storages_handler_ptr handler,
                     label_id label, agents_information_state state, unsigned long bound = 0,
                     std::optional<unsigned long> world = std::nullopt);
 
@@ -61,7 +61,7 @@ namespace delphic {
 
         void set_information_state(del::agent ag, information_state_id &is);
 
-        [[nodiscard]] bool satisfies(const del::formula_ptr &f, const del::storages_ptr &storages) const;
+        [[nodiscard]] bool satisfies(const del::formula_ptr &f, del::storages_handler_ptr handler) const;
 
         bool operator< (const possibility &rhs) const;
         bool operator> (const possibility &rhs) const;
@@ -72,7 +72,7 @@ namespace delphic {
 
     private:
         del::language_ptr m_language;
-        del::storages_ptr m_storages;
+        del::storages_handler_ptr m_handler;
 
         label_id m_label;
         agents_information_state m_information_state;

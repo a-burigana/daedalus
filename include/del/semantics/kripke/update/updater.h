@@ -47,10 +47,10 @@ namespace kripke {
             bool operator!=(const updated_world &rhs) const { return !(rhs == *this); }
         };
 
-        static bool is_applicable(const state &s, const action &a, const del::label_storage_ptr &l_storage);
-        static state product_update(const state &s, const action &a, const del::label_storage_ptr &l_storage);
+        static bool is_applicable(const state &s, const action &a, const del::label_storage &l_storage);
+        static state product_update(const state &s, const action &a, del::label_storage &l_storage);
 
-        static state product_update(const state &s, const action_deque &as, const del::storages_ptr &storage,
+        static state product_update(const state &s, const action_deque &as, del::storages_handler_ptr handler,
                                     bool apply_contraction = false, contraction_type type = contraction_type::full,
                                     unsigned long k = 0);
 
@@ -60,19 +60,19 @@ namespace kripke {
         using updated_world_pair_deque = std::deque<updated_world_pair>;
         using updated_edges_vector     = std::vector<updated_world_pair_deque>;
 
-        static bool is_applicable_world(const state &s, const action &a, world_id wd, const del::label_storage_ptr &l_storage);
+        static bool is_applicable_world(const state &s, const action &a, world_id wd, const del::label_storage &l_storage);
 
         static std::pair<world_id, world_bitset> calculate_worlds(const state &s, const action &a, updated_worlds_map &w_map,
-                                                                  updated_edges_vector &r_map, const del::label_storage_ptr &l_storage);
+                                                                  updated_edges_vector &r_map, del::label_storage &l_storage);
 
         static relations calculate_relations(const state &s, const action &a, world_id worlds_number,
                                              const updated_worlds_map &w_map, const updated_edges_vector &r_map);
 
         static label_vector calculate_labels(const state &s, const action &a, world_id worlds_number,
-                                             const updated_worlds_map &w_map, const del::label_storage_ptr &l_storage);
+                                             const updated_worlds_map &w_map, del::label_storage &l_storage);
 
         static label_id update_world(const state &s, const world_id &w, const action &a, const event_id &e,
-                                     const del::label_storage_ptr &l_storage);
+                                     del::label_storage &l_storage);
     };
 }
 

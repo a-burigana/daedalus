@@ -27,24 +27,24 @@
 #include <memory>
 #include <queue>
 #include "bounded_bisimulation_types.h"
-#include "../../../../utils/storage.h"
+#include "../../../../utils/storages_handler.h"
 #include "../states/states_types.h"
 
 namespace kripke {
     class bounded_identification {
     public:
-        static std::pair<signature_matrix, signature_map>
-        calculate_signatures(const state &s, unsigned long k, const del::storages_ptr &storages);
+//        static std::pair<signature_matrix, signature_map>
+//        calculate_signatures(const state &s, unsigned long k, del::storages_handler_ptr handler);
 
-        static information_state_id calculate_state_id(const state &s, unsigned long k, const del::storages_ptr &storages);
+        static information_state_id calculate_state_id(const state &s, unsigned long k, del::storages_handler_ptr &handler);
 
-        static unsigned long long calculate_world_signature(const state &s, unsigned long k, world_id x, unsigned long h,
-                                                            const del::storages_ptr &storages, signature_matrix &worlds_signatures);
+        static signature_id calculate_world_signature(const state &s, world_id x, unsigned long h,
+                                                      del::storages_handler_ptr &handler, signature_matrix &worlds_signatures);
 
     private:
-        static void calculate_world_signature(const state &s, unsigned long k, world_id x, unsigned long h,
-                                              const del::storages_ptr &storages, signature_matrix &worlds_signatures,
-                                              signature_map &sign_map);
+//        static void calculate_world_signature(const state &s, unsigned long k, world_id x, unsigned long h,
+//                                              del::storages_handler_ptr handler, signature_matrix &worlds_signatures,
+//                                              signature_map &sign_map);
     };
 }
 

@@ -56,14 +56,14 @@ namespace daedalus::tester {
         [[nodiscard]] std::ostream &out();
         void set_out_to_file(bool out_to_file);
 
-        static void to_string(std::ofstream &os, const state &s, const del::label_storage_ptr &l_storage);
+        static void to_string(std::ofstream &os, const state &s, const del::label_storage &l_storage);
 
-        static void print_state(const state &s, const del::label_storage_ptr &l_storages, const std::string &path, const std::string &name);
+        static void print_state(const state &s, const del::label_storage &l_storages, const std::string &path, const std::string &name);
         static void print_state(const delphic::possibility_spectrum &W, const std::string &path, const std::string &name);
 
         static void print_action(const action &a, const std::string &path);
 
-        static state_deque print_states(state_deque &ss, kripke::action_deque &as, const del::storages_ptr &storages,
+        static state_deque print_states(state_deque &ss, kripke::action_deque &as, del::storages_handler_ptr handler,
                                         const del::formula_ptr &goal, const std::string &path, const std::string &name,
                                         bool apply_contraction = false, contraction_type type = contraction_type::full,
                                         unsigned long b = 0);
@@ -77,13 +77,13 @@ namespace daedalus::tester {
 
         static void print_states(const search::delphic_planning_task &task, const delphic::action_deque &as, const std::string &path);
 
-        static void print_task(const search::planning_task &task, const del::storages_ptr &storages, const std::string &path);
+        static void print_task(const search::planning_task &task, del::storages_handler_ptr handler, const std::string &path);
 
-        static void print_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, const del::storages_ptr &storages, const std::string &out_path);
+        static void print_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, del::storages_handler_ptr handler, const std::string &out_path);
         static void print_delphic_results(const search::delphic_planning_task &task, search::strategy strategy, const std::string &out_path);
 
         static void print_domain_info(const search::planning_task &task, std::ofstream &table);
-        static void print_time_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, const del::storages_ptr &storages, std::ofstream &table);
+        static void print_time_results(const search::planning_task &task, search::strategy strategy, contraction_type contraction_type, del::storages_handler_ptr handler, std::ofstream &table);
         static void print_delphic_time_results(const search::delphic_planning_task &task, search::strategy strategy, std::ofstream &table);
 
     private:

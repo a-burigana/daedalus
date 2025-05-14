@@ -34,11 +34,11 @@ public:
     static std::string get_id(unsigned long agents_no, unsigned long steps_no);
 
     static del::language_ptr build_language(unsigned long agents_no, unsigned long steps_no);
-    static kripke::state build_initial_state(unsigned long agents_no, unsigned long steps_no, const del::label_storage_ptr &l_storage);
+    static kripke::state build_initial_state(unsigned long agents_no, unsigned long steps_no, del::label_storage &l_storage);
 
     static kripke::action_deque build_actions(unsigned long agents_no, unsigned long steps_no);
-    static search::planning_task build_task(unsigned long agents_no, unsigned long steps_no, const del::label_storage_ptr &l_storage);
-    static std::vector<search::planning_task> build_tasks(const del::label_storage_ptr &l_storage);
+    static search::planning_task build_task(unsigned long agents_no, unsigned long steps_no, del::label_storage &l_storage);
+    static std::vector<search::planning_task> build_tasks(del::label_storage &l_storage);
 
 private:
     static kripke::action build_move(unsigned long agents_no, unsigned long steps_no, del::agent ag);

@@ -31,61 +31,43 @@
 using namespace kripke;
 
 std::pair<bool, state>
-bisimulator::contract(contraction_type type, const state &s, unsigned long k, const del::storages_ptr &storages) {
+bisimulator::contract(contraction_type type, const state &s, unsigned long k, del::storages_handler_ptr handler) {
     switch (type) {
         case contraction_type::full:
-            return bounded_contraction_builder::calculate_standard_contraction(s, storages);
+            return bounded_contraction_builder::calculate_standard_contraction(s, handler);
         case contraction_type::rooted:  // todo: std::min(k, s.get_max_depth()+1)
             return bounded_contraction_builder::calculate_rooted_contraction(s, k);
         case contraction_type::canonical:
-            return bounded_contraction_builder::calculate_rooted_contraction(s, k, true, storages);
+            return bounded_contraction_builder::calculate_rooted_contraction(s, k, true, handler);
     }
 }
 
-bool bisimulator::are_bisimilar(const state &s, const state &t, unsigned long k, const del::storages_ptr &storages) {
+bool bisimulator::are_bisimilar(const state &s, const state &t, unsigned long k, del::storages_handler_ptr handler) {
     state u = disjoint_union(s, t);
     unsigned long offset = s.get_worlds_number();
 
     auto [is_bisim, structures] = bounded_partition_refinement::do_refinement_steps(u, k);
     auto worlds_blocks = structures.worlds_blocks;
-    bool are_bisimilar, same_id;
 
     for (auto wd: s.get_designated_worlds())
         if (std::all_of(t.get_designated_worlds().begin(), t.get_designated_worlds().end(),
                     [&](world_id vd) -> bool {
                         auto block_wd = worlds_blocks[wd][k];
                         return std::find(block_wd->begin(), block_wd->end(), offset + vd) == block_wd->end();}))
-            are_bisimilar = false;
+            return false;
 
     for (auto vd: t.get_designated_worlds())
         if (std::all_of(s.get_designated_worlds().begin(), s.get_designated_worlds().end(),
                         [&](world_id wd) -> bool {
                             auto block_vd = worlds_blocks[offset + vd][k];
                             return std::find(block_vd->begin(), block_vd->end(), wd) == block_vd->end();}))
-            are_bisimilar = false;
-/*
-        for (auto vd: t.get_designated_worlds())
-            if (auto block_wd = structures.worlds_blocks[wd][k],
-                     block_vd = structures.worlds_blocks[s.get_worlds_number() + vd][k];
-                std::find(block_wd->begin(), block_wd->end(), s.get_worlds_number() + vd) == block_wd->end())
-                return false;
+            return false;
 
-    for (auto vd: t.get_designated_worlds())
-        for (auto wd: s.get_designated_worlds())
-            if (auto block_wd = structures.worlds_blocks[wd][k],
-                     block_vd = structures.worlds_blocks[s.get_worlds_number() + vd][k];
-                std::find(block_vd->begin(), block_vd->end(), wd) == block_vd->end())
-                return false;*/
-
-    are_bisimilar = true;
-    same_id = bounded_identification::calculate_state_id(s, k, storages) == bounded_identification::calculate_state_id(t, k, storages);
-
-    assert(are_bisimilar == same_id);
-    return are_bisimilar;
+    return true;
 }
 
 /*std::tuple<bool, state, bpr_structures> bisimulator::resume_contraction(contraction_type type, const state &s, unsigned long k,
-                                                       bpr_structures &structures, const del::storages_ptr &storages) {
+                                                       bpr_structures &structures, del::storages_handler_ptr handler) {
     return bounded_contraction_builder::update_rooted_contraction(s, k, structures, type == contraction_type::canonical, storages);
 }*/
 

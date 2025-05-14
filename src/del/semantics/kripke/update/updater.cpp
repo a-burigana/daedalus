@@ -31,29 +31,29 @@
 
 using namespace kripke;
 
-bool updater::is_applicable(const state &s, const action &a, const del::label_storage_ptr &l_storage) {
+bool updater::is_applicable(const state &s, const action &a, const del::label_storage &l_storage) {
     const auto check = [&](const world_id wd) { return is_applicable_world(s, a, wd, l_storage); };
     return std::all_of(s.get_designated_worlds().begin(), s.get_designated_worlds().end(), check);
 }
 
-bool updater::is_applicable_world(const state &s, const action &a, const world_id wd, const del::label_storage_ptr &l_storage) {
+bool updater::is_applicable_world(const state &s, const action &a, const world_id wd, const del::label_storage &l_storage) {
     const auto check = [&](const event_id ed) { return model_checker::holds_in(s, wd, *a.get_precondition(ed), l_storage); };
     return std::any_of(a.get_designated_events().begin(), a.get_designated_events().end(), check);
 }
 
-state updater::product_update(const state &s, const action_deque &as, const del::storages_ptr &storages,
+state updater::product_update(const state &s, const action_deque &as, del::storages_handler_ptr handler,
                               bool apply_contraction, contraction_type type, const unsigned long k) {
-    state s_ = product_update(s, *as.front(), storages->l_storage);
+    state s_ = product_update(s, *as.front(), handler->get_label_storage());
 
     if (apply_contraction)
-        s_ = std::get<1>(bisimulator::contract(type, s_, k, storages));
+        s_ = std::get<1>(bisimulator::contract(type, s_, k, handler));
 
     action_deque as_ = as;
     as_.pop_front();
-    return as_.empty() ? std::move(s_) : product_update(s_, as_, storages, apply_contraction, type, k);
+    return as_.empty() ? std::move(s_) : product_update(s_, as_, handler, apply_contraction, type, k);
 }
 
-state updater::product_update(const state &s, const action &a, const del::label_storage_ptr &l_storage) {
+state updater::product_update(const state &s, const action &a, del::label_storage &l_storage) {
     updated_worlds_map w_map;
     updated_edges_vector r_map(s.get_language()->get_agents_number());
 
@@ -65,7 +65,7 @@ state updater::product_update(const state &s, const action &a, const del::label_
 }
 
 std::pair<world_id, world_bitset> updater::calculate_worlds(const state &s, const action &a, updated_worlds_map &w_map,
-                                                            updated_edges_vector &r_map, const del::label_storage_ptr &l_storage) {
+                                                            updated_edges_vector &r_map, del::label_storage &l_storage) {
     world_id worlds_number = 0;
     world_set designated_worlds;
 
@@ -134,7 +134,7 @@ relations updater::calculate_relations(const state &s, const action &a, const wo
 }
 
 label_vector updater::calculate_labels(const state &s, const action &a, const world_id worlds_number,
-                                       const updated_worlds_map &w_map, const del::label_storage_ptr &l_storage) {
+                                       const updated_worlds_map &w_map, del::label_storage &l_storage) {
     label_vector labels = label_vector(worlds_number);
 
     for (const auto &[w_, w_id] : w_map) {
@@ -145,11 +145,11 @@ label_vector updater::calculate_labels(const state &s, const action &a, const wo
 }
 
 label_id updater::update_world(const state &s, const world_id &w, const action &a, const event_id &e,
-                               const del::label_storage_ptr &l_storage) {
-    auto bitset = l_storage->get(s.get_label_id(w))->get_bitset();
+                               del::label_storage &l_storage) {
+    auto bitset = l_storage.get(s.get_label_id(w))->get_bitset();
 
     for (const auto &[p, post] : a.get_postconditions(e))
         bitset[p] = model_checker::holds_in(s, w, *post, l_storage);
 
-    return l_storage->emplace(del::label{std::move(bitset)});
+    return l_storage.emplace(del::label{std::move(bitset)});
 }

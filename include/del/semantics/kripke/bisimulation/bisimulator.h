@@ -27,7 +27,7 @@
 #include <utility>
 #include "../../../language/language.h"
 #include "bounded_bisimulation_types.h"
-#include "../../../../utils/storage_types.h"
+#include "../../../../utils/storages_handler.h"
 #include "../states/state.h"
 #include "bisimulation_types.h"
 #include "../../../../search/search_types.h"
@@ -36,12 +36,12 @@ namespace kripke {
     class bisimulator {
     public:
         static std::pair<bool, state> contract(contraction_type type, const state &s, unsigned long k,
-                                               const del::storages_ptr &storages = nullptr);
+                                               del::storages_handler_ptr handler = nullptr);
 
-        static bool are_bisimilar(const state &s, const state &t, unsigned long k, const del::storages_ptr &storages);
+        static bool are_bisimilar(const state &s, const state &t, unsigned long k, del::storages_handler_ptr handler);
 
         /*static std::tuple<bool, state, bpr_structures> resume_contraction(contraction_type type, const state &s, unsigned long k,
-                                                         bpr_structures &structures, const del::storages_ptr &storages = nullptr);*/
+                                                         bpr_structures &structures, del::storages_handler_ptr handler = nullptr);*/
 
     private:
         static state disjoint_union(const state &s, const state &t);

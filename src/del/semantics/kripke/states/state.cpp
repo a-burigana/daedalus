@@ -84,7 +84,7 @@ unsigned long state::get_max_depth() const {
     return m_max_depth;
 }
 
-bool state::satisfies(const formula_ptr &f, const del::label_storage_ptr &l_storage) const {
+bool state::satisfies(const formula_ptr &f, const del::label_storage &l_storage) const {
     return std::all_of(m_designated_worlds.begin(), m_designated_worlds.end(),
                        [&](const world_id wd) { return model_checker::holds_in(*this, wd, *f, l_storage); });
 }

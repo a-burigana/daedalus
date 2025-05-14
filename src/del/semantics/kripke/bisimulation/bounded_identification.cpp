@@ -27,8 +27,8 @@
 
 using namespace kripke;
 
-std::pair<signature_matrix, signature_map>
-bounded_identification::calculate_signatures(const state &s, unsigned long k, const del::storages_ptr &storages) {
+/*std::pair<signature_matrix, signature_map>
+bounded_identification::calculate_signatures(const state &s, unsigned long k, del::storages_handler_ptr handler) {
     auto worlds_signatures = signature_matrix(k+1);
     signature_map sign_map;
 
@@ -39,9 +39,9 @@ bounded_identification::calculate_signatures(const state &s, unsigned long k, co
         calculate_world_signature(s, k, wd, k, storages, worlds_signatures, sign_map);
 
     return {std::move(worlds_signatures), std::move(sign_map)};
-}
+}*/
 
-information_state_id bounded_identification::calculate_state_id(const kripke::state &s, unsigned long k, const del::storages_ptr &storages) {
+information_state_id bounded_identification::calculate_state_id(const kripke::state &s, unsigned long k, del::storages_handler_ptr &handler) {
     auto worlds_signatures = signature_matrix(k+1);
     information_state designated_signatures;
 
@@ -49,13 +49,13 @@ information_state_id bounded_identification::calculate_state_id(const kripke::st
         h_signatures = signature_vector(s.get_worlds_number());
 
     for (const world_id wd : s.get_designated_worlds())
-        designated_signatures.emplace(calculate_world_signature(s, k, wd, k, storages, worlds_signatures));
+        designated_signatures.emplace(calculate_world_signature(s, wd, k, handler, worlds_signatures));
 
-    return storages->is_storage->emplace(std::move(designated_signatures));
+    return handler->get_information_state_storage(k).emplace(std::move(designated_signatures));
 }
 
-void bounded_identification::calculate_world_signature(const state &s, const unsigned long k, const world_id x,
-                                                       const unsigned long h, const del::storages_ptr &storages,
+/*void bounded_identification::calculate_world_signature(const state &s, const unsigned long k, const world_id x,
+                                                       const unsigned long h, del::storages_handler_ptr handler,
                                                        signature_matrix &worlds_signatures, signature_map &sign_map) {
     agents_information_state xs = agents_information_state(s.get_language()->get_agents_number());
 //    signature_id empty_is = is_storage->emplace(information_state{});
@@ -88,32 +88,36 @@ void bounded_identification::calculate_world_signature(const state &s, const uns
         if (s.get_depth(x) < s.get_depth(worlds_it->second.second))     // The second element of the pair is the world with the maximum bound
             worlds_it->second.second = x;
     }
-}
+}*/
 
-unsigned long long bounded_identification::calculate_world_signature(const state &s, const unsigned long k, const world_id x,
-                                                                     const unsigned long h, const del::storages_ptr &storages,
-                                                                     signature_matrix &worlds_signatures) {
-    agents_information_state xs = agents_information_state(s.get_language()->get_agents_number());
+signature_id bounded_identification::calculate_world_signature(const state &s, const world_id x, const unsigned long h,
+                                                               del::storages_handler_ptr &handler,
+                                                               signature_matrix &worlds_signatures) {
+//    auto xss = std::deque<agents_information_state>(h+1);
+//
+//    for (auto &xs : xss) {
+        auto xs = agents_information_state(s.get_language()->get_agents_number());
 //    signature_id empty_is = is_storage->emplace(information_state{});
 
-    for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
-        xs[ag] = 0;
+        for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag)
+            xs[ag] = 0;
+//    }
 
     if (h > 0)
         for (del::agent ag = 0; ag < s.get_language()->get_agents_number(); ++ag) {
             information_state x_ag;
 
             for (const world_id y : s.get_agent_possible_worlds(ag, x)) {
-                if (storages->s_storage->is_null(worlds_signatures[h-1][y]))    // We check that we did not already calculate y's (h-1)-signature
-                    worlds_signatures[h-1][y] = calculate_world_signature(s, k, y, h-1, storages, worlds_signatures);
+                if (handler->get_signature_storage(h).is_null(worlds_signatures[h-1][y]))    // We check that we did not already calculate y's (h-1)-signature
+                    worlds_signatures[h-1][y] = calculate_world_signature(s, y, h-1, handler, worlds_signatures);
 
                 x_ag.emplace(worlds_signatures[h-1][y]);
             }
-            xs[ag] = storages->is_storage->emplace(std::move(x_ag));    // xs[ag] is the numerical id referring to the set of
-        }                                                               // (h-1)-signatures of the worlds y such that x R_ag y
+            xs[ag] = handler->get_information_state_storage(h).emplace(std::move(x_ag));     // xss[h][ag] is the numerical id referring to the set of
+        }                                                                                       // (h-1)-signatures of the worlds y such that x R_ag y
 
-    auto sign_x_h = signature{s.get_language(), storages, s.get_label_id(x), std::move(xs), h, x};     // We create the h-signature of x (h being x's bound),
-    auto id = storages->s_storage->emplace(std::move(sign_x_h));                                    // we add it to the storage, and we return it
+    auto sign_x_h = signature{s.get_language(), handler, s.get_label_id(x), std::move(xs), h, x};   // We create the h-signature of x (h being x's bound),
+    auto id = handler->get_signature_storage(h).emplace(std::move(sign_x_h));                                        // we add it to the storage, and we return it
     assert(id != 0);
     return id;
 }

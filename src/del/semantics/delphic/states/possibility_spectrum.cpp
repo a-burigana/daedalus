@@ -25,13 +25,13 @@
 #include "../../../../../include/del/semantics/delphic/states/possibility.h"
 #include "../../../../../include/del/semantics/delphic/model_checker.h"
 #include "../../../../../include/del/semantics/delphic/delphic_utils.h"
-#include "../../../../../include/utils/storage.h"
+#include "../../../../../include/utils/storages_handler.h"
 
 using namespace del;
 using namespace delphic;
 
-possibility_spectrum::possibility_spectrum(del::language_ptr language, const possibility_storage_ptr &p_storage,
-                                           const information_state_storage_ptr &is_storage, delphic::information_state_id designated_possibilities) :
+possibility_spectrum::possibility_spectrum(del::language_ptr language, const possibility_storage &p_storage,
+                                           const information_state_storage &is_storage, delphic::information_state_id designated_possibilities) :
 //                                           unsigned long possibilities_number) :
         m_language{std::move(language)}
 //        m_p_storage{std::move(p_storage)},
@@ -39,11 +39,11 @@ possibility_spectrum::possibility_spectrum(del::language_ptr language, const pos
         {
 //        m_possibilities_number{possibilities_number}
     m_max_depth = 0;
-    m_designated_possibilities = *is_storage->get(designated_possibilities);
+    m_designated_possibilities = *is_storage.get(designated_possibilities);
 
     for (const possibility_id &w : m_designated_possibilities)
-        if (p_storage->get(w)->get_bound() > m_max_depth)
-            m_max_depth = p_storage->get(w)->get_bound();
+        if (p_storage.get(w)->get_bound() > m_max_depth)
+            m_max_depth = p_storage.get(w)->get_bound();
 }
 
 del::language_ptr possibility_spectrum::get_language() const {
@@ -74,9 +74,9 @@ const information_state &possibility_spectrum::get_designated_possibilities() co
     return m_designated_possibilities;
 }
 
-bool possibility_spectrum::satisfies(const del::formula_ptr &f, const del::storages_ptr &storages) const {
+bool possibility_spectrum::satisfies(const del::formula_ptr &f, del::storages_handler_ptr handler) const {
     return std::all_of(m_designated_possibilities.begin(), m_designated_possibilities.end(),
-                       [&](const possibility_id &w) { return model_checker::holds_in(*storages->s_storage->get(w), *f, storages); });
+                       [&](const possibility_id &w) { return model_checker::holds_in(*handler->get_signature_storage(0).get(w), *f, handler); });
 }
 
 //unsigned long possibility_spectrum::get_possibilities_number() const {

@@ -61,7 +61,7 @@ del::language_ptr eavesdropping::build_language(unsigned long agents_no, unsigne
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-kripke::state eavesdropping::build_initial_state(unsigned long agents_no, unsigned long steps_no, const del::label_storage_ptr &l_storage) {
+kripke::state eavesdropping::build_initial_state(unsigned long agents_no, unsigned long steps_no, del::label_storage &l_storage) {
     language_ptr language = eavesdropping::build_language(agents_no, steps_no);
     const auto worlds_number = 1;
 
@@ -78,7 +78,7 @@ kripke::state eavesdropping::build_initial_state(unsigned long agents_no, unsign
     for (unsigned long i = 0; i < agents_no-1; ++i)
         bs[language->get_atom_id("at_" + std::to_string(i) + "_0")] = true;
 
-    ls[0] = l_storage->emplace(label{std::move(bs)});
+    ls[0] = l_storage.emplace(label{std::move(bs)});
 
     world_bitset designated_worlds = world_bitset{worlds_number, world_set{0}};
 
@@ -97,7 +97,7 @@ kripke::action_deque eavesdropping::build_actions(unsigned long agents_no, unsig
     return actions;
 }
 
-search::planning_task eavesdropping::build_task(unsigned long agents_no, unsigned long steps_no, const del::label_storage_ptr &l_storage) {
+search::planning_task eavesdropping::build_task(unsigned long agents_no, unsigned long steps_no, del::label_storage &l_storage) {
     std::string name = eavesdropping::get_name();
     std::string id = std::to_string(agents_no) + "_" + std::to_string(steps_no);
 
@@ -117,7 +117,7 @@ search::planning_task eavesdropping::build_task(unsigned long agents_no, unsigne
     return search::planning_task{std::move(name), std::move(id), language, std::move(s0), std::move(actions), std::move(goal)};
 }
 
-std::vector<search::planning_task> eavesdropping::build_tasks(const del::label_storage_ptr &l_storage) {
+std::vector<search::planning_task> eavesdropping::build_tasks(del::label_storage &l_storage) {
     const unsigned long N_MIN_AGS = 2, N_MAX_AGS = 4, N_MIN_STEPS = 2, N_MAX_STEPS = 5;
     std::vector<search::planning_task> tasks;
 

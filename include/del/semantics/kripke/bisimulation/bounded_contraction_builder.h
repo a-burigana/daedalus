@@ -27,7 +27,7 @@
 #include <set>
 #include <queue>
 #include "bounded_bisimulation_types.h"
-#include "../../../../utils/storage.h"
+#include "../../../../utils/storages_handler.h"
 #include "../../../../search/search_space.h"
 
 namespace kripke {
@@ -36,23 +36,23 @@ namespace kripke {
     class bounded_contraction_builder {
     public:
         static std::pair<bool, state> calculate_rooted_contraction(const state &s, unsigned long k, bool canonical = false,
-                                                                   const del::storages_ptr &storages = nullptr);
+                                                                   del::storages_handler_ptr handler = nullptr);
 
         /*static std::tuple<bool, state, bpr_structures> update_rooted_contraction(const state &s, unsigned long k, bpr_structures &structures,
-                                                                bool canonical = false, const del::storages_ptr &storages = nullptr);*/
+                                                                bool canonical = false, del::storages_handler_ptr handler = nullptr);*/
 
-        static std::pair<bool, state> calculate_standard_contraction(const state &n, const del::storages_ptr &storages = nullptr);
+        static std::pair<bool, state> calculate_standard_contraction(const state &n, del::storages_handler_ptr handler = nullptr);
 
     private:
         static std::pair<bool, state> rooted_contraction_helper(const state &s, unsigned long k, bool is_bisim,
-                                                                                 bpr_structures &structures, bool canonical = false,
-                                                                const del::storages_ptr &storages = nullptr);
+                                                                bpr_structures &structures, bool canonical = false,
+                                                                del::storages_handler_ptr handler = nullptr);
 
         static std::vector<world_id> calculate_max_representatives(const state &s, unsigned long k,
                                                                    const block_matrix &worlds_blocks);
 
 //        static std::tuple<signature_matrix, signature_vector, signature_map, std::vector<world_id>>
-//            calculate_max_signatures(const state &s, unsigned long k, const del::storages_ptr &storages);
+//            calculate_max_signatures(const state &s, unsigned long k, del::storages_handler_ptr handler);
 
         static world_id get_block_max_representative(const state &s, const block_ptr &block);
 

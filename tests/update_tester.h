@@ -29,9 +29,9 @@
 namespace daedalus::tester {
     class update_tester {
     public:
-        static kripke::state test_CB_1(const std::string &out_path, const del::label_storage_ptr &l_storage, bool print = true);
-        static kripke::state test_CB_2(const std::string &out_path, const del::label_storage_ptr &l_storage, bool print = true);
-        static kripke::state test_CB_3(const std::string &out_path, const del::label_storage_ptr &l_storage, bool print = true);
+        static kripke::state test_CB_1(const std::string &out_path, del::label_storage &l_storage, bool print = true);
+        static kripke::state test_CB_2(const std::string &out_path, del::label_storage &l_storage, bool print = true);
+        static kripke::state test_CB_3(const std::string &out_path, del::label_storage &l_storage, bool print = true);
     };
 }
 

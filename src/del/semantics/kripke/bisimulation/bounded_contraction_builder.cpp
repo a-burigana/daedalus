@@ -30,26 +30,26 @@
 using namespace kripke;
 
 std::pair<bool, state> bounded_contraction_builder::calculate_rooted_contraction(const state &s, unsigned long k, bool canonical,
-                                                                                 const del::storages_ptr &storages) {
+                                                                                 del::storages_handler_ptr handler) {
     auto [is_bisim, structures] = bounded_partition_refinement::do_refinement_steps(s, k);
-    return rooted_contraction_helper(s, k, is_bisim, structures, canonical, storages);
+    return rooted_contraction_helper(s, k, is_bisim, structures, canonical, handler);
 }
 
 /*std::tuple<bool, state, bpr_structures> bounded_contraction_builder::update_rooted_contraction(const state &s, unsigned long k, bpr_structures &structures,
-                                                                              bool canonical, const del::storages_ptr &storages) {
+                                                                              bool canonical, del::storages_handler_ptr handler) {
     bool is_bisim = bounded_partition_refinement::do_extra_refinement_step(s, structures);
     return rooted_contraction_helper(s, k, is_bisim, structures, canonical, storages);
 }*/
 
-std::pair<bool, state> bounded_contraction_builder::calculate_standard_contraction(const state &s, const del::storages_ptr &storages) {
+std::pair<bool, state> bounded_contraction_builder::calculate_standard_contraction(const state &s, del::storages_handler_ptr handler) {
     bpr_structures structures = bounded_partition_refinement::do_all_refinement_steps(s);
-    return rooted_contraction_helper(s, s.get_max_depth() + 1, true, structures, true, storages);
+    return rooted_contraction_helper(s, s.get_max_depth() + 1, true, structures, true, handler);
 }
 
 std::pair<bool, state>
 bounded_contraction_builder::rooted_contraction_helper(const kripke::state &s, unsigned long k, bool is_bisim,
                                                        bpr_structures &structures, bool canonical,
-                                                       const del::storages_ptr &storages) {
+                                                       del::storages_handler_ptr handler) {
     const block_matrix &worlds_blocks = structures.worlds_blocks;
     // We first calculate the maximal representatives: worlds_max_reprs[x] is the maximal representative of x
     auto worlds_max_reprs = calculate_max_representatives(s, k, worlds_blocks);
@@ -101,7 +101,7 @@ bounded_contraction_builder::rooted_contraction_helper(const kripke::state &s, u
     for (world_id wd : s.get_designated_worlds())
         designated_worlds.push_back(contracted_worlds_map[wd]);
 
-    auto state_id = canonical ? bounded_identification::calculate_state_id(s, k, storages) : 0;
+    auto state_id = canonical ? bounded_identification::calculate_state_id(s, k, handler) : 0;
 
     return {is_bisim, state{s.get_language(), bounded_worlds_number, std::move(quotient_r), std::move(quotient_v), std::move(designated_worlds), state_id}};
 }
@@ -201,7 +201,7 @@ std::vector<world_id> bounded_contraction_builder::calculate_max_representatives
 }
 
 /*std::tuple<signature_matrix, signature_vector, signature_map, std::vector<world_id>>
-bounded_contraction_builder::calculate_max_signatures(const state &s, unsigned long k, const del::storages_ptr &storages) {
+bounded_contraction_builder::calculate_max_signatures(const state &s, unsigned long k, del::storages_handler_ptr handler) {
     auto worlds_max_signs = signature_vector(s.get_worlds_number());
     auto worlds_max_reprs = std::vector<world_id>(s.get_worlds_number());
     std::queue<world_id> to_visit;

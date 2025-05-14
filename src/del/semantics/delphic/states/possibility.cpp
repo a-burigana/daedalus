@@ -27,11 +27,11 @@
 
 using namespace delphic;
 
-possibility::possibility(del::language_ptr language, del::storages_ptr storages, label_id label,
+possibility::possibility(del::language_ptr language, del::storages_handler_ptr handler, label_id label,
                          agents_information_state state, unsigned long bound, std::optional<unsigned long> world) :
     m_language{std::move(language)},
-    m_storages{std::move(storages)},
-    m_label{std::move(label)},
+    m_handler{std::move(handler)},
+    m_label{label},
     m_information_state{std::move(state)},
     m_bound{bound},
     m_world{world} {}
@@ -73,8 +73,8 @@ void possibility::set_information_state(del::agent ag, delphic::information_stat
     m_information_state[ag] = is;
 }
 
-bool possibility::satisfies(const del::formula_ptr &f, const del::storages_ptr &storages) const {
-    return model_checker::holds_in(*this, *f, storages);
+bool possibility::satisfies(const del::formula_ptr &f, del::storages_handler_ptr handler) const {
+    return model_checker::holds_in(*this, *f, handler);
 }
 
 bool possibility::operator<(const possibility &rhs) const {

@@ -122,32 +122,29 @@ void run(int argc, char *argv[]) {
     }
 
     search::planning_task_ptr task;
-    del::label_storage_ptr l_storage = std::make_shared<del::storage<del::label>>();
-    del::signature_storage_ptr s_storage = std::make_shared<del::storage<signature>>();
-    del::information_state_storage_ptr is_storage = std::make_shared<del::storage<information_state>>(information_state{});
-
-    del::storages_ptr storages = std::make_shared<del::storages>(del::storages{std::move(l_storage), std::move(s_storage), std::move(is_storage)});
+    del::label_storage l_storage;
 
     if (domain == "active_muddy_children" or domain == "amc")
-        task = std::make_unique<search::planning_task>(active_muddy_children::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), storages->l_storage));
+        task = std::make_unique<search::planning_task>(active_muddy_children::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage));
     else if (domain == "coin_in_the_box" or domain == "cb")
-        task = std::make_unique<search::planning_task>(coin_in_the_box::build_task(std::stoul(parameters[0]), storages->l_storage));
+        task = std::make_unique<search::planning_task>(coin_in_the_box::build_task(std::stoul(parameters[0]), l_storage));
     else if (domain == "collaboration_communication" or domain == "cc")
-        task = std::make_unique<search::planning_task>(collaboration_communication::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), std::stoul(parameters[3]), storages->l_storage));
+        task = std::make_unique<search::planning_task>(collaboration_communication::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), std::stoul(parameters[3]), l_storage));
     else if (domain == "consecutive_numbers" or domain == "cn")
-        task = std::make_unique<search::planning_task>(consecutive_numbers::build_task(std::stoul(parameters[0]), storages->l_storage));
+        task = std::make_unique<search::planning_task>(consecutive_numbers::build_task(std::stoul(parameters[0]), l_storage));
     else if (domain == "eavesdropping" or domain == "eav")
-        task = std::make_unique<search::planning_task>(eavesdropping::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), storages->l_storage));
+        task = std::make_unique<search::planning_task>(eavesdropping::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), l_storage));
     else if (domain == "gossip" or domain == "gos")
-        task = std::make_unique<search::planning_task>(gossip::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), storages->l_storage));
+        task = std::make_unique<search::planning_task>(gossip::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage));
     else if (domain == "grapevine" or domain == "gra")
-        task = std::make_unique<search::planning_task>(grapevine::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), storages->l_storage));
+        task = std::make_unique<search::planning_task>(grapevine::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage));
     else if (domain == "selective_communication" or domain == "sc")
-        task = std::make_unique<search::planning_task>(selective_communication::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), storages->l_storage));
+        task = std::make_unique<search::planning_task>(selective_communication::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage));
     else if (domain == "tiger" or domain == "tig")
-        task = std::make_unique<search::planning_task>(tiger::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), storages->l_storage));
+        task = std::make_unique<search::planning_task>(tiger::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), l_storage));
 
 //    search::delphic_planning_task task_ = delphic_utils::convert(*task);
+    del::storages_handler_ptr handler = std::make_shared<del::storages_handler>(task->get_goal()->get_modal_depth(), std::move(l_storage));
 
     search::strategy t = strategy == "unbounded" ? search::strategy::unbounded_search :
             (strategy == "bounded" ? search::strategy::iterative_bounded_search : search::strategy::approx_iterative_bounded_search);
@@ -156,7 +153,7 @@ void run(int argc, char *argv[]) {
     if (debug) {
         if (actions.empty()) {
             if (semantics == "kripke")
-                daedalus::tester::printer::print_results(*task, t, type, storages, OUT_PATH);
+                daedalus::tester::printer::print_results(*task, t, type, handler, OUT_PATH);
             else if (semantics == "delphic") {}
 //                daedalus::tester::printer::print_delphic_results(task_, t, OUT_PATH);
         } else {
@@ -167,7 +164,7 @@ void run(int argc, char *argv[]) {
 //                daedalus::tester::printer::print_state(*task->get_initial_state(), OUT_PATH + path, "s0");
                 state_deque ss = {task->get_initial_state()};
                 unsigned long b = bound.empty() ? task->get_goal()->get_modal_depth() : std::stoul(bound);
-                daedalus::tester::printer::print_states(ss, as, storages, task->get_goal(), OUT_PATH + path, "s0", true, type, b);
+                daedalus::tester::printer::print_states(ss, as, handler, task->get_goal(), OUT_PATH + path, "s0", true, type, b);
             } else if (semantics == "delphic") {
 //                delphic::action_deque as = task_.get_actions(actions);
 //                daedalus::tester::printer::print_state(*task_.get_initial_state(), OUT_PATH + path, "W0");
@@ -206,8 +203,8 @@ void run(int argc, char *argv[]) {
 
         if (not print_info) {
             if (semantics == "kripke") {
-                if (print_results) daedalus::tester::printer::print_time_results(*task, t, type, storages, out_file);
-                else search::planner::search(*task, t, type, storages);
+                if (print_results) daedalus::tester::printer::print_time_results(*task, t, type, handler, out_file);
+                else search::planner::search(*task, t, type, handler);
             } else if (semantics == "delphic") {
 //                if (print_results) daedalus::tester::printer::print_delphic_time_results(task_, t, out_file);
 //                else search::delphic_planner::search(task_, t);

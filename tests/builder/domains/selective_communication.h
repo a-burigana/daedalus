@@ -36,11 +36,11 @@ namespace daedalus::tester {
         static std::string get_name();
 
         static del::language_ptr build_language(unsigned long agents_no, unsigned long rooms_no);
-        static kripke::state build_initial_state(unsigned long agents_no, unsigned long rooms_no, const del::label_storage_ptr &l_storage);
+        static kripke::state build_initial_state(unsigned long agents_no, unsigned long rooms_no, del::label_storage &l_storage);
 
         static kripke::action_deque build_actions(unsigned long agents_no, unsigned long rooms_no);
-        static search::planning_task build_task(unsigned long agents_no, unsigned long rooms_no, unsigned long goal_id, const del::label_storage_ptr &l_storage);
-        static std::vector<search::planning_task> build_tasks(const del::label_storage_ptr &l_storage);
+        static search::planning_task build_task(unsigned long agents_no, unsigned long rooms_no, unsigned long goal_id, del::label_storage &l_storage);
+        static std::vector<search::planning_task> build_tasks(del::label_storage &l_storage);
 
     private:
         static kripke::action build_left(unsigned long agents_no, unsigned long rooms_no, del::agent ag, const del::agent_set &fo_ags);

@@ -31,18 +31,21 @@
 namespace del {
     class label;
 
-    using label_storage_ptr             = std::shared_ptr<storage<label>>;
-    using possibility_storage_ptr       = std::shared_ptr<storage<delphic::possibility>>;
-    using signature_storage_ptr         = possibility_storage_ptr;
-    using information_state_storage_ptr = std::shared_ptr<storage<delphic::information_state>>;
+    using label_storage             = storage<label>;
+    using possibility_storage       = storage<delphic::possibility>;
+    using signature_storage         = possibility_storage;
+    using information_state_storage = storage<delphic::information_state>;
 
-    struct storages {
-        label_storage_ptr l_storage;
-        signature_storage_ptr s_storage;
-        information_state_storage_ptr is_storage;
-    };
+    class storages_handler;
+    using storages_handler_ptr = std::shared_ptr<storages_handler>;
 
-    using storages_ptr = std::shared_ptr<storages>;
+//    struct storages {
+//        label_storage l_storage;
+//        signature_storage_ptr s_storage;
+//        information_state_storage_ptr is_storage;
+//    };
+//
+//    using storages_ptr = std::shared_ptr<storages>;
 }
 
 #endif //DAEDALUS_STORAGE_TYPES_H

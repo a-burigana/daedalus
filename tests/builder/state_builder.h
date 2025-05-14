@@ -29,10 +29,10 @@
 namespace daedalus::tester {
     class state_builder {
     public:
-        static kripke::state build_test_state1(const del::label_storage_ptr &l_storage);
-        static kripke::state build_singleton(bool has_loop, const del::label_storage_ptr &l_storage);
-        static kripke::state build_chain(unsigned long length, const del::label_storage_ptr &l_storage, bool has_final_loop, bool all_designated = false);
-        static kripke::state build_k_tree(unsigned long k, const del::label_storage_ptr &l_storage);
+        static kripke::state build_test_state1(del::label_storage &l_storage);
+        static kripke::state build_singleton(bool has_loop, del::label_storage &l_storage);
+        static kripke::state build_chain(unsigned long length, del::label_storage &l_storage, bool has_final_loop, bool all_designated = false);
+        static kripke::state build_k_tree(unsigned long k, del::label_storage &l_storage);
     };
 }
 

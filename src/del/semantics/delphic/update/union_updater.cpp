@@ -34,11 +34,11 @@
 
 using namespace delphic;
 
-bool union_updater::is_applicable(const possibility_ptr &w, const eventuality_ptr &e, const del::storages_ptr &storages) {
-    return model_checker::holds_in(*w, *e->get_pre(), storages);
+bool union_updater::is_applicable(const possibility_ptr &w, const eventuality_ptr &e, del::storages_handler_ptr handler) {
+    return model_checker::holds_in(*w, *e->get_pre(), handler);
 }
 
-bool union_updater::is_applicable(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E, const del::storages_ptr &storages) {
+bool union_updater::is_applicable(const possibility_spectrum_ptr &W, const eventuality_spectrum_ptr &E, del::storages_handler_ptr handler) {
     // TODO: UNCOMMENT AND FIX
 //    return std::all_of(W->get_designated_possibilities().begin(), W->get_designated_possibilities().end(),
 //                       [&](const possibility_id &w) {

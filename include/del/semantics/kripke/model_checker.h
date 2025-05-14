@@ -31,16 +31,16 @@
 namespace kripke {
     class model_checker {
     public:
-        static bool holds_in(const state &s, world_id w, const del::formula &f, const del::label_storage_ptr &l_storage);
+        static bool holds_in(const state &s, world_id w, const del::formula &f, const del::label_storage &l_storage);
 
     private:
-        static bool holds_in(const state &s, world_id w, const del::atom_formula &f, const del::label_storage_ptr &l_storage);
-        static bool holds_in(const state &s, world_id w, const del::not_formula &f, const del::label_storage_ptr &l_storage);
-        static bool holds_in(const state &s, world_id w, const del::and_formula &f, const del::label_storage_ptr &l_storage);
-        static bool holds_in(const state &s, world_id w, const del::or_formula &f, const del::label_storage_ptr &l_storage);
-        static bool holds_in(const state &s, world_id w, const del::imply_formula &f, const del::label_storage_ptr &l_storage);
-        static bool holds_in(const state &s, world_id w, const del::box_formula &f, const del::label_storage_ptr &l_storage);
-        static bool holds_in(const state &s, world_id w, const del::diamond_formula &f, const del::label_storage_ptr &l_storage);
+        static bool holds_in(const state &s, world_id w, const del::atom_formula &f, const del::label_storage &l_storage);
+        static bool holds_in(const state &s, world_id w, const del::not_formula &f, const del::label_storage &l_storage);
+        static bool holds_in(const state &s, world_id w, const del::and_formula &f, const del::label_storage &l_storage);
+        static bool holds_in(const state &s, world_id w, const del::or_formula &f, const del::label_storage &l_storage);
+        static bool holds_in(const state &s, world_id w, const del::imply_formula &f, const del::label_storage &l_storage);
+        static bool holds_in(const state &s, world_id w, const del::box_formula &f, const del::label_storage &l_storage);
+        static bool holds_in(const state &s, world_id w, const del::diamond_formula &f, const del::label_storage &l_storage);
     };
 }
 

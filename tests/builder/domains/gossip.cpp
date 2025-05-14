@@ -28,6 +28,9 @@
 #include "../../../include/del/formulas/modal/box_formula.h"
 #include "../../../include/del/formulas/propositional/not_formula.h"
 #include "../../../include/del/formulas/propositional/and_formula.h"
+#include "ma_star_utils.h"
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <string>
 #include <utility>
@@ -51,7 +54,7 @@ del::language_ptr gossip::build_language(unsigned long agents_no, unsigned long 
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-kripke::state gossip::build_initial_state(unsigned long agents_no, unsigned long secrets_no, const label_storage_ptr &l_storage) {
+kripke::state gossip::build_initial_state(unsigned long agents_no, unsigned long secrets_no, label_storage &l_storage) {
     language_ptr language = gossip::build_language(agents_no, secrets_no);
 
     const auto worlds_number = static_cast<const world_id>(std::exp2(secrets_no));
@@ -62,7 +65,7 @@ kripke::state gossip::build_initial_state(unsigned long agents_no, unsigned long
 
     for (const auto &combination: secrets_combinations) {
         label l = label{combination};
-        ls[count++] = l_storage->emplace(std::move(l));
+        ls[count++] = l_storage.emplace(std::move(l));
     }
     boost::dynamic_bitset<> all_worlds(worlds_number);
     all_worlds.set();
@@ -79,7 +82,7 @@ kripke::state gossip::build_initial_state(unsigned long agents_no, unsigned long
     for (agent ag = 0; ag < secrets_no; ++ag)
         for (world_id w = 0; w < worlds_number; ++w)
             for (world_id v = 0; v < worlds_number; ++v) {
-                label &lw = *l_storage->get(ls[w]), &lv = *l_storage->get(ls[v]);
+                label &lw = *l_storage.get(ls[w]), &lv = *l_storage.get(ls[v]);
 
                 if (lw[ag] != lv[ag])
                     r[ag][w].remove(v);
@@ -88,7 +91,7 @@ kripke::state gossip::build_initial_state(unsigned long agents_no, unsigned long
     world_id designated;
 
     for (world_id w = 0; w < worlds_number; ++w) {
-        label &lw = *l_storage->get(ls[w]);
+        label &lw = *l_storage.get(ls[w]);
         if (lw.get_bitset().all()) designated = w;
     }
 
@@ -108,7 +111,7 @@ kripke::action_deque gossip::build_actions(unsigned long agents_no, unsigned lon
     return actions;
 }
 
-search::planning_task gossip::build_task(unsigned long agents_no, unsigned long secrets_no, unsigned long goal_id, const label_storage_ptr &l_storage) {
+search::planning_task gossip::build_task(unsigned long agents_no, unsigned long secrets_no, unsigned long goal_id, label_storage &l_storage) {
     std::string name = gossip::get_name();
     std::string id   = std::to_string(agents_no) + "_" + std::to_string(secrets_no) + "_" + std::to_string(goal_id);
     language_ptr language = gossip::build_language(agents_no, secrets_no);
@@ -120,7 +123,7 @@ search::planning_task gossip::build_task(unsigned long agents_no, unsigned long 
     return search::planning_task{std::move(name), std::move(id), language, std::move(s0), std::move(actions), std::move(goal)};
 }
 
-std::vector<search::planning_task> gossip::build_tasks(const label_storage_ptr &l_storage) {
+std::vector<search::planning_task> gossip::build_tasks(label_storage &l_storage) {
     const unsigned long N_MIN_AGS = 3, N_MAX_AGS = 7, N_MIN_SECRETS = 2, MIN_GOAL_ID = 1, MAX_GOAL_ID = 9;
     std::vector<search::planning_task> tasks;
 
@@ -196,4 +199,46 @@ del::formula_ptr gossip::build_goal(unsigned long agents_no, unsigned long secre
     }
 
     return std::make_shared<and_formula>(std::move(fs));
+}
+
+void gossip::write_ma_star_problem(unsigned long agents_no, unsigned long secrets_no, unsigned long goal_id,
+                                   label_storage &l_storage) {
+    auto task = build_task(agents_no, secrets_no, goal_id, l_storage);
+    std::string path = "tests/builder/domains/ma_star/" + task.get_domain_name() + "/";
+    std::string name = task.get_problem_id();
+    std::string ext  = ".txt";
+
+    if (not std::filesystem::exists(path))
+        std::filesystem::create_directories(path);
+
+    std::ofstream out = std::ofstream{path + name + ext};
+
+    ma_star_utils::print_atoms(out, task);
+    ma_star_utils::print_agents(out, task);
+    ma_star_utils::print_action_names(out, task);
+
+    for (unsigned long ag_1 = 0; ag_1 < secrets_no; ++ag_1)
+        for (unsigned long ag_2 = 0; ag_2 < agents_no; ++ag_2)
+            if (ag_1 != ag_2) {
+                std::string act_name = "tell_" + std::to_string(ag_1) + "_" + std::to_string(ag_2);
+
+                formula_ptr s_1 = std::make_shared<atom_formula>(ag_1);     // index of ag_1 is the same as index of s_1
+                formula_ptr K_ag_2_s_1 = std::make_shared<box_formula>(ag_2, s_1);
+                formula_ptr not_K_ag_2_s_1 = std::make_shared<not_formula>(K_ag_2_s_1);
+
+                out << "executable " << act_name << " if ";
+                ma_star_utils::print_formula(out, task.get_language(), not_K_ag_2_s_1);
+                out << " ;" << std::endl;
+
+                out << act_name << " announces ";
+                ma_star_utils::print_formula(out, task.get_language(), s_1);
+                out << " ;" << std::endl;
+
+                out << task.get_language()->get_agent_name(ag_1) << " observes " << act_name << ";" << std::endl;
+                out << task.get_language()->get_agent_name(ag_2) << " observes " << act_name << ";" << std::endl;
+            }
+
+    // todo: init
+
+    ma_star_utils::print_formula(out, task.get_language(), task.get_goal());
 }

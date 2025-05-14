@@ -32,6 +32,9 @@
 #include "../../../include/del/formulas/propositional/true_formula.h"
 #include "../../../include/del/formulas/propositional/false_formula.h"
 #include "../../../include/del/formulas/propositional/imply_formula.h"
+#include "ma_star_utils.h"
+#include <filesystem>
+#include <fstream>
 #include <memory>
 
 using namespace daedalus::tester;
@@ -57,7 +60,7 @@ del::language_ptr grapevine::build_language(unsigned long agents_no, unsigned lo
     return std::make_shared<language>(std::move(language{atom_names, agent_names}));
 }
 
-kripke::state grapevine::build_initial_state(unsigned long agents_no, unsigned long secrets_no, const label_storage_ptr &l_storage) {
+kripke::state grapevine::build_initial_state(unsigned long agents_no, unsigned long secrets_no, label_storage &l_storage) {
     language_ptr language = grapevine::build_language(agents_no, secrets_no);
 
     const auto worlds_number = static_cast<const world_id>(std::exp2(secrets_no));
@@ -74,7 +77,7 @@ kripke::state grapevine::build_initial_state(unsigned long agents_no, unsigned l
 //            combination.push_back(false);
 
         label l = label{combination};
-        ls[count++] = l_storage->emplace(std::move(l));
+        ls[count++] = l_storage.emplace(std::move(l));
     }
     boost::dynamic_bitset<> all_worlds(worlds_number);
     all_worlds.set();
@@ -91,7 +94,7 @@ kripke::state grapevine::build_initial_state(unsigned long agents_no, unsigned l
     for (agent ag = 0; ag < secrets_no; ++ag)
         for (world_id w = 0; w < worlds_number; ++w)
             for (world_id v = 0; v < worlds_number; ++v) {
-                label &lw = *l_storage->get(ls[w]), &lv = *l_storage->get(ls[v]);
+                label &lw = *l_storage.get(ls[w]), &lv = *l_storage.get(ls[v]);
 
                 if (lw[ag] != lv[ag])
                     r[ag][w].remove(v);
@@ -100,7 +103,7 @@ kripke::state grapevine::build_initial_state(unsigned long agents_no, unsigned l
     world_id designated;
 
     for (world_id w = 0; w < worlds_number; ++w) {
-        label &lw = *l_storage->get(ls[w]);
+        label &lw = *l_storage.get(ls[w]);
         if (lw.get_bitset().all()) designated = w;
     }
 
@@ -130,7 +133,7 @@ kripke::action_deque grapevine::build_actions(unsigned long agents_no, unsigned 
     return actions;
 }
 
-search::planning_task grapevine::build_task(unsigned long agents_no, unsigned long secrets_no, unsigned long learning_ags_no, const label_storage_ptr &l_storage) {
+search::planning_task grapevine::build_task(unsigned long agents_no, unsigned long secrets_no, unsigned long learning_ags_no, label_storage &l_storage) {
     std::string name = grapevine::get_name();
     std::string id   = std::to_string(agents_no) + "_" + std::to_string(secrets_no) + "_" + std::to_string(learning_ags_no);
     language_ptr language = grapevine::build_language(agents_no, secrets_no);
@@ -142,7 +145,7 @@ search::planning_task grapevine::build_task(unsigned long agents_no, unsigned lo
     return search::planning_task{std::move(name), std::move(id), language, std::move(s0), std::move(actions), std::move(goal)};
 }
 
-std::vector<search::planning_task> grapevine::build_tasks(const label_storage_ptr &l_storage) {
+std::vector<search::planning_task> grapevine::build_tasks(label_storage &l_storage) {
     const unsigned long N_MIN_AGS = 3, N_MAX_AGS = 7, N_MIN_SECRETS = 1, N_MAX_SECRETS = 4;
 
     std::vector<search::planning_task> tasks;
@@ -276,4 +279,100 @@ del::formula_ptr grapevine::build_goal(unsigned long agents_no, unsigned long se
     }
 
     return std::make_shared<and_formula>(std::move(fs));
+}
+
+void grapevine::write_ma_star_problem(unsigned long agents_no, unsigned long secrets_no, unsigned long learning_ags_no,
+                                      del::label_storage &l_storage) {
+    auto task = build_task(agents_no, secrets_no, learning_ags_no, l_storage);
+    std::string path = "tests/builder/domains/ma_star/" + task.get_domain_name() + "/";
+    std::string name = task.get_problem_id();
+    std::string ext  = ".txt";
+
+    if (not std::filesystem::exists(path))
+        std::filesystem::create_directories(path);
+
+    std::ofstream out = std::ofstream{path + name + ext};
+
+    ma_star_utils::print_atoms(out, task);
+    ma_star_utils::print_agents(out, task);
+    ma_star_utils::print_action_names(out, task);
+
+    for (unsigned long teller = 0; teller < secrets_no; ++teller) {
+        std::string act_name = "tell_" + std::to_string(teller);
+        formula_ptr s_1 = std::make_shared<atom_formula>(teller);     // index of ag_1 is the same as index of s_1
+        formula_deque fs;
+
+        for (agent ag = 0; ag < agents_no; ++ag)
+            fs.push_back(std::make_shared<not_formula>(std::make_shared<box_formula>(ag, s_1)));
+
+        formula_ptr some_agent_not_K_s_1 = std::make_shared<or_formula>(std::move(fs));
+        formula_deque fs_pre = {s_1, some_agent_not_K_s_1};
+        formula_ptr f_pre = std::make_shared<and_formula>(fs_pre);
+
+        out << "executable " << act_name << " if ";
+        ma_star_utils::print_formula(out, task.get_language(), f_pre);
+        out << " ;" << std::endl;
+
+        out << act_name << " announces ";
+        ma_star_utils::print_formula(out, task.get_language(), s_1);
+        out << " ;" << std::endl;
+
+        out << task.get_language()->get_agent_name(teller) << " observes " << act_name << ";" << std::endl;
+
+        formula_ptr in_room_1_teller = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_1_ag_" + std::to_string(teller)));
+        formula_ptr not_in_room_1_teller = std::make_shared<not_formula>(in_room_1_teller);
+
+        for (agent ag = 0; ag < task.get_language()->get_agents_number(); ++ag) {
+            if (ag != teller) {
+                formula_ptr in_room_1_ag = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_1_ag_" + std::to_string(ag)));
+                formula_ptr not_in_room_1_ag = std::make_shared<not_formula>(in_room_1_ag);
+
+                formula_ptr both_ags_in_room_1 = std::make_shared<and_formula>(formula_deque{in_room_1_teller, in_room_1_ag});
+                formula_ptr both_ags_in_room_2 = std::make_shared<and_formula>(formula_deque{not_in_room_1_teller, not_in_room_1_ag});
+
+                formula_ptr obs_cond = std::make_shared<or_formula>(formula_deque{both_ags_in_room_1, both_ags_in_room_2});
+
+                out << task.get_language()->get_agent_name(ag) << " observes " << act_name << " if ";
+                ma_star_utils::print_formula(out, task.get_language(), obs_cond);
+                out << ";" << std::endl;
+            }
+        }
+    }
+
+    for (unsigned long ag = 0; ag < agents_no; ++ag) {
+        std::string ag_name = task.get_language()->get_agent_name(ag);
+        std::string left_name = "left_" + std::to_string(ag);
+        std::string right_name = "right_" + std::to_string(ag);
+
+        // left
+        formula_ptr in_room_1_ag = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_1_" + ag_name));
+        formula_ptr not_in_room_1_ag = std::make_shared<not_formula>(in_room_1_ag);
+
+        out << "executable " << left_name << " if ";
+        ma_star_utils::print_formula(out, task.get_language(), not_in_room_1_ag);
+        out << " ;" << std::endl;
+
+        out << left_name << " causes ";
+        ma_star_utils::print_formula(out, task.get_language(), in_room_1_ag);
+        out << " ;" << std::endl;
+
+        for (agent ag2 = 0; ag2 < task.get_language()->get_agents_number(); ++ag2)
+            out << task.get_language()->get_agent_name(ag2) << " observes " << left_name << ";" << std::endl;
+
+        // right
+        out << "executable " << right_name << " if ";
+        ma_star_utils::print_formula(out, task.get_language(), in_room_1_ag);
+        out << " ;" << std::endl;
+
+        out << right_name << " causes -";
+        ma_star_utils::print_formula(out, task.get_language(), in_room_1_ag);
+        out << " ;" << std::endl;
+
+        for (agent ag2 = 0; ag2 < task.get_language()->get_agents_number(); ++ag2)
+            out << task.get_language()->get_agent_name(ag2) << " observes " << right_name << ";" << std::endl;
+    }
+
+    // todo: init
+
+    ma_star_utils::print_formula(out, task.get_language(), task.get_goal());
 }

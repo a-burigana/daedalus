@@ -62,7 +62,7 @@ collaboration_communication::build_language(unsigned long agents_no, unsigned lo
 }
 
 kripke::state collaboration_communication::build_initial_state(unsigned long agents_no, unsigned long rooms_no,
-                                                               unsigned long boxes_no, const label_storage_ptr &l_storage) {
+                                                               unsigned long boxes_no, label_storage &l_storage) {
     language_ptr language = collaboration_communication::build_language(agents_no, rooms_no, boxes_no);
 
     ulong_vector all_rooms_but_2(rooms_no - 1);
@@ -118,7 +118,7 @@ kripke::state collaboration_communication::build_initial_state(unsigned long age
             designated_worlds.push_back(w);
 
         label l = label{std::move(bs)};
-        ls[w++] = l_storage->emplace(std::move(l));
+        ls[w++] = l_storage.emplace(std::move(l));
     }
     return state{language, worlds_number, std::move(r), std::move(ls), std::move(designated_worlds)};
 }
@@ -217,7 +217,7 @@ del::formula_ptr collaboration_communication::build_goal(const del::language_ptr
 }
 
 search::planning_task collaboration_communication::build_task(unsigned long agents_no, unsigned long rooms_no,
-                                                              unsigned long boxes_no, unsigned long goal_id, const label_storage_ptr &l_storage) {
+                                                              unsigned long boxes_no, unsigned long goal_id, label_storage &l_storage) {
     std::string name = collaboration_communication::get_name();
     std::string id = std::to_string(agents_no) + "_" + std::to_string(rooms_no) + "_" + std::to_string(boxes_no) + "_g" + std::to_string(goal_id);
 
@@ -230,7 +230,7 @@ search::planning_task collaboration_communication::build_task(unsigned long agen
     return search::planning_task{std::move(name), std::move(id), language, std::move(s0), std::move(actions), std::move(goal)};
 }
 
-std::vector<search::planning_task> collaboration_communication::build_tasks(const label_storage_ptr &l_storage) {
+std::vector<search::planning_task> collaboration_communication::build_tasks(label_storage &l_storage) {
     const unsigned long N_MIN_AGS = 2, N_MAX_AGS = 3, N_MIN_ROOMS = 3, N_MAX_ROOMS = 4, MIN_GOAL_ID = 1, MAX_GOAL_ID = 3;
     std::vector<search::planning_task> tasks;
 

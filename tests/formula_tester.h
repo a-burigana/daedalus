@@ -30,9 +30,9 @@
 namespace daedalus::tester {
     class formula_tester {
     public:
-        static void test_CB_1(const del::label_storage_ptr &l_storage);
-        static void test_CB_2(const del::label_storage_ptr &l_storage);
-        static void test_CB_3(const del::label_storage_ptr &l_storage);
+        static void test_CB_1(del::label_storage &l_storage);
+        static void test_CB_2(del::label_storage &l_storage);
+        static void test_CB_3(del::label_storage &l_storage);
     };
 }
 

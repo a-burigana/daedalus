@@ -60,7 +60,7 @@ possibility_spectrum delphic::delphic_utils::convert(const state &s) {
 //            possibilities[w]->set_information_state(ag, information_states[w][ag]);
 
     // TODO: FIX
-    return possibility_spectrum{s.get_language(), nullptr, nullptr, 0};       // , s.get_worlds_number()
+    return possibility_spectrum{s.get_language(), del::possibility_storage{}, del::information_state_storage{}, 0};       // , s.get_worlds_number()
 }
 
 eventuality_spectrum delphic_utils::convert(const kripke::action &a) {

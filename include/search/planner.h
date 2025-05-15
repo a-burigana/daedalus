@@ -42,59 +42,60 @@ namespace search {
     public:
         static std::pair<node_deque, statistics>
         search(const planning_task &task, strategy strategy, contraction_type contraction_type,
-               del::storages_handler_ptr handler, const daedalus::tester::printer_ptr &printer = nullptr);
+               const del::storages_handler_ptr &handler, const daedalus::tester::printer_ptr &printer = nullptr);
 
         static void print_plan(const node_deque &path);
 
     private:
         static node_deque unbounded_search(const planning_task &task, statistics &stats, visited_states &visited_states,
-                         del::storages_handler_ptr handler, const daedalus::tester::printer_ptr &printer);
+                         const del::storages_handler_ptr &handler, const daedalus::tester::printer_ptr &printer);
 
         static node_deque
         iterative_bounded_search(const planning_task &task, strategy strategy, contraction_type contraction_type, statistics &stats,
-                                 visited_states &visited_states, del::storages_handler_ptr handler,
+                                 visited_states &visited_states, const del::storages_handler_ptr &handler,
                                  const daedalus::tester::printer_ptr &printer);
 
         static node_deque bounded_search(const planning_task &task, strategy strategy, contraction_type contraction_type, statistics &stats,
                                          frontier &previous_iter_frontier, unsigned long b,
                                          unsigned long long &id, visited_states &visited_states,
-                                         del::storages_handler_ptr handler, const daedalus::tester::printer_ptr &printer);
+                                         const del::storages_handler_ptr &handler, const daedalus::tester::printer_ptr &printer);
 
         static node_deque bfs(const planning_task &task, strategy strategy, contraction_type contraction_type, statistics &stats,
                               frontier &previous_iter_frontier, unsigned long b, unsigned long long &id,
-                              visited_states &visited_states, del::storages_handler_ptr handler,
+                              visited_states &visited_states, const del::storages_handler_ptr &handler,
                               const daedalus::tester::printer_ptr &printer);
 
         static frontier init_frontier(kripke::state_ptr &s0, strategy strategy, contraction_type contraction_type,
                                         unsigned long b, frontier &previous_iter_frontier, statistics &stats,
-                                        visited_states &visited_states, del::storages_handler_ptr handler);
+                                        visited_states &visited_states, const del::storages_handler_ptr &handler);
 
         static node_deque expand_node(const planning_task &task, strategy strategy, contraction_type contraction_type,
                                       statistics &stats, node_ptr &n, const kripke::action_deque &actions, frontier &frontier,
-                                      unsigned long goal_depth, unsigned long long &id, visited_states &visited_states,
-                                      del::storages_handler_ptr handler, const daedalus::tester::printer_ptr &printer);
+                                      class frontier &previous_iter_frontier, unsigned long goal_depth, unsigned long long &id, visited_states &visited_states,
+                                      const del::storages_handler_ptr &handler, const daedalus::tester::printer_ptr &printer);
 
         static void update_statistics(search::statistics &stats, search::node_ptr &n);
 
         static node_deque extract_path(node_ptr n, statistics &stats);
 
-        static bool validate(const planning_task &task, const node_deque &path, del::storages_handler_ptr handler);
+        static bool validate(const planning_task &task, const node_deque &path, const del::storages_handler_ptr &handler);
 
         static search::node_ptr update_node(strategy strategy, contraction_type contraction_type, const node_ptr &n,
                                             const kripke::action_ptr &a, unsigned long long &id,
-                                            const visited_states &visited_states, del::storages_handler_ptr handler,
+                                            const visited_states &visited_states, const del::storages_handler_ptr &handler,
                                             unsigned long goal_depth = 0);
 
         static void refresh_node(node_ptr &n, contraction_type contraction_type, statistics &stats,
-                                 visited_states &visited_states, del::storages_handler_ptr handler);
+                                 frontier &frontier, class frontier &next_iter_frontier,
+                                 visited_states &visited_states, const del::storages_handler_ptr &handler);
 
         static search::node_ptr init_node(contraction_type contraction_type, const kripke::state_ptr &s,
                                           const kripke::action_ptr &a, bool was_bisim, const node_ptr &parent, unsigned long long id,
-                                          const visited_states &visited_states, del::storages_handler_ptr handler, unsigned long b = 0);
+                                          const visited_states &visited_states, const del::storages_handler_ptr &handler, unsigned long b = 0);
 
         static void update_visited_states(const kripke::state_ptr &s, visited_states &visited_states);
 
-        static bool is_already_visited(const kripke::state &s, unsigned long b, const visited_states &visited_states, del::storages_handler_ptr handler);
+        static bool is_already_visited(const kripke::state &s, unsigned long b, const visited_states &visited_states, const del::storages_handler_ptr &handler);
 
         // Print utilities
         static void print_info(const planning_task &task, strategy strategy, contraction_type contraction_type);

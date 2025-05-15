@@ -35,7 +35,7 @@ using namespace search;
 
 std::pair<node_deque, statistics>
 planner::search(const planning_task &task, const strategy strategy, contraction_type contraction_type,
-                del::storages_handler_ptr handler, const daedalus::tester::printer_ptr &printer) {
+                const del::storages_handler_ptr &handler, const daedalus::tester::printer_ptr &printer) {
     print_info(task, strategy, contraction_type);
     node_deque path;
     visited_states visited_states;
@@ -68,7 +68,7 @@ planner::search(const planning_task &task, const strategy strategy, contraction_
 }
 
 node_deque planner::unbounded_search(const planning_task &task, statistics &stats, visited_states &visited_states,
-                                     del::storages_handler_ptr handler, const daedalus::tester::printer_ptr &printer) {
+                                     const del::storages_handler_ptr &handler, const daedalus::tester::printer_ptr &printer) {
     frontier previous_iter_frontier;
     unsigned long long id = 0;
     auto path = bfs(task, strategy::unbounded_search, contraction_type::full, stats, previous_iter_frontier, 0, id,
@@ -82,7 +82,7 @@ node_deque planner::unbounded_search(const planning_task &task, statistics &stat
 
 node_deque
 planner::iterative_bounded_search(const planning_task &task, const strategy strategy, contraction_type contraction_type,
-                                  statistics &stats, visited_states &visited_states, del::storages_handler_ptr handler,
+                                  statistics &stats, visited_states &visited_states, const del::storages_handler_ptr &handler,
                                   const daedalus::tester::printer_ptr &printer) {
     unsigned long b = task.get_goal()->get_modal_depth(), iterations = 0;
     frontier previous_iter_frontier;
@@ -104,7 +104,7 @@ node_deque
 planner::bounded_search(const planning_task &task, const strategy strategy, contraction_type contraction_type,
                         statistics &stats, frontier &previous_iter_frontier, const unsigned long b,
                         unsigned long long &id,
-                        visited_states &visited_states, del::storages_handler_ptr handler,
+                        visited_states &visited_states, const del::storages_handler_ptr &handler,
                         const daedalus::tester::printer_ptr &printer) {
     return bfs(task, strategy, contraction_type, stats, previous_iter_frontier, b, id, visited_states, handler, printer);
 }
@@ -112,7 +112,7 @@ planner::bounded_search(const planning_task &task, const strategy strategy, cont
 node_deque
 planner::bfs(const planning_task &task, const strategy strategy, contraction_type contraction_type, statistics &stats,
              frontier &previous_iter_frontier, const unsigned long b, unsigned long long &id,
-             visited_states &visited_states, del::storages_handler_ptr handler,
+             visited_states &visited_states, const del::storages_handler_ptr& handler,
              const daedalus::tester::printer_ptr &printer) {
     kripke::state_ptr s0 = task.get_initial_state();
     frontier frontier = init_frontier(s0, strategy, contraction_type, b, previous_iter_frontier, stats, visited_states, handler);
@@ -123,7 +123,7 @@ planner::bfs(const planning_task &task, const strategy strategy, contraction_typ
     }
 
     unsigned long goal_depth = task.get_goal()->get_modal_depth();
-    unsigned long long max_graph_depth = 0, is_bisim_graph_depth = 0;     // is_bisim_graph_depth: deepest level of the search graph such that all nodes in the previous levels have is_bisim = true
+    unsigned long long max_graph_depth = 0;
 
 //    if (not previous_iter_frontier.empty())
     for (auto &[_, deq] : frontier)
@@ -136,8 +136,8 @@ planner::bfs(const planning_task &task, const strategy strategy, contraction_typ
     while (not frontier.empty()) {
         node_ptr n = frontier.front();
 
-        if (previous_iter_frontier.empty())
-            is_bisim_graph_depth = n->get_graph_depth();
+//        if (previous_iter_frontier.empty())
+//            is_bisim_graph_depth = n->get_graph_depth();
 
         if (n->get_graph_depth() > max_graph_depth) {
             max_graph_depth = n->get_graph_depth();
@@ -146,14 +146,16 @@ planner::bfs(const planning_task &task, const strategy strategy, contraction_typ
         }
 
         if (printer) print_begin_expanding_node(printer, n, strategy);
-        // We expand n. We have two cases:
+        // We expand n. We have three cases:
         //   1. If n is a node that has been partially expanded in the previous iteration (b-1), then we expand it wrt
         //      the actions that produced nodes n_ such that n_.is_bisim == false. These actions are stored in the
         //      member 'm_to_apply_actions' of the class 'node'.
-        //   2. Otherwise, we reached n for the first time. We then expand it wrt the entire set of actions of our task.
+        //   2. If we reached n for the first time, we then expand it wrt the entire set of actions of our task.
+        //   3. If n.state was flagged as already visited in some previous iteration and refreshing the node in the
+        //      current iteration made it non visited, then n was never expanded, so we do it wrt all actions.
         const auto &actions = n->get_to_apply_actions().empty() ? task.get_actions() : n->get_to_apply_actions();
-        node_deque path = expand_node(task, strategy, contraction_type, stats, n, actions, frontier, goal_depth, id,
-                                      visited_states, handler, printer);
+        node_deque path = expand_node(task, strategy, contraction_type, stats, n, actions, frontier,
+                                      previous_iter_frontier, goal_depth, id, visited_states, handler, printer);
 
         if (not path.empty()) return path;
 
@@ -169,7 +171,7 @@ planner::bfs(const planning_task &task, const strategy strategy, contraction_typ
 
 frontier planner::init_frontier(kripke::state_ptr &s0, const strategy strategy, contraction_type contraction_type,
                                   const unsigned long b, frontier &previous_iter_frontier, statistics &stats,
-                                  visited_states &visited_states, del::storages_handler_ptr handler) {
+                                  visited_states &visited_states, const del::storages_handler_ptr &handler) {
     frontier frontier;
     bool fresh_frontier = previous_iter_frontier.empty() or strategy == strategy::approx_iterative_bounded_search;
 
@@ -182,20 +184,27 @@ frontier planner::init_frontier(kripke::state_ptr &s0, const strategy strategy, 
             frontier.push(n0);
         }
     } else {
-        frontier = std::move(previous_iter_frontier);
-        previous_iter_frontier = {};
+        class frontier next_iter_frontier;
 
-        for (auto &[_, deq] : frontier.get())
-            for (node_ptr &n: deq)    // The nodes in previous_iter_frontier have to be refreshed
-                refresh_node(n, contraction_type, stats, visited_states, handler);
+        for (auto &[_, deq] : previous_iter_frontier.get())     // The nodes in previous_iter_frontier have to be refreshed
+            for (node_ptr &n: deq)
+                refresh_node(n, contraction_type, stats, frontier, next_iter_frontier, visited_states, handler);
+
+        // In refresh_node, we saved some nodes to be processed in the next iteration (i.e., in next_iter_frontier).
+        // If a node 'n' with bound 'b' and n.is_bisim false was flagged as already visited, then we only know that
+        // itd state is b-bisimilar to some already visited state. Therefore, when we refresh it and we set its bound
+        // to b+1, we have to check whether its state is still visited, i.e., if the refreshed state is (b+1)-bisimilar
+        // to some visited state. If this is the case and n.is_bisim is still false, then we still have to repeat this
+        // check in the next iteration, so we save 'n' in 'next_iter_frontier'
+        previous_iter_frontier = std::move(next_iter_frontier);
     }
     return frontier;
 }
 
 node_deque planner::expand_node(const planning_task &task, const strategy strategy, contraction_type contraction_type,
                                 statistics &stats, node_ptr &n, const kripke::action_deque &actions,
-                                frontier &frontier, const unsigned long goal_depth, unsigned long long &id,
-                                visited_states &visited_states, del::storages_handler_ptr handler,
+                                frontier &frontier, class frontier &previous_iter_frontier, const unsigned long goal_depth,
+                                unsigned long long &id, visited_states &visited_states, const del::storages_handler_ptr &handler,
                                 const daedalus::tester::printer_ptr &printer) {
     kripke::action_deque to_reapply_actions;
     bool is_dead_node = true;
@@ -223,7 +232,8 @@ node_deque planner::expand_node(const planning_task &task, const strategy strate
                         to_reapply_actions.push_back(a);            // reapply 'a' to n in the next iteration
 
                     frontier.push(n_);              // We update the frontier
-                }
+                } else if (not n_->is_bisim())          // If n_'s b-contracted state has been visited, but it's not bisimilar to the real state,
+                    previous_iter_frontier.push(n_);    // it could still be that the (b+1)-contraction hasn't been visited
             } else if (printer) print_not_applied_action(printer, a);
         } else {
             if (strategy == strategy::iterative_bounded_search) to_reapply_actions.push_back(a);
@@ -259,7 +269,7 @@ node_deque planner::extract_path(node_ptr n, statistics &stats) {
 }
 
 bool planner::validate(const search::planning_task &task, const search::node_deque &path,
-                       del::storages_handler_ptr handler) {
+                       const del::storages_handler_ptr &handler) {
     kripke::state_ptr s = task.get_initial_state();
     bool valid = true;
     auto n = path.begin();
@@ -292,7 +302,7 @@ bool planner::validate(const search::planning_task &task, const search::node_deq
 node_ptr planner::update_node(const strategy strategy, contraction_type contraction_type, const node_ptr &n,
                               const kripke::action_ptr &a,
                               unsigned long long &id, const visited_states &visited_states,
-                              del::storages_handler_ptr handler, unsigned long goal_depth) {
+                              const del::storages_handler_ptr &handler, unsigned long goal_depth) {
     kripke::state_ptr s_ = std::make_shared<kripke::state>(
             kripke::updater::product_update(*n->get_state(), *a, handler->get_label_storage()));
 
@@ -316,29 +326,37 @@ node_ptr planner::update_node(const strategy strategy, contraction_type contract
 }
 
 void planner::refresh_node(node_ptr &n, contraction_type contraction_type, statistics &stats,
-                           visited_states &visited_states, del::storages_handler_ptr handler) {
+                           frontier &frontier, class frontier &next_iter_frontier,
+                           visited_states &visited_states, const del::storages_handler_ptr &handler) {
     n->increment_bound();           // We increment the bound value. Moreover,  node n might have children n' such that
     n->clear_non_bisim_children();  // n'.is_bisim == false. We have to discard them before we move to the next iteration
 
     if (not n->is_bisim()) {                                        // If we can still do some refinement steps
-        stats.m_visited_worlds_no -= n->get_state()->get_worlds_number();
+//        stats.m_visited_worlds_no -= n->get_state()->get_worlds_number();
 
 //        auto [is_bisim, s_contr, structures] = kripke::bisimulator::resume_contraction(contraction_type, *n->get_original_state(), n->get_bound(), n->get_bpr_structures(), handler);    // We do another refinement step
         auto [is_bisim, s_contr] = kripke::bisimulator::contract(contraction_type, *n->get_original_state(), n->get_bound(), handler);    // We do another refinement step
+        bool already_visited = is_already_visited(s_contr, n->get_bound(), visited_states, handler);
 
-        n->set_is_bisim(is_bisim);                                  // And we update the value of is_bisim
         n->set_state(std::make_shared<kripke::state>(std::move(s_contr)));
-        update_visited_states(n->get_state(), visited_states);
-        update_statistics(stats, n);
-
+        n->set_is_bisim(is_bisim);                                  // And we update the value of is_bisim
         if (is_bisim) n->clear_original_state();
+
+        if (already_visited) { // If the refreshed state is still visited
+            if (n->is_bisim()) return;                              // If the refreshed state is bisimilar to the real one, we don't need to do anything;
+            else next_iter_frontier.push(n);                        // otherwise, we save the node for next iteration
+        } else {
+            frontier.push(n);                                       // If the refreshed state is not visited, then we
+            update_visited_states(n->get_state(), visited_states);  // save it in the frontier for the current iteration
+        }
+        update_statistics(stats, n);
 //            n->clear_bpr_structures();
-    }
+    } else frontier.push(n);
 }
 
 node_ptr planner::init_node(contraction_type contraction_type, const state_ptr &s, const action_ptr &a, bool was_bisim,
                             const node_ptr &parent, unsigned long long id, const visited_states &visited_states,
-                            del::storages_handler_ptr handler, unsigned long b) {
+                            const del::storages_handler_ptr &handler, unsigned long b) {
     auto [is_bisim, s_contr] = kripke::bisimulator::contract(contraction_type, *s, b, handler);
     bool already_visited = is_already_visited(s_contr, b, visited_states, handler);
 
@@ -360,7 +378,7 @@ void planner::update_visited_states(const kripke::state_ptr &s, visited_states &
     }, visited_states);
 }
 
-bool planner::is_already_visited(const kripke::state &s, unsigned long b, const visited_states &visited_states, del::storages_handler_ptr handler) {
+bool planner::is_already_visited(const kripke::state &s, unsigned long b, const visited_states &visited_states, const del::storages_handler_ptr &handler) {
     return std::visit([&](auto &&arg) -> bool {
         using arg_type = std::remove_reference_t<decltype(arg)>;
 

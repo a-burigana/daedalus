@@ -395,8 +395,8 @@ void grapevine::write_ma_star_problem(unsigned long agents_no, unsigned long sec
     for (auto s = 0; s < secrets_no; ++s) {
         out
             << "initially C(" << all_agents << ", "
-            << "( B( " << task.get_language()->get_agent_name(s) << " , "  << task.get_language()->get_atom_name(s) << " ) | "
-            << "( B( " << task.get_language()->get_agent_name(s) << " , -" << task.get_language()->get_atom_name(s) << " ) ) "
+            << "( ( B( " << task.get_language()->get_agent_name(s) << " , "  << task.get_language()->get_atom_name(s) << " ) ) | "
+            << "( B( " << task.get_language()->get_agent_name(s) << " , -" << task.get_language()->get_atom_name(s) << " ) ) ) "
             << ");\n";
     }
 

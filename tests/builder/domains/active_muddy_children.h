@@ -40,6 +40,7 @@ namespace daedalus::tester {
         static search::planning_task build_task(unsigned long children_no, unsigned long muddy_no, bool is_0_muddy, del::label_storage &l_storage);
         static std::vector<search::planning_task> build_tasks(del::label_storage &l_storage);
 
+        static void write_ma_star_problem(unsigned long children_no, unsigned long muddy_no, bool is_0_muddy, del::label_storage &l_storage);
     private:
         static kripke::action build_ask(unsigned long children_no, unsigned long muddy_no, del::agent ag);
     };

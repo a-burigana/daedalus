@@ -32,6 +32,7 @@
 #include <filesystem>
 #include <fstream>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <utility>
 
@@ -204,8 +205,8 @@ del::formula_ptr gossip::build_goal(unsigned long agents_no, unsigned long secre
 void gossip::write_ma_star_problem(unsigned long agents_no, unsigned long secrets_no, unsigned long goal_id,
                                    label_storage &l_storage) {
     auto task = build_task(agents_no, secrets_no, goal_id, l_storage);
-    std::string path = "tests/builder/domains/ma_star/" + task.get_domain_name() + "/";
-    std::string name = task.get_problem_id();
+    std::string path = "../tests/builder/domains/ma_star/" + task.get_domain_name() + "/";
+    std::string name = task.get_domain_name() + "_" + task.get_problem_id();
     std::string ext  = ".txt";
 
     if (not std::filesystem::exists(path))
@@ -216,6 +217,8 @@ void gossip::write_ma_star_problem(unsigned long agents_no, unsigned long secret
     ma_star_utils::print_atoms(out, task);
     ma_star_utils::print_agents(out, task);
     ma_star_utils::print_action_names(out, task);
+
+    out << std::endl << std::endl;
 
     for (unsigned long ag_1 = 0; ag_1 < secrets_no; ++ag_1)
         for (unsigned long ag_2 = 0; ag_2 < agents_no; ++ag_2)
@@ -235,10 +238,26 @@ void gossip::write_ma_star_problem(unsigned long agents_no, unsigned long secret
                 out << " ;" << std::endl;
 
                 out << task.get_language()->get_agent_name(ag_1) << " observes " << act_name << ";" << std::endl;
-                out << task.get_language()->get_agent_name(ag_2) << " observes " << act_name << ";" << std::endl;
+                out << task.get_language()->get_agent_name(ag_2) << " observes " << act_name << ";" << std::endl << std::endl;
             }
 
-    // todo: init
+    out << "\ninitially ";
+    for (auto s = 0; s < secrets_no; ++s)
+        out << task.get_language()->get_atom_name(s) << (s+1 < secrets_no ? ", " : ";\n");
 
+    std::string all_agents = "[";
+    for (auto ag = 0; ag < agents_no; ++ag)
+        all_agents += task.get_language()->get_agent_name(ag) + (ag+1 < agents_no ? ", " : "]");
+
+    for (auto s = 0; s < secrets_no; ++s) {
+        out
+            << "initially C(" << all_agents << ", "
+            << "( B( " << task.get_language()->get_agent_name(s) << " , "  << task.get_language()->get_atom_name(s) << " ) | "
+            << "( B( " << task.get_language()->get_agent_name(s) << " , -" << task.get_language()->get_atom_name(s) << " ) ) "
+            << ");\n";
+    }
+
+    out << std::endl << "goal ";
     ma_star_utils::print_formula(out, task.get_language(), task.get_goal());
+    out << ";" << std::endl;
 }

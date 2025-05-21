@@ -101,7 +101,7 @@ void run(int argc, char *argv[]) {
     std::string semantics = "kripke", strategy = "unbounded", contraction_type = "full", bound;
     std::string domain;
     std::vector<std::string> parameters, actions;
-    bool print_results = false, print_info = false, debug = false;
+    bool print_results = false, print_info = false, debug = false, ma_star = false;
 
     auto cli = (
             required("-d", "--domain") & value("domain", domain),
@@ -113,7 +113,8 @@ void run(int argc, char *argv[]) {
             option("-b", "--bound" ) & values("bound", bound).doc("Initial bound"),
             option("--print").set(print_results).doc("Print time results"),
             option("--info").set(print_info),
-            option("--debug").set(debug)
+            option("--debug").set(debug),
+            option("--ma_star").set(ma_star)
     );
 
     if (not parse(argc, argv, cli)) {
@@ -142,6 +143,23 @@ void run(int argc, char *argv[]) {
         task = std::make_unique<search::planning_task>(selective_communication::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage));
     else if (domain == "tiger" or domain == "tig")
         task = std::make_unique<search::planning_task>(tiger::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), l_storage));
+
+    if (ma_star) {
+        if (domain == "active_muddy_children" or domain == "amc")
+            ;
+        else if (domain == "collaboration_communication" or domain == "cc")
+            ;
+        else if (domain == "gossip" or domain == "gos")
+            gossip::write_ma_star_problem(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage);
+        else if (domain == "grapevine" or domain == "gra")
+            grapevine::write_ma_star_problem(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage);
+        else if (domain == "selective_communication" or domain == "sc")
+            ;
+        else if (domain == "tiger" or domain == "tig")
+            ;
+
+        return;
+    }
 
 //    search::delphic_planning_task task_ = delphic_utils::convert(*task);
     del::storages_handler_ptr handler = std::make_shared<del::storages_handler>(task->get_goal()->get_modal_depth(), std::move(l_storage));

@@ -284,8 +284,8 @@ del::formula_ptr grapevine::build_goal(unsigned long agents_no, unsigned long se
 void grapevine::write_ma_star_problem(unsigned long agents_no, unsigned long secrets_no, unsigned long learning_ags_no,
                                       del::label_storage &l_storage) {
     auto task = build_task(agents_no, secrets_no, learning_ags_no, l_storage);
-    std::string path = "tests/builder/domains/ma_star/" + task.get_domain_name() + "/";
-    std::string name = task.get_problem_id();
+    std::string path = "../tests/builder/domains/ma_star/" + task.get_domain_name() + "/";
+    std::string name = task.get_domain_name() + "_" + task.get_problem_id();
     std::string ext  = ".txt";
 
     if (not std::filesystem::exists(path))
@@ -295,10 +295,14 @@ void grapevine::write_ma_star_problem(unsigned long agents_no, unsigned long sec
 
     ma_star_utils::print_atoms(out, task);
     ma_star_utils::print_agents(out, task);
-    ma_star_utils::print_action_names(out, task);
+//    ma_star_utils::print_action_names(out, task);
+
+    out << std::endl << std::endl;
 
     for (unsigned long teller = 0; teller < secrets_no; ++teller) {
         std::string act_name = "tell_" + std::to_string(teller);
+        out << "action " << act_name << ";\n";
+
         formula_ptr s_1 = std::make_shared<atom_formula>(teller);     // index of ag_1 is the same as index of s_1
         formula_deque fs;
 
@@ -337,6 +341,7 @@ void grapevine::write_ma_star_problem(unsigned long agents_no, unsigned long sec
                 out << ";" << std::endl;
             }
         }
+        out << std::endl;
     }
 
     for (unsigned long ag = 0; ag < agents_no; ++ag) {
@@ -345,6 +350,7 @@ void grapevine::write_ma_star_problem(unsigned long agents_no, unsigned long sec
         std::string right_name = "right_" + std::to_string(ag);
 
         // left
+        out << "action " << left_name << ";\n";
         formula_ptr in_room_1_ag = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_1_" + ag_name));
         formula_ptr not_in_room_1_ag = std::make_shared<not_formula>(in_room_1_ag);
 
@@ -359,7 +365,9 @@ void grapevine::write_ma_star_problem(unsigned long agents_no, unsigned long sec
         for (agent ag2 = 0; ag2 < task.get_language()->get_agents_number(); ++ag2)
             out << task.get_language()->get_agent_name(ag2) << " observes " << left_name << ";" << std::endl;
 
+        out << std::endl;
         // right
+        out << "action " << right_name << ";\n";
         out << "executable " << right_name << " if ";
         ma_star_utils::print_formula(out, task.get_language(), in_room_1_ag);
         out << " ;" << std::endl;
@@ -370,9 +378,29 @@ void grapevine::write_ma_star_problem(unsigned long agents_no, unsigned long sec
 
         for (agent ag2 = 0; ag2 < task.get_language()->get_agents_number(); ++ag2)
             out << task.get_language()->get_agent_name(ag2) << " observes " << right_name << ";" << std::endl;
+        out << std::endl;
     }
 
-    // todo: init
+    out << "\ninitially ";
+    for (auto ag = 0; ag < agents_no; ++ag)
+        out << "in_room_1_ag_" << ag << ", ";
 
+    for (auto s = 0; s < secrets_no; ++s)
+        out << task.get_language()->get_atom_name(s) << (s+1 < secrets_no ? ", " : ";\n");
+
+    std::string all_agents = "[";
+    for (auto ag = 0; ag < agents_no; ++ag)
+        all_agents += task.get_language()->get_agent_name(ag) + (ag+1 < agents_no ? ", " : "]");
+
+    for (auto s = 0; s < secrets_no; ++s) {
+        out
+            << "initially C(" << all_agents << ", "
+            << "( B( " << task.get_language()->get_agent_name(s) << " , "  << task.get_language()->get_atom_name(s) << " ) | "
+            << "( B( " << task.get_language()->get_agent_name(s) << " , -" << task.get_language()->get_atom_name(s) << " ) ) "
+            << ");\n";
+    }
+
+    out << std::endl << "goal ";
     ma_star_utils::print_formula(out, task.get_language(), task.get_goal());
+    out << ";" << std::endl;
 }

@@ -542,7 +542,7 @@ void collaboration_communication::write_ma_star_problem(unsigned long agents_no,
     for (auto ag = 0; ag < agents_no; ++ag)
         all_agents += task.get_language()->get_agent_name(ag) + (ag+1 < agents_no ? ", " : "]");
 
-    out << "initially C(" << all_agents << ", " << init << ");\n";;
+    out << "initially C(" << all_agents << ", " << init << ");\n";
 
     for (auto b = 1; b <= boxes_no; ++b) {
         formula_deque fs;

@@ -31,6 +31,9 @@
 #include "../../../include/del/formulas/propositional/and_formula.h"
 #include "../../../include/del/formulas/propositional/or_formula.h"
 #include "../../../include/del/formulas/propositional/false_formula.h"
+#include "ma_star_utils.h"
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <string>
 
@@ -327,4 +330,169 @@ del::formula_deque selective_communication::in_room_agents(const del::language_p
     }
 
     return fs;
+}
+
+void
+selective_communication::write_ma_star_problem(unsigned long agents_no, unsigned long rooms_no, unsigned long goal_id,
+                                               del::label_storage &l_storage) {
+    auto task = build_task(agents_no, rooms_no, goal_id, l_storage);
+    std::string path = "../tests/builder/domains/ma_star/" + task.get_domain_name() + "/";
+    std::string name = task.get_domain_name() + "_" + task.get_problem_id();
+    std::string ext  = ".txt";
+
+    if (not std::filesystem::exists(path))
+        std::filesystem::create_directories(path);
+
+    std::ofstream out = std::ofstream{path + name + ext};
+
+    ma_star_utils::print_atoms(out, task);
+    ma_star_utils::print_agents(out, task);
+
+    out << std::endl << std::endl;
+
+    for (agent i = 0; i < task.get_language()->get_agents_number(); ++i) {
+        std::string ag_name = task.get_language()->get_agent_name(i);
+
+        for (unsigned long r = 1; r <= rooms_no; ++r) {
+            std::string act_name = "tell_" + ag_name + "_" + std::to_string(r);
+            formula_ptr q     = std::make_shared<atom_formula>(task.get_language()->get_atom_id("q"));
+            formula_ptr f_pre = std::make_shared<box_formula>(i, q);
+
+            out << "action " << act_name << ";\n";
+            out << "executable " << act_name << " if ";
+            ma_star_utils::print_formula(out, task.get_language(), f_pre);
+            out << " ;\n";
+
+            out << act_name << " announces ";
+            ma_star_utils::print_formula(out, task.get_language(), q);
+            out << " ;\n";
+
+            out << ag_name << " observes " << act_name << ";\n";
+
+            for (agent ag2 = 0; ag2 < task.get_language()->get_agents_number(); ++ag2) {
+                if (ag2 != i) {
+                    out
+                        << task.get_language()->get_agent_name(ag2) << " observes " << act_name << " if "
+                        << "in_room_" + std::to_string(r) + "_" + task.get_language()->get_agent_name(ag2)
+                        << " ;\n";
+
+//                    formula_deque fs;
+//
+//                    for (unsigned long r2 = 1; r2 <= rooms_no; ++r2) {
+//                        formula_ptr in_room_r2_ag  = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_" + std::to_string(r2) + "_" + task.get_language()->get_agent_name(i)));
+//                        formula_ptr in_room_r2_ag2 = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_" + std::to_string(r2) + "_" + task.get_language()->get_agent_name(ag2)));
+//
+//                        formula_ptr both_ags_in_room_r2 = std::make_shared<and_formula>(formula_deque{in_room_r2_ag, in_room_r2_ag2});
+//                        fs.push_back(both_ags_in_room_r2);
+//                    }
+//
+//                    formula_ptr obs_cond = std::make_shared<or_formula>(fs);
+//
+//                    out << task.get_language()->get_agent_name(ag2) << " observes " << act_name << " if ";
+//                    ma_star_utils::print_formula(out, task.get_language(), obs_cond);
+//                    out << " ;\n";
+                }
+            }
+            out << std::endl;
+        }
+
+        std::string act_name = "sense_" + ag_name;
+        formula_ptr sensed = std::make_shared<atom_formula>(task.get_language()->get_atom_id("q"));
+
+        std::string f_pre = "in_room_" + std::to_string(rooms_no) + "_" + ag_name;
+
+        out << "action " << act_name << ";\n";
+        out << "executable " << act_name << " if " << f_pre << " ;\n";
+
+        out << act_name << " determines ";
+        ma_star_utils::print_formula(out, task.get_language(), sensed);
+        out << " ;\n";
+
+        out << ag_name << " observes " << act_name << ";\n";
+
+        for (agent ag2 = 0; ag2 < task.get_language()->get_agents_number(); ++ag2)
+            if (ag2 != i)
+                out
+                    << task.get_language()->get_agent_name(ag2) << " aware_of " << act_name
+                    << " if " << "in_room_" << rooms_no << "_" << task.get_language()->get_agent_name(ag2) << ";\n";
+
+        out << std::endl;
+
+        // left
+        std::string left_name = "left_" + ag_name;
+
+        formula_ptr in_room_1_ag = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_1_" + ag_name));
+        formula_ptr f_pre_left = std::make_shared<not_formula>(in_room_1_ag);
+
+        out << "action " << left_name << ";\n";
+        out << "executable " << left_name << " if ";
+        ma_star_utils::print_formula(out, task.get_language(), f_pre_left);
+        out << " ;" << std::endl;
+
+//        std::string in_room_n_ag = "in_room_" + std::to_string(rooms_no) + "_" + ag_name;
+//        out << left_name << " causes -" << in_room_n_ag << " ;\n";
+
+        for (unsigned long r = 1; r < rooms_no; ++r) {
+            std::string in_room_r_ag_from = "in_room_" + std::to_string(r+1) + "_" + ag_name;
+            std::string in_room_r_ag_to   = "in_room_" + std::to_string(r)   + "_" + ag_name;
+
+            out << left_name << " causes -" << in_room_r_ag_from << " if " << in_room_r_ag_from << " ;\n";
+            out << left_name << " causes  " << in_room_r_ag_to   << " if " << in_room_r_ag_from << " ;\n";
+        }
+
+        for (agent ag2 = 0; ag2 < task.get_language()->get_agents_number(); ++ag2)
+            out << task.get_language()->get_agent_name(ag2) << " observes " << left_name << ";" << std::endl;
+
+        out << std::endl;
+
+        // right
+        std::string right_name = "right_" + ag_name;
+
+        formula_ptr in_room_n_ag = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_" + std::to_string(rooms_no) + "_" + ag_name));
+        formula_ptr f_pre_right = std::make_shared<not_formula>(in_room_n_ag);
+
+        out << "action " << right_name << ";\n";
+        out << "executable " << right_name << " if ";
+        ma_star_utils::print_formula(out, task.get_language(), f_pre_right);
+        out << " ;" << std::endl;
+
+//        std::string in_room_1_ag = "in_room_1_" + ag_name;
+//        out << right_name << " causes -" << in_room_1_ag << " ;\n";
+
+        for (unsigned long r = 1; r < rooms_no; ++r) {
+            std::string in_room_r_ag_from = "in_room_" + std::to_string(r)   + "_" + ag_name;
+            std::string in_room_r_ag_to   = "in_room_" + std::to_string(r+1) + "_" + ag_name;
+
+            out << right_name << " causes -" << in_room_r_ag_from << " if " << in_room_r_ag_from << " ;\n";
+            out << right_name << " causes  " << in_room_r_ag_to   << " if " << in_room_r_ag_from << " ;\n";
+        }
+
+        for (agent ag2 = 0; ag2 < task.get_language()->get_agents_number(); ++ag2)
+            out << task.get_language()->get_agent_name(ag2) << " observes " << right_name << ";" << std::endl;
+
+        out << std::endl;
+    }
+
+    out << "\ninitially ";
+    std::string init;
+
+    for (auto ag = 0; ag < agents_no; ++ag) {
+        init += "in_room_2_" + task.get_language()->get_agent_name(ag) + ", ";
+
+        for (auto r = 1; r <= rooms_no; ++r)
+            if (r != 2)
+                init += "-in_room_" + std::to_string(r) + "_" + task.get_language()->get_agent_name(ag) + (r == rooms_no ? "" : ", ");
+    }
+
+    out << "q, " << init << ";\n";
+
+    std::string all_agents = "[";
+    for (auto ag = 0; ag < agents_no; ++ag)
+        all_agents += task.get_language()->get_agent_name(ag) + (ag+1 < agents_no ? ", " : "]");
+
+    out << "initially C(" << all_agents << ", " << init << ");\n";
+
+    out << std::endl << "goal ";
+    ma_star_utils::print_formula(out, task.get_language(), task.get_goal());
+    out << ";" << std::endl;
 }

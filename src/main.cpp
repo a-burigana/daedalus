@@ -154,7 +154,7 @@ void run(int argc, char *argv[]) {
         else if (domain == "grapevine" or domain == "gra")
             grapevine::write_ma_star_problem(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage);
         else if (domain == "selective_communication" or domain == "sc")
-            ;
+            selective_communication::write_ma_star_problem(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage);
         else if (domain == "tiger" or domain == "tig")
             ;
 

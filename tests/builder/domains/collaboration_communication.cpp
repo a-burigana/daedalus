@@ -513,6 +513,64 @@ void collaboration_communication::write_ma_star_problem(unsigned long agents_no,
         out << std::endl;
     }
 
+    out << "\ninitially ";
+    std::string init;
+
+    for (auto ag = 0; ag < agents_no; ++ag) {
+        init += "in_room_2_" + task.get_language()->get_agent_name(ag) + ", ";
+
+        for (auto r = 1; r <= rooms_no; ++r)
+            if (r != 2)
+                init += "-in_room_" + std::to_string(r) + "_" + task.get_language()->get_agent_name(ag) + ", ";
+    }
+
+    init += "in_room_1_box_1, ";
+    for (auto r = 3; r <= rooms_no; ++r)
+        init += "-in_room_" + std::to_string(r) + "_box_1, ";
+
+    for (auto b = 2; b <= boxes_no; ++b)
+        for (auto r = 1; r <= rooms_no; ++r)
+            if (r != 2) {
+                std::string sign = (r == b+1 ? "" : "-");
+                init += sign + "in_room_" + std::to_string(r) + "_box_" + std::to_string(b) +
+                        (r == rooms_no and b == boxes_no ? "" : ", ");
+            }
+
+    out << init << ";\n";
+
+    std::string all_agents = "[";
+    for (auto ag = 0; ag < agents_no; ++ag)
+        all_agents += task.get_language()->get_agent_name(ag) + (ag+1 < agents_no ? ", " : "]");
+
+    out << "initially C(" << all_agents << ", " << init << ");\n";;
+
+    for (auto b = 1; b <= boxes_no; ++b) {
+        formula_deque fs;
+
+        for (auto r = 1; r <= rooms_no; ++r) {
+            if (r != 2) {
+                formula_deque fs2;
+                auto in_box_r = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_" + std::to_string(r) + "_box_" + std::to_string(b)));
+                fs2.push_back(in_box_r);
+
+                for (auto r2 = 1; r2 <= rooms_no; ++r2) {
+                    if (r2 != 2 and r != r2) {
+                        auto in_box_r2 = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_" + std::to_string(r2) + "_box_" + std::to_string(b)));
+                        auto not_in_box_r2 = std::make_shared<not_formula>(in_box_r2);
+                        fs2.push_back(not_in_box_r2);
+                    }
+                }
+                auto only_room_r_b = std::make_shared<and_formula>(fs2);
+                fs.push_back(only_room_r_b);
+            }
+
+        }
+        auto only_one_room_b = std::make_shared<or_formula>(fs);
+        out << "initially C(" << all_agents << ", ";
+        ma_star_utils::print_formula(out, task.get_language(), only_one_room_b);
+        out << " );\n";
+    }
+
     out << std::endl << "goal ";
     ma_star_utils::print_formula(out, task.get_language(), task.get_goal());
     out << ";" << std::endl;

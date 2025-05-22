@@ -30,6 +30,9 @@
 #include "../../../include/del/formulas/modal/box_formula.h"
 #include "../../../include/del/formulas/modal/diamond_formula.h"
 #include "../../../include/del/formulas/propositional/false_formula.h"
+#include "ma_star_utils.h"
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <string>
 
@@ -362,4 +365,145 @@ del::formula_deque collaboration_communication::at_room_agents(const del::langua
     }
 
     return fs;
+}
+
+void collaboration_communication::write_ma_star_problem(unsigned long agents_no, unsigned long rooms_no,
+                                                        unsigned long boxes_no, unsigned long goal_id,
+                                                        del::label_storage &l_storage) {
+    auto task = build_task(agents_no, rooms_no, boxes_no, goal_id, l_storage);
+    std::string path = "../tests/builder/domains/ma_star/" + task.get_domain_name() + "/";
+    std::string name = task.get_domain_name() + "_" + task.get_problem_id();
+    std::string ext  = ".txt";
+
+    if (not std::filesystem::exists(path))
+        std::filesystem::create_directories(path);
+
+    std::ofstream out = std::ofstream{path + name + ext};
+
+    ma_star_utils::print_atoms(out, task);
+    ma_star_utils::print_agents(out, task);
+
+    out << std::endl << std::endl;
+
+    for (agent i = 0; i < task.get_language()->get_agents_number(); ++i) {
+        std::string ag_name = task.get_language()->get_agent_name(i);
+
+        for (unsigned long r = 1; r <= rooms_no; ++r)
+            if (r != 2)
+                for (unsigned long b = 1; b <= boxes_no; ++b) {
+                    std::string act_name = "tell_" + ag_name + "_in_room_" + std::to_string(r) + "_box_" + std::to_string(b);
+
+                    out << "action " << act_name << ";\n";
+
+                    formula_ptr in_room_box  = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_" + std::to_string(r) + "_box_" + std::to_string(b)));
+                    formula_ptr f_pre = std::make_shared<box_formula>(i, in_room_box);
+
+                    out << "executable " << act_name << " if ";
+                    ma_star_utils::print_formula(out, task.get_language(), f_pre);
+                    out << " ;\n";
+
+                    out << act_name << " announces ";
+                    ma_star_utils::print_formula(out, task.get_language(), in_room_box);
+                    out << " ;\n";
+
+                    out << ag_name << " observes " << act_name << ";\n";
+
+                    for (agent ag2 = 0; ag2 < task.get_language()->get_agents_number(); ++ag2)
+                        if (ag2 != i)
+                            out
+                                << task.get_language()->get_agent_name(ag2) << " observes " << act_name
+                                << " if " << "at_room_" << r << "_" << task.get_language()->get_agent_name(ag2) << ";\n";
+
+                    out << std::endl;
+                }
+
+        for (unsigned long r = 1; r <= rooms_no; ++r)
+            if (r != 2)
+                for (unsigned long b = 1; b <= boxes_no; ++b) {
+                    std::string act_name = "sense_" + ag_name + "_in_room_" + std::to_string(r) + "_box_" + std::to_string(b);
+
+                    formula_ptr f_pre  = std::make_shared<atom_formula>(task.get_language()->get_atom_id("at_room_" + std::to_string(r) + "_" + ag_name));
+                    formula_ptr sensed = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_" + std::to_string(r) + "_box_" + std::to_string(b)));
+
+                    out << "action " << act_name << ";\n";
+                    out << "executable " << act_name << " if ";
+                    ma_star_utils::print_formula(out, task.get_language(), f_pre);
+                    out << " ;\n";
+
+                    out << act_name << " determines ";
+                    ma_star_utils::print_formula(out, task.get_language(), sensed);
+                    out << " ;\n";
+
+                    out << ag_name << " observes " << act_name << ";\n";
+
+                    for (agent ag2 = 0; ag2 < task.get_language()->get_agents_number(); ++ag2)
+                        if (ag2 != i)
+                            out
+                                    << task.get_language()->get_agent_name(ag2) << " aware_of " << act_name
+                                    << " if " << "at_room_" << r << "_" << task.get_language()->get_agent_name(ag2) << ";\n";
+
+                    out << std::endl;
+                }
+
+//
+//        collaboration_communication::build_left(agents_no, rooms_no, boxes_no, i, all_ags);
+
+        // left
+        std::string left_name = "left_" + ag_name;
+
+        formula_ptr at_room_1_ag = std::make_shared<atom_formula>(task.get_language()->get_atom_id("at_room_1_" + ag_name));
+        formula_ptr f_pre_left = std::make_shared<not_formula>(at_room_1_ag);
+
+        out << "action " << left_name << ";\n";
+        out << "executable " << left_name << " if ";
+        ma_star_utils::print_formula(out, task.get_language(), f_pre_left);
+        out << " ;" << std::endl;
+
+//        std::string at_room_n_ag = "at_room_" + std::to_string(rooms_no) + "_" + ag_name;
+//        out << left_name << " causes -" << at_room_n_ag << " ;\n";
+
+        for (unsigned long r = 1; r < rooms_no; ++r) {
+            std::string at_room_r_ag_from = "at_room_" + std::to_string(r+1) + "_" + ag_name;
+            std::string at_room_r_ag_to   = "at_room_" + std::to_string(r)   + "_" + ag_name;
+
+            out << left_name << " causes -" << at_room_r_ag_from << " if " << at_room_r_ag_from << " ;\n";
+            out << left_name << " causes  " << at_room_r_ag_to   << " if " << at_room_r_ag_from << " ;\n";
+        }
+
+        for (agent ag2 = 0; ag2 < task.get_language()->get_agents_number(); ++ag2)
+            out << task.get_language()->get_agent_name(ag2) << " observes " << left_name << ";" << std::endl;
+
+        out << std::endl;
+
+        // right
+        std::string right_name = "right_" + ag_name;
+
+        formula_ptr at_room_n_ag = std::make_shared<atom_formula>(task.get_language()->get_atom_id("at_room_" + std::to_string(rooms_no) + "_" + ag_name));
+        formula_ptr f_pre_right = std::make_shared<not_formula>(at_room_n_ag);
+
+        out << "action " << right_name << ";\n";
+        out << "executable " << right_name << " if ";
+        ma_star_utils::print_formula(out, task.get_language(), f_pre_right);
+        out << " ;" << std::endl;
+
+//        std::string at_room_1_ag = "at_room_1_" + ag_name;
+//        out << right_name << " causes -" << at_room_1_ag << " ;\n";
+
+        for (unsigned long r = 1; r < rooms_no; ++r) {
+            std::string at_room_r_ag_from = "at_room_" + std::to_string(r)   + "_" + ag_name;
+            std::string at_room_r_ag_to   = "at_room_" + std::to_string(r+1) + "_" + ag_name;
+
+            out << right_name << " causes -" << at_room_r_ag_from << " if " << at_room_r_ag_from << " ;\n";
+            out << right_name << " causes  " << at_room_r_ag_to   << " if " << at_room_r_ag_from << " ;\n";
+        }
+
+        for (agent ag2 = 0; ag2 < task.get_language()->get_agents_number(); ++ag2)
+            out << task.get_language()->get_agent_name(ag2) << " observes " << right_name << ";" << std::endl;
+
+        out << std::endl;
+    }
+
+    out << std::endl << "goal ";
+    ma_star_utils::print_formula(out, task.get_language(), task.get_goal());
+    out << ";" << std::endl;
 }

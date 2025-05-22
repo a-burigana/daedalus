@@ -148,7 +148,7 @@ void run(int argc, char *argv[]) {
         if (domain == "active_muddy_children" or domain == "amc")
             active_muddy_children::write_ma_star_problem(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage);
         else if (domain == "collaboration_communication" or domain == "cc")
-            ;
+            collaboration_communication::write_ma_star_problem(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), std::stoul(parameters[3]), l_storage);
         else if (domain == "gossip" or domain == "gos")
             gossip::write_ma_star_problem(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage);
         else if (domain == "grapevine" or domain == "gra")

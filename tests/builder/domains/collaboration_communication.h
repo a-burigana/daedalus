@@ -42,6 +42,7 @@ namespace daedalus::tester {
         static search::planning_task build_task(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no, unsigned long goal_id, del::label_storage &l_storage);
         static std::vector<search::planning_task> build_tasks(del::label_storage &l_storage);
 
+        static void write_ma_star_problem(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no, unsigned long goal_id, del::label_storage &l_storage);
     private:
         static kripke::action build_left(unsigned long agents_no, unsigned long rooms_no, unsigned long boxes_no,
                                       del::agent ag, const del::agent_set &fo_ags);

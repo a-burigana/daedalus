@@ -215,8 +215,8 @@ void gossip::write_ma_star_problem(unsigned long agents_no, unsigned long secret
     std::ofstream out = std::ofstream{path + name + ext};
 
     ma_star_utils::print_atoms(out, task);
-    ma_star_utils::print_agents(out, task);
     ma_star_utils::print_action_names(out, task);
+    ma_star_utils::print_agents(out, task);
 
     out << std::endl << std::endl;
 

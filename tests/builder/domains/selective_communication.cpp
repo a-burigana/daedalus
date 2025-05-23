@@ -346,6 +346,19 @@ selective_communication::write_ma_star_problem(unsigned long agents_no, unsigned
     std::ofstream out = std::ofstream{path + name + ext};
 
     ma_star_utils::print_atoms(out, task);
+    out << "action ";
+
+    for (agent i = 0; i < task.get_language()->get_agents_number(); ++i) {
+        std::string ag_name = task.get_language()->get_agent_name(i);
+
+        for (unsigned long r = 1; r <= rooms_no; ++r)
+            out << "tell_" + ag_name + "_" + std::to_string(r) << ", ";
+
+        out << "sense_" + ag_name << ", ";
+        out << "left_" + ag_name << ", ";
+        out << "right_" + ag_name << (i+1 == agents_no ? ";\n" : ", ");
+    }
+
     ma_star_utils::print_agents(out, task);
 
     out << std::endl << std::endl;
@@ -358,7 +371,6 @@ selective_communication::write_ma_star_problem(unsigned long agents_no, unsigned
             formula_ptr q     = std::make_shared<atom_formula>(task.get_language()->get_atom_id("q"));
             formula_ptr f_pre = std::make_shared<box_formula>(i, q);
 
-            out << "action " << act_name << ";\n";
             out << "executable " << act_name << " if ";
             ma_star_utils::print_formula(out, task.get_language(), f_pre);
             out << " ;\n";
@@ -401,7 +413,6 @@ selective_communication::write_ma_star_problem(unsigned long agents_no, unsigned
 
         std::string f_pre = "in_room_" + std::to_string(rooms_no) + "_" + ag_name;
 
-        out << "action " << act_name << ";\n";
         out << "executable " << act_name << " if " << f_pre << " ;\n";
 
         out << act_name << " determines ";
@@ -424,7 +435,6 @@ selective_communication::write_ma_star_problem(unsigned long agents_no, unsigned
         formula_ptr in_room_1_ag = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_1_" + ag_name));
         formula_ptr f_pre_left = std::make_shared<not_formula>(in_room_1_ag);
 
-        out << "action " << left_name << ";\n";
         out << "executable " << left_name << " if ";
         ma_star_utils::print_formula(out, task.get_language(), f_pre_left);
         out << " ;" << std::endl;
@@ -451,7 +461,6 @@ selective_communication::write_ma_star_problem(unsigned long agents_no, unsigned
         formula_ptr in_room_n_ag = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_" + std::to_string(rooms_no) + "_" + ag_name));
         formula_ptr f_pre_right = std::make_shared<not_formula>(in_room_n_ag);
 
-        out << "action " << right_name << ";\n";
         out << "executable " << right_name << " if ";
         ma_star_utils::print_formula(out, task.get_language(), f_pre_right);
         out << " ;" << std::endl;

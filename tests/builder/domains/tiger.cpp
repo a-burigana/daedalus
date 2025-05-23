@@ -280,6 +280,18 @@ void tiger::write_ma_star_problem(unsigned long doors_no, unsigned long tigers_n
     std::ofstream out = std::ofstream{path + name + ext};
 
     ma_star_utils::print_atoms(out, task);
+    out << "action ";
+
+    for (unsigned long door = 1; door <= doors_no; ++door) {
+        out << "listen_" + std::to_string(door) << ", ";
+        out << "open_" + std::to_string(door) << ", ";
+        out << "look_" + std::to_string(door) << ", ";
+        out << "save_" + std::to_string(door) << ", ";
+    }
+
+    out << "left" << ", ";
+    out << "right" << ";\n";
+
     ma_star_utils::print_agents(out, task);
 
     out << std::endl << std::endl;
@@ -298,7 +310,6 @@ void tiger::write_ma_star_problem(unsigned long doors_no, unsigned long tigers_n
         formula_deque fs = {knight_d, not_K_tiger_d};
         formula_ptr f_pre_listen = std::make_shared<and_formula>(fs);
 
-        out << "action " << listen_name << ";\n";
         out << "executable " << listen_name << " if ";
         ma_star_utils::print_formula(out, task.get_language(), f_pre_listen);
         out << " ;\n";
@@ -320,7 +331,6 @@ void tiger::write_ma_star_problem(unsigned long doors_no, unsigned long tigers_n
 
         formula_ptr f_pre_open = std::make_shared<and_formula>(formula_deque{knight_d, not_open_d, K_not_tiger_d});
 
-        out << "action " << open_name << ";\n";
         out << "executable " << open_name << " if ";
         ma_star_utils::print_formula(out, task.get_language(), f_pre_open);
         out << " ;\n";
@@ -338,7 +348,6 @@ void tiger::write_ma_star_problem(unsigned long doors_no, unsigned long tigers_n
         formula_deque fs2 = {knight_d, not_K_princess_d};
         formula_ptr f_pre_look = std::make_shared<and_formula>(fs2);
 
-        out << "action " << look_name << ";\n";
         out << "executable " << look_name << " if ";
         ma_star_utils::print_formula(out, task.get_language(), f_pre_look);
         out << " ;\n";
@@ -354,7 +363,6 @@ void tiger::write_ma_star_problem(unsigned long doors_no, unsigned long tigers_n
 
         formula_ptr f_pre_save = std::make_shared<and_formula>(formula_deque{knight_d, open_d, K_princess_d});
 
-        out << "action " << save_name << ";\n";
         out << "executable " << save_name << " if ";
         ma_star_utils::print_formula(out, task.get_language(), f_pre_save);
         out << " ;\n";
@@ -369,7 +377,6 @@ void tiger::write_ma_star_problem(unsigned long doors_no, unsigned long tigers_n
     formula_ptr knight_1 = std::make_shared<atom_formula>(task.get_language()->get_atom_id("knight_1"));
     formula_ptr f_pre_left = std::make_shared<not_formula>(knight_1);
 
-    out << "action " << left_name << ";\n";
     out << "executable " << left_name << " if ";
     ma_star_utils::print_formula(out, task.get_language(), f_pre_left);
     out << " ;" << std::endl;
@@ -390,7 +397,6 @@ void tiger::write_ma_star_problem(unsigned long doors_no, unsigned long tigers_n
     formula_ptr knight_n = std::make_shared<atom_formula>(task.get_language()->get_atom_id("knight_" + std::to_string(doors_no)));
     formula_ptr f_pre_right = std::make_shared<not_formula>(knight_n);
 
-    out << "action " << right_name << ";\n";
     out << "executable " << right_name << " if ";
     ma_star_utils::print_formula(out, task.get_language(), f_pre_right);
     out << " ;" << std::endl;

@@ -294,14 +294,27 @@ void grapevine::write_ma_star_problem(unsigned long agents_no, unsigned long sec
     std::ofstream out = std::ofstream{path + name + ext};
 
     ma_star_utils::print_atoms(out, task);
+    out << "action ";
+
+    for (unsigned long teller = 0; teller < secrets_no; ++teller)
+        out << "tell_" + std::to_string(teller) << ", ";
+
+    for (unsigned long ag = 0; ag < agents_no; ++ag) {
+        std::string ag_name = task.get_language()->get_agent_name(ag);
+        std::string left_name = "left_" + std::to_string(ag);
+        std::string right_name = "right_" + std::to_string(ag);
+
+        // left
+        out << "left_" << std::to_string(ag) << ", ";
+        out << "right_" << std::to_string(ag) << (ag+1 == agents_no ? ";\n" : ", ");
+    }
+
     ma_star_utils::print_agents(out, task);
-//    ma_star_utils::print_action_names(out, task);
 
     out << std::endl << std::endl;
 
     for (unsigned long teller = 0; teller < secrets_no; ++teller) {
         std::string act_name = "tell_" + std::to_string(teller);
-        out << "action " << act_name << ";\n";
 
         formula_ptr s_1 = std::make_shared<atom_formula>(teller);     // index of ag_1 is the same as index of s_1
         formula_deque fs;
@@ -350,7 +363,6 @@ void grapevine::write_ma_star_problem(unsigned long agents_no, unsigned long sec
         std::string right_name = "right_" + std::to_string(ag);
 
         // left
-        out << "action " << left_name << ";\n";
         formula_ptr in_room_1_ag = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_1_" + ag_name));
         formula_ptr not_in_room_1_ag = std::make_shared<not_formula>(in_room_1_ag);
 
@@ -367,7 +379,6 @@ void grapevine::write_ma_star_problem(unsigned long agents_no, unsigned long sec
 
         out << std::endl;
         // right
-        out << "action " << right_name << ";\n";
         out << "executable " << right_name << " if ";
         ma_star_utils::print_formula(out, task.get_language(), in_room_1_ag);
         out << " ;" << std::endl;

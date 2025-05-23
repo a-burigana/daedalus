@@ -323,7 +323,7 @@ void grapevine::write_ma_star_problem(unsigned long agents_no, unsigned long sec
             fs.push_back(std::make_shared<not_formula>(std::make_shared<box_formula>(ag, s_1)));
 
         formula_ptr some_agent_not_K_s_1 = std::make_shared<or_formula>(std::move(fs));
-        formula_deque fs_pre = {s_1, some_agent_not_K_s_1};
+        formula_deque fs_pre = {some_agent_not_K_s_1, s_1};
         formula_ptr f_pre = std::make_shared<and_formula>(fs_pre);
 
         out << "executable " << act_name << " if ";
@@ -407,7 +407,7 @@ void grapevine::write_ma_star_problem(unsigned long agents_no, unsigned long sec
         out
             << "initially C(" << all_agents << ", "
             << "( ( B( " << task.get_language()->get_agent_name(s) << " , "  << task.get_language()->get_atom_name(s) << " ) ) | "
-            << "( B( " << task.get_language()->get_agent_name(s) << " , -" << task.get_language()->get_atom_name(s) << " ) ) ) "
+            << "( B( " << task.get_language()->get_agent_name(s) << " , (-" << task.get_language()->get_atom_name(s) << ") ) ) ) "
             << ");\n";
     }
 

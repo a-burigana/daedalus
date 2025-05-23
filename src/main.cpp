@@ -145,9 +145,7 @@ void run(int argc, char *argv[]) {
         task = std::make_unique<search::planning_task>(tiger::build_task(std::stoul(parameters[0]), std::stoul(parameters[1]), l_storage));
 
     if (ma_star) {
-        if (domain == "active_muddy_children" or domain == "amc")
-            active_muddy_children::write_ma_star_problem(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage);
-        else if (domain == "collaboration_communication" or domain == "cc")
+        if (domain == "collaboration_communication" or domain == "cc")
             collaboration_communication::write_ma_star_problem(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), std::stoul(parameters[3]), l_storage);
         else if (domain == "gossip" or domain == "gos")
             gossip::write_ma_star_problem(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage);
@@ -156,7 +154,7 @@ void run(int argc, char *argv[]) {
         else if (domain == "selective_communication" or domain == "sc")
             selective_communication::write_ma_star_problem(std::stoul(parameters[0]), std::stoul(parameters[1]), std::stoul(parameters[2]), l_storage);
         else if (domain == "tiger" or domain == "tig")
-            ;
+            tiger::write_ma_star_problem(std::stoul(parameters[0]), std::stoul(parameters[1]), l_storage);
 
         return;
     }

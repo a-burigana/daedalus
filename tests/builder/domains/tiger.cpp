@@ -31,6 +31,9 @@
 #include "../../../include/del/formulas/propositional/true_formula.h"
 #include "../../../include/del/formulas/modal/box_formula.h"
 #include "../../../include/del/formulas/propositional/and_formula.h"
+#include "ma_star_utils.h"
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <string>
 
@@ -262,4 +265,179 @@ kripke::action tiger::build_save_princess(unsigned long doors_no, unsigned long 
     e_post[saved_princess] = std::make_shared<true_formula>();
 
     return action_builder::build_public_ontic("save_princess_" + std::to_string(door), language, f_pre, e_post);
+}
+
+void tiger::write_ma_star_problem(unsigned long doors_no, unsigned long tigers_no,
+                                  del::label_storage &l_storage) {
+    auto task = build_task(doors_no, tigers_no, l_storage);
+    std::string path = "../tests/builder/domains/ma_star/" + task.get_domain_name() + "/";
+    std::string name = task.get_domain_name() + "_" + task.get_problem_id();
+    std::string ext  = ".txt";
+
+    if (not std::filesystem::exists(path))
+        std::filesystem::create_directories(path);
+
+    std::ofstream out = std::ofstream{path + name + ext};
+
+    ma_star_utils::print_atoms(out, task);
+    ma_star_utils::print_agents(out, task);
+
+    out << std::endl << std::endl;
+    std::string ag_name = "knight";
+
+    for (unsigned long door = 1; door <= doors_no; ++door) {
+        // listen
+        std::string listen_name = "listen_" + std::to_string(door);
+
+        formula_ptr knight_d = std::make_shared<atom_formula>(task.get_language()->get_atom_id("knight_" + std::to_string(door)));
+        formula_ptr tiger_d  = std::make_shared<atom_formula>(task.get_language()->get_atom_id("tiger_"  + std::to_string(door)));
+
+        formula_ptr K_tiger_d     = std::make_shared<box_formula>(0, tiger_d);
+        formula_ptr not_K_tiger_d = std::make_shared<not_formula>(K_tiger_d);
+
+        formula_deque fs = {knight_d, not_K_tiger_d};
+        formula_ptr f_pre_listen = std::make_shared<and_formula>(fs);
+
+        out << "action " << listen_name << ";\n";
+        out << "executable " << listen_name << " if ";
+        ma_star_utils::print_formula(out, task.get_language(), f_pre_listen);
+        out << " ;\n";
+
+        out << listen_name << " determines ";
+        ma_star_utils::print_formula(out, task.get_language(), tiger_d);
+        out << " ;\n";
+
+        out << ag_name << " observes " << listen_name << ";\n\n";
+
+        // open
+        std::string open_name = "open_" + std::to_string(door);
+
+        formula_ptr open_d   = std::make_shared<atom_formula>(task.get_language()->get_atom_id("open_" + std::to_string(door)));
+
+        formula_ptr not_tiger_d = std::make_shared<not_formula>(tiger_d);
+        formula_ptr not_open_d  = std::make_shared<not_formula>(open_d);
+        formula_ptr K_not_tiger_d = std::make_shared<box_formula>(0, not_tiger_d);
+
+        formula_ptr f_pre_open = std::make_shared<and_formula>(formula_deque{knight_d, not_open_d, K_not_tiger_d});
+
+        out << "action " << open_name << ";\n";
+        out << "executable " << open_name << " if ";
+        ma_star_utils::print_formula(out, task.get_language(), f_pre_open);
+        out << " ;\n";
+        out << open_name << " causes open_" << door << " ;\n";
+        out << ag_name << " observes " << open_name << ";\n\n";
+
+        // look
+        std::string look_name = "look_" + std::to_string(door);
+
+        formula_ptr princess_d = std::make_shared<atom_formula>(task.get_language()->get_atom_id("princess_" + std::to_string(door)));
+
+        formula_ptr K_princess_d     = std::make_shared<box_formula>(0, princess_d);
+        formula_ptr not_K_princess_d = std::make_shared<not_formula>(K_princess_d);
+
+        formula_deque fs2 = {knight_d, not_K_princess_d};
+        formula_ptr f_pre_look = std::make_shared<and_formula>(fs2);
+
+        out << "action " << look_name << ";\n";
+        out << "executable " << look_name << " if ";
+        ma_star_utils::print_formula(out, task.get_language(), f_pre_look);
+        out << " ;\n";
+
+        out << look_name << " determines ";
+        ma_star_utils::print_formula(out, task.get_language(), princess_d);
+        out << " ;\n";
+
+        out << ag_name << " observes " << look_name << ";\n\n";
+
+        // save_princess
+        std::string save_name = "save_" + std::to_string(door);
+
+        formula_ptr f_pre_save = std::make_shared<and_formula>(formula_deque{knight_d, open_d, K_princess_d});
+
+        out << "action " << save_name << ";\n";
+        out << "executable " << save_name << " if ";
+        ma_star_utils::print_formula(out, task.get_language(), f_pre_save);
+        out << " ;\n";
+
+        out << save_name << " causes saved_princess;\n";
+        out << ag_name << " observes " << save_name << ";\n\n";
+    }
+
+    // left
+    std::string left_name = "left";
+
+    formula_ptr knight_1 = std::make_shared<atom_formula>(task.get_language()->get_atom_id("knight_1"));
+    formula_ptr f_pre_left = std::make_shared<not_formula>(knight_1);
+
+    out << "action " << left_name << ";\n";
+    out << "executable " << left_name << " if ";
+    ma_star_utils::print_formula(out, task.get_language(), f_pre_left);
+    out << " ;" << std::endl;
+
+    for (unsigned long r = 1; r < doors_no; ++r) {
+        std::string knight_from = "knight_" + std::to_string(r+1);
+        std::string knight_to   = "knight_" + std::to_string(r);
+
+        out << left_name << " causes -" << knight_from << " if " << knight_from << " ;\n";
+        out << left_name << " causes  " << knight_to   << " if " << knight_from << " ;\n";
+    }
+
+    out << ag_name << " observes " << left_name << ";\n\n";
+
+    // right
+    std::string right_name = "right";
+
+    formula_ptr knight_n = std::make_shared<atom_formula>(task.get_language()->get_atom_id("knight_" + std::to_string(doors_no)));
+    formula_ptr f_pre_right = std::make_shared<not_formula>(knight_n);
+
+    out << "action " << right_name << ";\n";
+    out << "executable " << right_name << " if ";
+    ma_star_utils::print_formula(out, task.get_language(), f_pre_right);
+    out << " ;" << std::endl;
+
+    for (unsigned long r = 1; r < doors_no; ++r) {
+        std::string knight_from = "knight_" + std::to_string(r);
+        std::string knight_to   = "knight_" + std::to_string(r+1);
+
+        out << right_name << " causes -" << knight_from << " if " << knight_from << " ;\n";
+        out << right_name << " causes  " << knight_to   << " if " << knight_from << " ;\n";
+    }
+
+    out << ag_name << " observes " << right_name << ";\n\n";
+
+    out << "\ninitially knight_1, ";
+
+    for (auto t = 1; t <= tigers_no; ++t)
+        out << "tiger_" << t << ", ";
+
+    out << "princess_" << doors_no << ";\n";
+    out << "initially C( [knight] , knight_1 );\n";
+
+    formula_deque fs;
+
+    for (auto r = 1; r <= doors_no; ++r) {
+        formula_deque fs2;
+
+        auto princess_r = std::make_shared<atom_formula>(task.get_language()->get_atom_id("princess_" + std::to_string(r)));
+        fs2.push_back(princess_r);
+
+        for (auto r2 = 1; r2 <= doors_no; ++r2) {
+            if (r != r2) {
+                auto princess_r2 = std::make_shared<atom_formula>(task.get_language()->get_atom_id("princess_" + std::to_string(r2)));
+                auto not_princess_r2 = std::make_shared<not_formula>(princess_r2);
+                fs2.push_back(not_princess_r2);
+            }
+        }
+        auto only_room_r_princess = std::make_shared<and_formula>(fs2);
+        fs.push_back(only_room_r_princess);
+    }
+
+    auto only_one_room_princess = std::make_shared<or_formula>(fs);
+    out << "initially C( [knight], ";
+    ma_star_utils::print_formula(out, task.get_language(), only_one_room_princess);
+    out << " );\n";
+
+    out << std::endl << "goal ";
+    ma_star_utils::print_formula(out, task.get_language(), task.get_goal());
+    out << ";" << std::endl;
 }

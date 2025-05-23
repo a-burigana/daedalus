@@ -253,7 +253,7 @@ void gossip::write_ma_star_problem(unsigned long agents_no, unsigned long secret
         out
             << "initially C(" << all_agents << ", "
             << "( ( B( " << task.get_language()->get_agent_name(s) << " , "  << task.get_language()->get_atom_name(s) << " ) ) | "
-            << "( B( " << task.get_language()->get_agent_name(s) << " , -" << task.get_language()->get_atom_name(s) << " ) ) ) "
+            << "( B( " << task.get_language()->get_agent_name(s) << " , (-" << task.get_language()->get_atom_name(s) << " ) ) ) ) "
             << ");\n";
     }
 

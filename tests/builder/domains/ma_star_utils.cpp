@@ -80,9 +80,14 @@ void ma_star_utils::print_atom_formula(std::ofstream &out, const del::language_p
 }
 
 void ma_star_utils::print_not_formula(std::ofstream &out, const del::language_ptr &lang, const del::not_formula &f) {
-    out << " ( - ( ";
+    if (f.get_f()->get_type() == del::formula_type::box_formula)
+        out << " ( ";
+
+    out << "-";
     print_formula(out, lang, f.get_f());
-    out << " ) ) ";
+
+    if (f.get_f()->get_type() == del::formula_type::box_formula)
+        out << " ) ";
 }
 
 void ma_star_utils::print_and_formula(std::ofstream &out, const del::language_ptr &lang, const del::and_formula &f) {
@@ -120,9 +125,9 @@ void ma_star_utils::print_imply_formula(std::ofstream &out, const del::language_
 }
 
 void ma_star_utils::print_box_formula(std::ofstream &out, const del::language_ptr &lang, const del::box_formula &f) {
-    out << " ( B( " << lang->get_agent_name(f.get_ag()) << " , ";
+    out << " B( " << lang->get_agent_name(f.get_ag()) << " , ";
     print_formula(out, lang, f.get_f());
-    out << " ) ) ";
+    out << " ) ";
 }
 
 void ma_star_utils::print_diamond_formula(std::ofstream &out, const del::language_ptr &lang, const del::diamond_formula &f) {

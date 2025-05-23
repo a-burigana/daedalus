@@ -533,22 +533,23 @@ void collaboration_communication::write_ma_star_problem(unsigned long agents_no,
 
         for (auto r = 1; r <= rooms_no; ++r)
             if (r != 2)
-                init += "-in_room_" + std::to_string(r) + "_" + task.get_language()->get_agent_name(ag) + ", ";
+                init += "-in_room_" + std::to_string(r) + "_" + task.get_language()->get_agent_name(ag)
+                        + (r == rooms_no and ag+1 == agents_no ? "" : ", ");
     }
 
-    init += "in_room_1_box_1, ";
+    out << init;
+    out << ", in_room_1_box_1, ";
+
     for (auto r = 3; r <= rooms_no; ++r)
-        init += "-in_room_" + std::to_string(r) + "_box_1, ";
+        out << "-in_room_" + std::to_string(r) + "_box_1, ";
 
     for (auto b = 2; b <= boxes_no; ++b)
         for (auto r = 1; r <= rooms_no; ++r)
             if (r != 2) {
                 std::string sign = (r == b+1 ? "" : "-");
-                init += sign + "in_room_" + std::to_string(r) + "_box_" + std::to_string(b) +
-                        (r == rooms_no and b == boxes_no ? "" : ", ");
+                out << sign + "in_room_" + std::to_string(r) + "_box_" + std::to_string(b) +
+                        (r == rooms_no and b == boxes_no ? ";\n" : ", ");
             }
-
-    out << init << ";\n";
 
     std::string all_agents = "[";
     for (auto ag = 0; ag < agents_no; ++ag)

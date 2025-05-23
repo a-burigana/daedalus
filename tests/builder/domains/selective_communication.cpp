@@ -369,7 +369,10 @@ selective_communication::write_ma_star_problem(unsigned long agents_no, unsigned
         for (unsigned long r = 1; r <= rooms_no; ++r) {
             std::string act_name = "tell_" + ag_name + "_" + std::to_string(r);
             formula_ptr q     = std::make_shared<atom_formula>(task.get_language()->get_atom_id("q"));
-            formula_ptr f_pre = std::make_shared<box_formula>(i, q);
+            formula_ptr B_i_q = std::make_shared<box_formula>(i, q);
+            formula_ptr in_r_i = std::make_shared<atom_formula>(task.get_language()->get_atom_id("in_room_" + std::to_string(r) + "_" + task.get_language()->get_agent_name(i)));
+
+            formula_ptr f_pre = std::make_shared<and_formula>(formula_deque{B_i_q, in_r_i});
 
             out << "executable " << act_name << " if ";
             ma_star_utils::print_formula(out, task.get_language(), f_pre);
@@ -486,11 +489,12 @@ selective_communication::write_ma_star_problem(unsigned long agents_no, unsigned
     std::string init;
 
     for (auto ag = 0; ag < agents_no; ++ag) {
-        init += "in_room_2_" + task.get_language()->get_agent_name(ag) + ", ";
+        init += "in_room_" + std::to_string(ag+1) + "_" + task.get_language()->get_agent_name(ag) + ", ";
 
         for (auto r = 1; r <= rooms_no; ++r)
-            if (r != 2)
-                init += "-in_room_" + std::to_string(r) + "_" + task.get_language()->get_agent_name(ag) + (r == rooms_no ? "" : ", ");
+            if (r != ag+1)
+                init += "-in_room_" + std::to_string(r) + "_" + task.get_language()->get_agent_name(ag)
+                        + (r == rooms_no and ag+1 == agents_no ? "" : ", ");
     }
 
     out << "q, " << init << ";\n";
